@@ -3,69 +3,66 @@ import { Link } from 'react-router-dom'
 
 function Login () {
     return (
-        <main className='flex min-h-screen bg-gradient-to-r from-cyan-500 to-blue-950'>
+        <main className='flex min-h-screen bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Left Side */}
-            <section className='flex w-1/2 flex-col justify-center px-20 text-white'>
-                <img
-                    src={logo}
-                    alt='Vault of Evidence Logo'
-                    className='mb-25 -mt-30 w-139.5'
-                />
+            <section className='flex w-4/7 flex-col justify-center gap-y-36 px-14 py-12 text-white'>
+                {/* Logo */}
+                <div>
+                    <img
+                        src={logo}
+                        alt='Vault of Evidence Logo'
+                        className='max-h-28'
+                    />
+                </div>
 
-                <h1 className='ml-6 mb-6 text-4xl font-semibold font-montserrat leading-tight'>
-                    Your Evidence,
-                    <br />
+                {/* Text */}
+                <div className= 'flex flex-1 flex-col px-6 '>
+                    <h1 className='mb-6 text-5xl font-semibold font-montserrat leading-tight'>
+                        Your Evidence, <br/> Protected and Organized.
+                    </h1>
 
-                    <span className='whitespace-nowrap'>
-                        Protected and Organized.
-                    </span>
-                </h1>
-
-                <p className='ml-6 max-w-lg text-2xl font-montserrat font-medium text-blue-100'>
-                    <span className='whitespace-nowrap'>
-                        Centralized storage for findings and
-                    </span>
-
-                    <br />
-                    investigation records.
-                </p>
+                    <p className='max-w-xl text-2xl font-montserrat font-medium text-white'>
+                        Centralized storage for findings and investigation records.
+                    </p>
+                </div>
             </section>
 
             {/* Right Side*/}
-            <section className='flex w-1/2 items-center justify-center'>
-                <div className='w-full max-w-md rounded-[40px] border border-white/20 bg-white/10 p-10 backdrop-blur-md'>
+            <section className='flex w-3/7 items-center justify-center px-20'>
+                <div className='flex flex-col gap-y-10 px-14 py-16 w-xl max-w-xl rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'>
+                    <div className='flex flex-col'>
+                        <h2 className='text-[2.5rem] font-montserrat font-bold text-white'>
+                            Welcome Back!
+                        </h2>
 
-                    <h2 className='mb-2 text-4xl font-montserrat font-bold text-white'>
-                        Welcome Back!
-                    </h2>
-
-                    <p className='mb-10 font-montserrat font-medium text-blue-100'>
-                        Continue where you left off.
-                    </p>
+                        <p className='font-montserrat font-medium text-white text-lg'>
+                            Continue where you left off.
+                        </p>
+                    </div>
 
                     {/* Email */}
-                    <div className='mb-5'>
-                        <label className='mb-2 block font-montserrat font-medium text-white'>
+                    <div className='flex flex-col gap-y-1 text-lg'>
+                        <label className='block font-montserrat font-medium text-white'>
                             Email address
                         </label>
 
                         <input
                             type='email'
-                            placeholder='youremail@gmail.com'
-                            className='w-full rounded-lg border border-cyan-300 bg-transparent px-4 py-3 text-white outline-none'/>
+                            placeholder='youremail@mail.com'
+                            className='w-full rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-4 py-3 text-white outline-none'/>
                     </div>
 
                     {/* Password */}
-                    <div className='mb-3'>
-                        <div className='mb-2 flex items-center justify-between'>
+                    <div className='flex flex-col gap-y-1 text-lg'>
+                        <div className='flex items-center justify-between'>
                             
-                            <label className='mb-2 block font-montserrat font-medium text-white'>
+                            <label className='font-montserrat font-medium text-white'>
                             Password
                             </label>
                             
                             <Link
                                 to='/ResetPassword'
-                                className='text-sm font-montserrat font-semibold text-white hover:text-cyan-200'
+                                className='font-montserrat font-semibold text-white hover:text-[#27D6FF]'
                             >
                                 Forgot Password?
                             </Link>
@@ -74,17 +71,17 @@ function Login () {
                         <input
                             type='password'
                             placeholder='******'
-                            className='w-full rounded-lg border border-cyan-300 bg-transparent px-4 py-3 text-white outline-none' 
+                            className='w-full rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-4 py-3 text-white outline-none' 
                         />
                     </div>
 
                     {/* Create Account */}
-                    <p className='mb-6 text-center font-montserrat font-medium text-white'>
+                    <p className='text-center text-lg font-montserrat font-medium text-white'>
                         Don't have account?{' '}
 
                         <Link
-                            to='/Signup'
-                            className='font-montserrat font-bold text-white hover:text-cyan-200'
+                            to='/SignUp'
+                            className='font-montserrat font-bold text-white hover:text-[#27D6FF]'
                         >
                             Create one
                         </Link>
@@ -93,7 +90,7 @@ function Login () {
                     {/* Sign-In Button*/}
                     <Link
                         to='/Dashboard'
-                        className='block w-full rounded-xl bg-cyan-400 py-3 text-center text-xl font-montserrat font-semibold text-white transition hover:bg-cyan-300'
+                        className='w-fit rounded-xl bg-[#41B0EC] mx-auto py-2 px-6 text-center text-xl font-montserrat font-semibold text-white hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC]'
                     >
                         Sign In
                     </Link>
