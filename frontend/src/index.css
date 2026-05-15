@@ -4,6 +4,7 @@
 
 @theme {
   --font-montserrat: "Montserrat", sans-serif;
+  --color-white: #F5F5F5;
 }
 
 /* Kalau mau custom css tailwind theme pakai format di bawah ini */
