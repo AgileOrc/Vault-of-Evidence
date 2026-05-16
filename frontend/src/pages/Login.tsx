@@ -5,23 +5,23 @@ function Login () {
     return (
         <main className='flex min-h-screen bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center gap-y-36 px-14 py-12 text-white'>
+            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 xl:gap-y-36 lg:px-8 lg:py-10 xl:px-14 xl:py-12 text-white'>
                 {/* Logo */}
                 <div>
                     <img
                         src={logo}
                         alt='Vault of Evidence Logo'
-                        className='max-h-28'
+                        className='lg:max-h-18 xl:max-h-28'
                     />
                 </div>
 
                 {/* Text */}
-                <div className= 'flex flex-1 flex-col px-6 '>
-                    <h1 className='mb-6 text-5xl font-semibold font-montserrat leading-tight'>
+                <div className= 'flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
+                    <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
                     </h1>
 
-                    <p className='max-w-xl text-2xl font-montserrat font-medium text-white'>
+                    <p className='max-w-xl lg:text-xl xl:text-2xl font-montserrat font-medium text-white'>
                         Centralized storage for findings and investigation records.
                     </p>
                 </div>
