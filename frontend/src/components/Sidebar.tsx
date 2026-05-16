@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldAlert, ListTodo, Home, FileText, Settings } from 'lucide-react';
+import { ShieldAlert, ListTodo, Home, FileText, Settings, Target } from 'lucide-react';
 
 function Sidebar() {
   const location = useLocation();
@@ -7,6 +7,7 @@ function Sidebar() {
 
   const navItems = [
     { name: 'Dashboard', path: '/Dashboard', icon: Home },
+    { name: 'Scopes', path: '/Scopes', icon: Target },
     { name: 'Worklist', path: '/Worklist', icon: ListTodo },
     { name: 'Findings', path: '/Findings', icon: ShieldAlert },
     { name: 'Reports', path: '/Reports', icon: FileText },

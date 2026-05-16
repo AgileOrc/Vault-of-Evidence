@@ -1,4 +1,4 @@
-import { Plus, MoreHorizontal, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Plus, MoreHorizontal, Clock, AlertCircle, CheckCircle2, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 function Worklist() {
@@ -51,6 +51,38 @@ function Worklist() {
       }
     } catch (error) {
       console.error('Failed to create task:', error);
+    }
+  };
+
+  const handleDeleteTask = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    try {
+      const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+    }
+  };
+
+  const handleUpdateStatus = async (task: any, newStatus: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/tasks/${task.ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...task,
+          status: newStatus
+        })
+      });
+      if (response.ok) {
+        fetchTasks();
+      }
+    } catch (error) {
+      console.error('Failed to update task:', error);
     }
   };
 
@@ -119,14 +151,25 @@ function Worklist() {
               <div className="flex-1 p-3 space-y-3 overflow-y-auto custom-scrollbar">
                 {loading && <div className="text-sm text-center text-gray-400 py-4">Loading tasks...</div>}
                 {column.items.map((task) => (
-                  <div key={task.ID} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-[var(--color-brand-light)] hover:shadow-md transition-all cursor-grab active:cursor-grabbing group">
+                  <div key={task.ID} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:border-[var(--color-brand-light)] hover:shadow-md transition-all group relative">
                     <div className="flex items-start justify-between mb-3">
                       <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-gray-100 text-gray-600">
                         Task
                       </span>
-                      <button className="text-gray-300 opacity-0 group-hover:opacity-100 hover:text-gray-600 transition-all cursor-pointer">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <select 
+                          className="text-xs border border-gray-200 rounded px-1 py-0.5 text-gray-600 bg-gray-50 cursor-pointer focus:outline-none focus:border-[var(--color-brand-light)]"
+                          value={task.status}
+                          onChange={(e) => handleUpdateStatus(task, e.target.value)}
+                        >
+                          <option value="To Do">To Do</option>
+                          <option value="In Progress">In Progress</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                        <button onClick={() => handleDeleteTask(task.ID)} className="text-gray-400 hover:text-red-500 transition-colors p-1 cursor-pointer">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                     
                     <h4 className="font-semibold text-gray-800 text-sm mb-3 leading-snug">

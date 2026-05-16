@@ -38,6 +38,13 @@ func main() {
 		// Tasks (Worklist) Routes
 		api.GET("/tasks", handler.GetTasks)
 		api.POST("/tasks", handler.CreateTask)
+		api.PUT("/tasks/:id", handler.UpdateTask)
+		api.DELETE("/tasks/:id", handler.DeleteTask)
+
+		// Scope Routes
+		api.GET("/scopes", handler.GetScopes)
+		api.POST("/scopes", handler.CreateScope)
+		api.DELETE("/scopes/:id", handler.DeleteScope)
 	}
 
 	// 5. Start Server

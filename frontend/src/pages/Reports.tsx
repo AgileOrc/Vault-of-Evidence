@@ -1,23 +1,91 @@
-import { FileText, Download, Calendar, Filter, MoreVertical, Plus } from 'lucide-react';
-
-const mockReports = [
-  { id: 'REP-001', name: 'Web App Pentest - Phase 1', date: 'Oct 15, 2026', scope: 'Core Platform', format: 'PDF', size: '2.4 MB' },
-  { id: 'REP-002', name: 'API Security Audit (v2)', date: 'Oct 10, 2026', scope: 'Backend APIs', format: 'PDF', size: '1.8 MB' },
-  { id: 'REP-003', name: 'External Infrastructure Scan', date: 'Sep 28, 2026', scope: 'External Subnets', format: 'CSV', size: '145 KB' },
-  { id: 'REP-004', name: 'Mobile App Assessment', date: 'Sep 15, 2026', scope: 'iOS & Android App', format: 'PDF', size: '3.1 MB' },
-];
+import { FileText, Download, Calendar, Filter, MoreVertical, Plus, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 
 function Reports() {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [reports, setReports] = useState<any[]>([
+    { id: 'REP-001', name: 'Web App Pentest - Phase 1', date: 'Oct 15, 2026', scope: 'Core Platform', format: 'PDF', size: '2.4 MB' }
+  ]);
+
+  const generateReport = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('http://localhost:8080/api/findings');
+      const findings = await response.json();
+
+      // Create a temporary hidden print layout
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) return;
+
+      const findingsHtml = findings.map((f: any) => `
+        <div style="margin-bottom: 2rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+          <h2 style="color: #002C49; margin-bottom: 0.5rem;">[${f.severity}] ${f.title} (CVSS: ${f.cvss})</h2>
+          <p><strong>Endpoints:</strong> ${f.endpoints}</p>
+          <p><strong>Description:</strong> ${f.description}</p>
+          <p><strong>Impact:</strong> ${f.impact}</p>
+          <p><strong>Remediation:</strong> ${f.remediation}</p>
+          <p><strong>Status:</strong> ${f.status}</p>
+        </div>
+      `).join('');
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Pentest Report</title>
+          <style>
+            body { font-family: 'Open Sans', Arial, sans-serif; color: #333; line-height: 1.6; padding: 2rem; }
+            h1 { color: #1767AA; border-bottom: 2px solid #27D6FF; padding-bottom: 1rem; }
+            .header { margin-bottom: 4rem; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Vault of Evidence - Security Assessment Report</h1>
+            <p>Generated on: ${new Date().toLocaleDateString()}</p>
+          </div>
+          <div>
+            ${findingsHtml || '<p>No findings available to report.</p>'}
+          </div>
+          <script>
+            window.onload = () => {
+              window.print();
+            }
+          </script>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+
+      // Mock saving to the table list
+      setReports(prev => [{
+        id: `REP-00${prev.length + 1}`,
+        name: `Automated Full Assessment`,
+        date: new Date().toLocaleDateString(),
+        scope: 'Global',
+        format: 'PDF (Print)',
+        size: '~100 KB'
+      }, ...prev]);
+
+    } catch (err) {
+      console.error('Failed to generate report:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="mb-6 flex justify-between items-center shrink-0">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Reports</h2>
-          <p className="text-gray-500 mt-1">Generate, view, and export penetesting engagement reports.</p>
+          <p className="text-gray-500 mt-1">Generate, view, and export pentesting engagement reports.</p>
         </div>
-        <button className="bg-[var(--color-brand-primary)] hover:bg-[var(--color-brand-dark)] text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer flex items-center gap-2">
+        <button onClick={generateReport} disabled={isGenerating} className="bg-[var(--color-brand-primary)] hover:bg-[var(--color-brand-dark)] text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50">
           <Plus className="w-5 h-5" />
-          Generate Report
+          {isGenerating ? 'Generating...' : 'Generate New Report'}
         </button>
       </div>
       
@@ -48,7 +116,7 @@ function Reports() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {mockReports.map((report) => (
+            {reports.map((report) => (
               <tr key={report.id} className="hover:bg-gray-50 transition-colors group">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -78,7 +146,7 @@ function Reports() {
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-2">
                     <button className="p-2 text-gray-500 hover:text-[var(--color-brand-primary)] hover:bg-blue-50 rounded-lg transition-colors cursor-pointer">
-                      <Download className="w-5 h-5" />
+                      <CheckCircle className="w-5 h-5" />
                     </button>
                     <button className="p-2 text-gray-400 hover:text-gray-700 rounded-lg transition-colors cursor-pointer">
                       <MoreVertical className="w-5 h-5" />
@@ -87,7 +155,7 @@ function Reports() {
                 </td>
               </tr>
             ))}
-            {mockReports.length === 0 && (
+            {reports.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                   No reports generated yet.

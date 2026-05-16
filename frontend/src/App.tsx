@@ -8,6 +8,7 @@ import ResetPassword from './pages/ResetPassword'
 import CreateFinding from './pages/CreateFinding'
 import Findings from './pages/Findings'
 import Worklist from './pages/Worklist'
+import Scopes from './pages/Scopes'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 
@@ -24,6 +25,7 @@ function App () {
         <Route path='/Findings' element={<Findings />} />
         <Route path='/Findings/New' element={<CreateFinding />} />
         <Route path='/Worklist' element={<Worklist />} />
+        <Route path='/Scopes' element={<Scopes />} />
         <Route path='/Reports' element={<Reports />} />
         <Route path='/Settings' element={<Settings />} />
       </Route>

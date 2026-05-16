@@ -36,3 +36,12 @@ type Task struct {
 	Status     string `json:"status"`   // To Do, In Progress, Completed
 	AssigneeID uint   `json:"assignee_id"`
 }
+
+// Scope represents a testing target (URL, IP, CIDR, etc.)
+type Scope struct {
+	gorm.Model
+	Name        string `json:"name"`
+	Target      string `json:"target"`
+	Type        string `json:"type"` // e.g., Web, CIDR, Mobile App
+	Description string `json:"description"`
+}
