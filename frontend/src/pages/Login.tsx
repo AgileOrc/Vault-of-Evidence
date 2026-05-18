@@ -1,7 +1,56 @@
+import { useState } from 'react';
 import logo from '../assets/logo-05.svg';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 
 function Login () {
+    const navigate = useNavigate();
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [errors, setErrors] = useState<{
+        email?: [],
+        password?: [],
+    }>({
+        email: [],
+        password: [],
+    });
+
+    {/* Email & Password Validation Using ZOD */}
+    const loginSchema = z.object({
+        email: z.string().email('Invalid Email Format').regex(
+            /^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must use @gmail.com'
+        ),
+
+        password: z.string().min(6, 'Password must have at least 6 characters').regex(
+            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'
+        ),
+    });
+
+    const handleLogin = () => {
+        const result = loginSchema.safeParse({
+            email,
+            password,
+        });
+
+        if (!result.success) {
+            const fielErrors = result.error.flatten().fieldErrors;
+            setErrors(fielErrors);
+            return;
+        }
+
+        setErrors({
+            email: [],
+            password: [],
+        });
+
+        setErrors({});
+        console.log('Login Success')
+
+        navigate('/Dashboard')
+    }
+
     return (
         <main className='flex min-h-screen items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Logo */}
@@ -49,7 +98,16 @@ function Login () {
                         <input
                             type='email'
                             placeholder='youremail@mail.com'
-                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'/>
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
+                        />
+
+                        {errors.email && (
+                            <p className='text-sm text-red-300'>
+                                {errors.email[0]}
+                            </p>
+                        )}
                     </div>
 
                     {/* Password */}
@@ -71,8 +129,16 @@ function Login () {
                         <input
                             type='password'
                             placeholder='******'
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none' 
                         />
+
+                        {errors.password && (
+                            <p className='text-sm text-red-300'>
+                                {errors.password[0]}
+                            </p>
+                        )}
                     </div>
 
                     {/* Create Account */}
@@ -88,12 +154,12 @@ function Login () {
                     </p>
 
                     {/* Sign-In Button*/}
-                    <Link
-                        to='/Dashboard'
+                    <button
+                        onClick={handleLogin}
                         className='w-fit lg:rounded-lg xl:rounded-xl bg-[#41B0EC] mx-auto lg:px-4 lg:py-1 xl:px-6 xl:py-2 text-center lg:text-md xl:text-xl font-montserrat font-semibold text-white hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC]'
                     >
                         Sign In
-                    </Link>
+                    </button>
                 </div>
             </section>
 
