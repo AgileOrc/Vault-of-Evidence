@@ -5,6 +5,17 @@
 @theme {
   --font-montserrat: "Montserrat", sans-serif;
   --color-white: #F5F5F5;
+  --color-brand-cyan: #27D6FF;
+  --color-brand-light: #20A6DA;
+  --color-brand-primary: #1767AA;
+  --color-brand-dark: #002C49;
+  --color-background-light: #F5F5F5;
+}
+
+body {
+  font-family: var(--font-montserrat);
+  background-color: var(--color-background-light);
+  color: #1a202c;
 }
 
 /* Kalau mau custom css tailwind theme pakai format di bawah ini */
