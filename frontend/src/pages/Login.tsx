@@ -64,29 +64,33 @@ function Login() {
     };
 
     return (
-        <main className='flex min-h-screen items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
-            {/* Logo */}
-            <div className='absolute w-md lg:top-10 lg:left-10 xl:top-12 xl:left-14'>
-                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-18 xl:max-h-28' />
-            </div>
-
+        <main className='flex min-h-screen items-start pt-20 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-8 xl:px-14 text-white'>
-                <div className='flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
+            <section className='flex w-4/7 flex-col justify-center lg:gap-y-18 lg:px-14 xl:px-20 text-white'>
+
+                {/* Logo */}
+                <div>
+                    <img 
+                        src={logo} 
+                        alt='Vault of Evidence Logo' 
+                        className='md:max-h-16 lg:max-h-22 xl:max-h-32' />
+                </div>
+            
+                <div className='flex flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
                     <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
                     </h1>
                     <p className='max-w-xl lg:text-xl xl:text-2xl font-montserrat font-medium text-white'>
-                        Centralized storage for findings and investigation records.
+                        Centralized storage for findings and <br/> investigation records.
                     </p>
                 </div>
             </section>
 
             {/* Right Side - Diperbaiki pembukaan dan penutupan tag Form */}
-            <section className='flex w-3/7 items-center lg:px-12 xl:px-20'>
+            <section className='flex w-3/7 items-center lg:px-14 xl:px-22'>
                 <form 
                     onSubmit={handleLoginSubmit} 
-                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex flex-col lg:gap-y-8 xl:gap-y-12 lg:px-12 lg:py-14 xl:px-16 xl:py-18 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
                 >
                     <div className='flex flex-col'>
                         <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
