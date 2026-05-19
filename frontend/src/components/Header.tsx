@@ -1,6 +1,16 @@
 import { Search, Bell } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 function Header() {
+  const [user, setUser] = useState({ name: '', role: '' })
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/me', {
+      credentials: 'include'
+    })
+      .then(res => res.json())
+      .then(data => setUser(data))
+  }, [])
   return (
     <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
       <div className="relative w-96">
@@ -22,8 +32,8 @@ function Header() {
             J
           </div>
           <div>
-            <p className="text-sm font-bold text-gray-800">Admin User</p>
-            <p className="text-xs text-gray-500">Security Analyst</p>
+            <p className="text-sm font-bold text-gray-800">{user.name || 'Admin User'}</p>
+            <p className="text-xs text-gray-500">{user.role || 'Security Analyst'}</p>
           </div>
         </div>
       </div>

@@ -1,15 +1,33 @@
+import addProjectIconLight from '../assets/folder-add-light.svg';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 function Dashboard() {
+  const [user, setUser] = useState({ name: '', role: '' })
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/me', {
+      credentials: 'include'
+    })
+      .then(res => res.json())
+      .then(data => setUser(data))
+  }, [])
+
   return (
     <>
-      <div className="mb-8 flex justify-between items-center">
+      <div className="mb-8 flex justify-between items-center text-[#002C49]">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Hello there, </h2>
-          <p className="text-gray-500 mt-1">Summary of current penetration testing projects.</p>
+          <h2 className="font-semibold xl:text-3xl border-2 border-red-800">Hello there, {user.name || 'Admin User'}</h2>
+          <p className="font-medium xl:text-xl border-2 border-red-800">Here's what's happening across your projects today.</p>
         </div>
-        <button className="bg-[#1767AA] hover:bg-[#002C49] text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer">
-          + New Testing Scope
+        <button className="bg-[#1767AA] hover:bg-[#002C49] text-white flex flex-col xl:text-lg px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer">
+          <div>
+            <img
+              src={addProjectIconLight}
+              className=''
+            />
+            <p>New Project</p>
+          </div>
         </button>
       </div>
 
