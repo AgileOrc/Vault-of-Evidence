@@ -11,7 +11,7 @@ function Settings() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Navigation Sidebar inside Settings */}
         <div className="md:col-span-1 space-y-1">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-[var(--color-brand-primary)] text-white font-medium cursor-pointer">
+          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-[#1767AA] text-white font-medium cursor-pointer">
             <User className="w-5 h-5" />
             Profile
           </button>

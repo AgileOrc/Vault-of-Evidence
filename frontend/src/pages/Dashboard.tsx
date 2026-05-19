@@ -5,10 +5,10 @@ function Dashboard() {
     <>
       <div className="mb-8 flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Engagement Overview</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Hello there, </h2>
           <p className="text-gray-500 mt-1">Summary of current penetration testing projects.</p>
         </div>
-        <button className="bg-[var(--color-brand-primary)] hover:bg-[var(--color-brand-dark)] text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer">
+        <button className="bg-[#1767AA] hover:bg-[#002C49] text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer">
           + New Testing Scope
         </button>
       </div>
@@ -18,7 +18,7 @@ function Dashboard() {
         {[
           { label: 'Critical Findings', value: '12', color: 'text-red-600', bg: 'bg-red-50' },
           { label: 'High Findings', value: '24', color: 'text-orange-500', bg: 'bg-orange-50' },
-          { label: 'Active Worklists', value: '8', color: 'text-[var(--color-brand-primary)]', bg: 'bg-blue-50' },
+          { label: 'Active Worklists', value: '8', color: 'text-[#1767AA]', bg: 'bg-blue-50' },
           { label: 'Total Endpoints Checked', value: '1,420', color: 'text-gray-700', bg: 'bg-gray-100' }
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm flex flex-col justify-between">
@@ -34,7 +34,7 @@ function Dashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm">
           <div className="p-6 border-b border-gray-100 flex justify-between items-center">
             <h3 className="font-bold text-lg text-gray-800">Recent Findings</h3>
-            <Link to="/Findings" className="text-[var(--color-brand-primary)] text-sm font-medium hover:underline">View All</Link>
+            <Link to="/Findings" className="text-[#1767AA] text-sm font-medium hover:underline">View All</Link>
           </div>
           <div className="p-0 overflow-x-auto">
             <table className="w-full text-left">
@@ -77,7 +77,7 @@ function Dashboard() {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-lg text-gray-800">In-Progress Worklists</h3>
-            <Link to="/Worklist" className="text-[var(--color-brand-primary)] text-sm font-medium hover:underline">View All</Link>
+            <Link to="/Worklist" className="text-[#1767AA] text-sm font-medium hover:underline">View All</Link>
           </div>
           <div className="space-y-4">
             {[
@@ -91,7 +91,7 @@ function Dashboard() {
                   <span className="text-xs text-gray-500 font-medium">Due {item.due}</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2 mb-2 mt-4">
-                  <div className="bg-[var(--color-brand-light)] h-2 rounded-full" style={{ width: `${item.progress}%` }}></div>
+                  <div className="bg-[#20A6DA] h-2 rounded-full" style={{ width: `${item.progress}%` }}></div>
                 </div>
                 <span className="text-xs text-gray-500">{item.progress}% Complete</span>
               </div>

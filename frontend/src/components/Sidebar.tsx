@@ -14,9 +14,9 @@ function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-[var(--color-brand-dark)] text-white hidden md:flex flex-col">
+    <aside className="w-64 bg-[#002C49] text-white hidden md:flex flex-col">
       <div className="p-6 flex items-center gap-3">
-        <ShieldAlert className="w-8 h-8 text-[var(--color-brand-cyan)]" />
+        <ShieldAlert className="w-8 h-8 text-[#27D6FF]" />
         <h1 className="text-xl font-bold font-montserrat">Vault of Evidence</h1>
       </div>
       
@@ -30,8 +30,8 @@ function Sidebar() {
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${
                 isActive 
-                  ? 'bg-[var(--color-brand-primary)] text-white' 
-                  : 'text-gray-300 hover:bg-[var(--color-brand-primary)] hover:text-white'
+                  ? 'bg-[#1767AA] text-white' 
+                  : 'text-gray-300 hover:bg-[#1767AA] hover:text-white'
               }`}
             >
               <Icon className="w-5 h-5" />
@@ -41,13 +41,13 @@ function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-[var(--color-brand-primary)]">
+      <div className="p-4 border-t border-[#1767AA]">
         <Link 
           to="/Settings" 
           className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${
             path.startsWith('/Settings') 
-              ? 'bg-[var(--color-brand-primary)] text-white' 
-              : 'text-gray-300 hover:bg-[var(--color-brand-primary)] hover:text-white'
+              ? 'bg-[#1767AA] text-white' 
+              : 'text-gray-300 hover:bg-[#1767AA] hover:text-white'
           }`}
         >
           <Settings className="w-5 h-5" />
