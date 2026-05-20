@@ -39,8 +39,8 @@ func NewPostgresConnection(cfg *config.Config) (*gorm.DB, error) {
 	return db, nil
 }
 
+// Ganti fungsi AutoMigrate yang lama dengan ini:
 func AutoMigrate(db *gorm.DB) error {
-	// pgcrypto untuk gen_random_uuid() sebagai default UUID primary key
 	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS pgcrypto").Error; err != nil {
 		return fmt.Errorf("pgcrypto: %w", err)
 	}
@@ -48,6 +48,8 @@ func AutoMigrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
 		&domain.User{},
 		&domain.Project{},
+		&domain.ProjectMember{},     // NEW
+		&domain.PasswordResetToken{}, // NEW
 		&domain.Finding{},
 		&domain.Evidence{},
 	); err != nil {

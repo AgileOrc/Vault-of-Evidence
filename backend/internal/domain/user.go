@@ -43,6 +43,12 @@ type ChangePasswordRequest struct {
 	NewPassword     string `json:"new_password"     binding:"required,min=12,max=128"`
 }
 
+// UpdateRoleRequest dipakai admin untuk promote/demote user.
+// Role tidak boleh di-set oleh user sendiri — hanya admin via endpoint khusus.
+type UpdateRoleRequest struct {
+	Role UserRole `json:"role" binding:"required,oneof=admin pentester client"`
+}
+
 // ── Response DTO ──────────────────────────────────────────────────────────────
 
 type UserResponse struct {
