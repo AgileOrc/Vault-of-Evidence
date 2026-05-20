@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/middleware"
+	"vault-of-evidence/backend/internal/pkg/pagination"
 )
 
 type Handler struct{ service Service }
@@ -22,12 +23,15 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
-	projects, err := h.service.GetAll()
+	params := pagination.ParseFromContext(c)
+
+	projects, total, err := h.service.GetAll(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch projects"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": projects})
+
+	c.JSON(http.StatusOK, pagination.NewResponse(projects, params, total))
 }
 
 func (h *Handler) Create(c *gin.Context) {

@@ -6,13 +6,14 @@ import (
 
 	"github.com/google/uuid"
 	"vault-of-evidence/backend/internal/domain"
+	"vault-of-evidence/backend/internal/pkg/pagination"
 )
 
 var ErrNotFound = errors.New("finding not found")
 
 type Service interface {
 	Create(projectID string, req *domain.CreateFindingRequest) (*domain.Finding, error)
-	GetByProject(projectID string) ([]domain.Finding, error)
+	GetByProject(projectID string, params pagination.Params) ([]domain.Finding, int64, error)
 	GetByID(id string) (*domain.Finding, error)
 	Update(id string, req *domain.UpdateFindingRequest) (*domain.Finding, error)
 	Delete(id string) error
@@ -44,8 +45,8 @@ func (s *service) Create(projectID string, req *domain.CreateFindingRequest) (*d
 	return f, nil
 }
 
-func (s *service) GetByProject(projectID string) ([]domain.Finding, error) {
-	return s.repo.FindByProjectID(projectID)
+func (s *service) GetByProject(projectID string, params pagination.Params) ([]domain.Finding, int64, error) {
+	return s.repo.FindByProjectID(projectID, params)
 }
 
 func (s *service) GetByID(id string) (*domain.Finding, error) {
