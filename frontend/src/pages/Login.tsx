@@ -64,12 +64,12 @@ function Login() {
     return (
         <main className='flex min-h-screen items-center bg-gradient-to-br from-[#27D6FF] to-[#1767AA]'>
             {/* Logo */}
-            <div className='absolute w-md lg:top-10 lg:left-10 xl:top-12 xl:left-14'>
-                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-18 xl:max-h-28' />
+            <div className='absolute w-64 lg:top-10 lg:left-10 xl:top-12 xl:left-14'>
+                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-20 xl:max-h-28' />
             </div>
 
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-8 xl:px-14 text-[#F5F5F5]'>
+            <section className='flex w-[57%] flex-col justify-center lg:gap-y-40 lg:px-8 xl:px-14 text-[#F5F5F5]'>
                 <div className='flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
                     <h1 className='lg:text-4xl xl:text-5xl font-semibold leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
@@ -81,10 +81,10 @@ function Login() {
             </section>
 
             {/* Right Side */}
-            <section className='flex w-3/7 items-center lg:px-14 xl:px-20'>
+            <section className='flex w-[43%] items-center lg:px-14 xl:px-20'>
                 <form 
                     onSubmit={handleLoginSubmit} 
-                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-[#F5F5F5]/40 bg-[#1767AA]/30 shadow-lg shadow-[#002C49]/20 backdrop-blur-md'
+                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-full max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-[#F5F5F5]/40 bg-[#1767AA]/30 shadow-lg shadow-[#002C49]/20 backdrop-blur-md'
                 >
                     <div className='flex flex-col'>
                         <h2 className='lg:text-3xl xl:text-[2.5rem] font-bold text-[#F5F5F5]'>
@@ -150,7 +150,7 @@ function Login() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#20A6DA] mx-auto lg:px-4 lg:py-1 xl:px-6 xl:py-2 text-center lg:text-md xl:text-xl font-semibold text-[#F5F5F5] transition-all hover:bg-[#27D6FF] hover:text-[#002C49] hover:border hover:border-[#27D6FF] ${
+                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#20A6DA] mx-auto lg:px-4 lg:py-1 xl:px-6 xl:py-2 text-center lg:text-base xl:text-xl font-semibold text-[#F5F5F5] transition-all hover:bg-[#27D6FF] hover:text-[#002C49] hover:border hover:border-[#27D6FF] ${
                             isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                     >
