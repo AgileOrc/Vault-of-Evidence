@@ -4,6 +4,5 @@
 
 body {
   font-family: "Montserrat", sans-serif;
-  background-color: #F5F5F5;
-  color: #1a202c;
+  --color-white: #F5F5F5;
 }
