@@ -30,8 +30,7 @@ function Signup() {
             .min(3, 'Username must be at least 3 characters')
             .regex(/^[a-zA-Z0-9]+$/, 'Username must be alphanumeric (no spaces or symbols)'), // Mencegah error 400 dari backend Gin
         email: z.string()
-            .email('Invalid Email Format')
-            .regex(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must use @gmail.com'),
+            .email('Invalid Email Format'),
         password: z.string()
             .min(6, 'Password must have at least 6 characters')
             .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'),

@@ -18,9 +18,7 @@ function ResetPassword () {
 
     const resetPasswordSchema = z.object({
         email: z.string()
-            .email('Invalid Email Format')
-            .regex(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must use @gmail.com'
-        ),
+            .email('Invalid Email Format'),
     });
 
     const handleResetPasswordSubmit = async (e: React.FormEvent) => {
@@ -89,7 +87,7 @@ function ResetPassword () {
                         <label className='font-montserrat font-medium text-white'>Email address</label>
                         <input
                             type='email'
-                            placeholder='youremail@gmail.com'
+                            placeholder='youremail@mail.com'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
