@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import logo from '../assets/logo-05.svg';
+import logo from '../assets/logo-01.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../api/axios';

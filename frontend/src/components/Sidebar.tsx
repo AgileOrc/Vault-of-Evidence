@@ -1,6 +1,6 @@
 import { Bell, Calculator, FolderKanban, LayoutDashboard, Settings, User } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
-import logo from '../assets/logo-05.svg'
+import logo from '../assets/logo-01.svg'
 
 type SidebarProps = {
   isDark: boolean
@@ -17,7 +17,7 @@ function Sidebar ({
   onOpenSettings,
   onOpenNotifications
 }: SidebarProps) {
-  const navItemBase = `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition ${
+  const navItemBase = `flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold transition ${
     isCollapsed ? 'justify-center' : ''
   }`
 
@@ -29,16 +29,16 @@ function Sidebar ({
 
   return (
     <aside
-      className={`flex min-h-screen flex-col bg-[#1767AA] px-4 py-6 text-[#F5F5F5] transition-all ${
+      className={`sticky top-0 flex flex-col h-screen ${isDark ? 'bg-[#1767AA]' : 'bg-gradient-to-b from-[#0E5998] to-[#0EB8DF]'} px-3 py-6 md:px-4 text-[#F5F5F5] transition-all ${
         isCollapsed ? 'w-[88px]' : 'w-[260px]'
       }`}
     >
       <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-        <img src={logo} alt='Vault of Evidence logo' className='h-10 w-10' />
+        <img src={logo} alt='Vault of Evidence Logo' className='h-10 w-10' />
         {!isCollapsed && (
           <div>
             <p className='text-sm font-semibold uppercase'>Vault of Evidence</p>
-            <p className='text-[10px] tracking-wider'>Where findings live.</p>
+            <p className='text-[10px] tracking-wider uppercase'>Where findings live.</p>
           </div>
         )}
       </div>
