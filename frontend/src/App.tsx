@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-import SignUp from './pages/SignUp'
+import SignUp from './pages/Signup'
 import ResetPassword from './pages/ResetPassword'
 
 function App () {
