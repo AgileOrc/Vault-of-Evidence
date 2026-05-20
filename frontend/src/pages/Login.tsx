@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import logo from '../assets/logo-05.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import api from '../api/axios'; // WAJIB DIKEMBALIKAN: Import koneksi backend
+import api from '../api/axios'; 
 
 function Login() {
     const navigate = useNavigate();
@@ -23,9 +23,7 @@ function Login() {
 
     // Skema Validasi ZOD
     const loginSchema = z.object({
-        email: z.string().email('Invalid Email Format').regex(
-            /^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must use @gmail.com'
-        ),
+        email: z.string().email('Invalid Email Format'),
         password: z.string().min(6, 'Password must have at least 6 characters').regex(
             /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'
         ),
@@ -64,29 +62,33 @@ function Login() {
     };
 
     return (
-        <main className='flex min-h-screen items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
-            {/* Logo */}
-            <div className='absolute w-md lg:top-10 lg:left-10 xl:top-12 xl:left-14'>
-                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-18 xl:max-h-28' />
-            </div>
-
+        <main className='flex min-h-screen items-start pt-20 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-8 xl:px-14 text-white'>
-                <div className='flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
+            <section className='flex w-4/7 flex-col justify-center lg:gap-y-18 lg:px-14 xl:px-20 text-white'>
+
+                {/* Logo */}
+                <div>
+                    <img 
+                        src={logo} 
+                        alt='Vault of Evidence Logo' 
+                        className='md:max-h-16 lg:max-h-22 xl:max-h-32' />
+                </div>
+            
+                <div className='flex flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
                     <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
                     </h1>
                     <p className='max-w-xl lg:text-xl xl:text-2xl font-montserrat font-medium text-white'>
-                        Centralized storage for findings and investigation records.
+                        Centralized storage for findings and <br/> investigation records.
                     </p>
                 </div>
             </section>
 
             {/* Right Side - Diperbaiki pembukaan dan penutupan tag Form */}
-            <section className='flex w-3/7 items-center lg:px-12 xl:px-20'>
+            <section className='flex w-3/7 items-center lg:px-14 xl:px-22'>
                 <form 
                     onSubmit={handleLoginSubmit} 
-                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex flex-col lg:gap-y-8 xl:gap-y-12 lg:px-12 lg:py-14 xl:px-16 xl:py-18 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
                 >
                     <div className='flex flex-col'>
                         <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
@@ -109,7 +111,7 @@ function Login() {
                         <label className='font-montserrat font-medium text-white'>Email address</label>
                         <input
                             type='email'
-                            placeholder='youremail@gmail.com'
+                            placeholder='youremail@mail.com'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'

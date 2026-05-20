@@ -30,8 +30,7 @@ function Signup() {
             .min(3, 'Username must be at least 3 characters')
             .regex(/^[a-zA-Z0-9]+$/, 'Username must be alphanumeric (no spaces or symbols)'), // Mencegah error 400 dari backend Gin
         email: z.string()
-            .email('Invalid Email Format')
-            .regex(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must use @gmail.com'),
+            .email('Invalid Email Format'),
         password: z.string()
             .min(12, 'Password must have at least 12 characters')
             .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'),
@@ -85,12 +84,12 @@ function Signup() {
     return (
         <main className='flex min-h-screen items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Logo */}
-            <div className='absolute w-md lg:top-10 lg:left-10 xl:top-12 xl:left-14'>
-                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-18 xl:max-h-28' />
+            <div className='mt-2 absolute w-md lg:top-10 lg:left-14 xl:top-16 xl:left-14'>
+                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-22 xl:max-h-32' />
             </div>
 
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-8 xl:px-14 text-white'>
+            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-12 xl:px-18 text-white'>
                 <div className= 'flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
                     <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
@@ -102,10 +101,10 @@ function Signup() {
             </section>
 
             {/* Right Side - Diubah dari div menjadi tag <form> */}
-            <section className='flex w-3/7 items-center lg:px-12 xl:px-20'>
+            <section className='flex w-3/7 items-center lg:px-12 xl:px-18'>
                 <form 
                     onSubmit={handleSignupSubmit}
-                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex flex-col lg:gap-y-4 xl:gap-y-8 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
                 >
                     <div className='flex flex-col'>
                         <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
