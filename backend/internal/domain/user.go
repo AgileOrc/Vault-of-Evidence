@@ -62,3 +62,9 @@ func (u *User) ToResponse() UserResponse {
 		CreatedAt: u.CreatedAt,
 	}
 }
+
+// ── Admin Request DTOs ────────────────────────────────────────────────────────
+
+type UpdateUserRoleRequest struct {
+	Role UserRole `json:"role" binding:"required,oneof=admin pentester client"`
+}

@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/time/rate"
 
+	"vault-of-evidence/backend/internal/admin"
 	"vault-of-evidence/backend/internal/auth"
 	"vault-of-evidence/backend/internal/config"
 	"vault-of-evidence/backend/internal/database"
@@ -57,6 +58,8 @@ func main() {
 	evidenceRepo := evidence.NewRepository(db)
 	evidenceSvc := evidence.NewService(evidenceRepo)
 	evidenceHandler := evidence.NewHandler(evidenceSvc, cfg.EvidenceStoragePath, cfg.MaxUploadSizeMB)
+
+	adminHandler := admin.NewAdminHandler(db)
 
 	authLimiter := middleware.NewRateLimiter(rate.Every(20*time.Second), 3)
 
@@ -137,6 +140,14 @@ func main() {
 		}
 	}
 
+	adminRoutes := api.Group("/admin")
+	adminRoutes.Use(authMw) // Syarat 1: Harus Login
+	adminRoutes.Use(middleware.RequireRole(domain.RoleAdmin)) // Syarat 2: Wajib Admin
+	{
+		adminRoutes.GET("/users", adminHandler.GetAllUsers)
+		adminRoutes.PUT("/users/:id/role", adminHandler.UpdateUserRole)
+	}
+	
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
 	log.Printf("[SERVER] Listening on %s (mode: %s)", addr, cfg.GinMode)
 	if err := router.Run(addr); err != nil {
