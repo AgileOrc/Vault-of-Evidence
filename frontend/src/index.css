@@ -2,15 +2,8 @@
 
 @import "tailwindcss";
 
-@theme {
-  --font-montserrat: "Montserrat", sans-serif;
-  --color-white: #F5F5F5;
+body {
+  font-family: "Montserrat", sans-serif;
+  background-color: #F5F5F5;
+  color: #1a202c;
 }
-
-/* Kalau mau custom css tailwind theme pakai format di bawah ini */
-/*
-@theme {
-  --color-brand: #6366f1;
-  --font-display: "Inter", sans-serif;
-}
-  */

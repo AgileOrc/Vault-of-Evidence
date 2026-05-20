@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import logo from '../assets/logo-05.svg';
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
-import api from '../api/axios'; 
+import api from '../api/axios';
+import { Info } from 'lucide-react';
 
 function EmailSent () {
     const location = useLocation();
@@ -30,71 +31,55 @@ function EmailSent () {
     };
 
     return (
-        <main className='flex min-h-screen justify-center items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
-            <div className='flex flex-col items-center lg:gap-y-6 xl:gap-y-8'>
-                {/* Logo */}
+        <main className='flex min-h-screen items-center justify-center bg-gradient-to-br from-[#27D6FF] to-[#1767AA] px-6'>
+            <div className='flex flex-col items-center gap-6'>
                 <div>
                     <img
                         src={logo}
                         alt='Vault of Evidence Logo'
-                        className='h-22 lg:h-22 xl:h-34' />
+                        className='h-16 lg:h-20 xl:h-24'
+                    />
                 </div>
 
-                {/* Email Sent (the box) */}
-                <div className='flex flex-col lg:gap-y-8 xl:gap-y-12 lg:px-12 lg:py-12 xl:px-12 xl:py-16 w-[85%] max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'>
-                    
-                    <div className='flex flex-col items-center text-center gap-y-1'>
-                        <h2 className='lg:text-4xl xl:text-[3.5rem] font-montserrat font-bold text-white'>
-                            Email sent
-                        </h2>
+                <div className='flex w-full max-w-xl flex-col gap-6 rounded-[36px] border border-[#F5F5F5]/40 bg-[#1767AA]/30 px-10 py-12 text-[#F5F5F5] shadow-lg shadow-[#002C49]/20 backdrop-blur-md'>
+                    <div className='flex flex-col items-center text-center gap-y-2'>
+                        <h2 className='text-3xl font-semibold'>Email sent</h2>
 
-                        <p className='font-montserrat font-normal text-white lg:text-sm xl:text-lg'>
+                        <p className='text-sm opacity-90'>
                             Please check your email, we sent a reset link to{' '}
-                            <span className='font-semibold'>
-                                {email}
-                            </span>
+                            <span className='font-semibold'>{email}</span>
                         </p>
                     </div>
 
-                    {/* Info */}
-                    <div className='flex justify-center w-full'>
-
-                        <div className='flex items-center justify-center gap-x-3 text-white max-w-lg'>
-                            {/* Icon */}
-                            <div className='flex items-center justify-center min-w-10 h-10 rounded-full border-3 border-white text-2xl'>
-                                i
-                            </div>
-
-                            <p className='font-montserrat lg:text-lg xl:text-2xl max-w-md leading-relaxed'>
-                                Link expires in 15 minutes. Check your spam folder if you don't see it
-                            </p>
-                        </div>
+                    <div className='flex items-center gap-3 rounded-xl border border-[#F5F5F5]/30 bg-[#002C49]/30 px-4 py-3 text-sm'>
+                        <Info className='h-5 w-5' />
+                        <p>
+                            Link expires in 15 minutes. Check your spam folder if you do not see it.
+                        </p>
                     </div>
 
-                    {/* Error Box */}
                     {serverError && (
-                        <div className='bg-red-500/20 border border-red-500 text-red-200 px-4 py-2 rounded-lg font-montserrat text-sm text-center'>
+                        <div className='rounded-lg border border-[#27D6FF]/40 bg-[#002C49]/40 px-4 py-2 text-sm text-[#F5F5F5]'>
                             {serverError}
                         </div>
                     )}
 
-                    {/* Resend Button */}
                     <button
                         type='button'
                         onClick={handleResendLink}
                         disabled={isLoading}
-                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#41B0EC] mx-auto lg:px-8 lg:py-2 xl:px-10 xl:py-3 text-center lg:text-lg xl:text-xl font-montserrat font-bold text-white transition-all hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC] ${
+                        className={`mx-auto w-fit rounded-lg bg-[#20A6DA] px-8 py-2 text-sm font-semibold text-[#F5F5F5] transition-all hover:bg-[#27D6FF] hover:text-[#002C49] hover:border hover:border-[#27D6FF] ${
                             isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                     >
-                        {isLoading ? 'Checking...' : '↻ Resend Link' }
+                        {isLoading ? 'Checking...' : 'Resend Link' }
                     </button>
 
-                    <p className='-mt-3 text-center lg:text-sm xl:text-lg font-montserrat font-medium text-white'>
+                    <p className='text-center text-sm'>
                         &lt; Go back to{' '}
-                        <Link 
+                        <Link
                             to='/'
-                            className='font-montserrat font-bold text-white hover:text-[#27D6FF]'
+                            className='font-semibold text-[#F5F5F5] hover:text-[#27D6FF]'
                         >
                             Sign In
                         </Link>

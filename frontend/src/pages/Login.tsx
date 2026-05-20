@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import logo from '../assets/logo-05.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -51,7 +51,7 @@ function Login() {
 
             if (response.status === 200) {
                 // Jika sukses, baru arahkan ke Dashboard
-                navigate('/Dashboard');
+                navigate('/dashboard');
             }
         } catch (err: any) {
             // Tangkap penolakan dari server (misal password salah)
@@ -62,71 +62,67 @@ function Login() {
     };
 
     return (
-        <main className='flex min-h-screen items-start pt-20 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
-            {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-18 lg:px-14 xl:px-20 text-white'>
+        <main className='flex min-h-screen items-center bg-gradient-to-br from-[#27D6FF] to-[#1767AA]'>
+            {/* Logo */}
+            <div className='absolute w-md lg:top-10 lg:left-10 xl:top-12 xl:left-14'>
+                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-18 xl:max-h-28' />
+            </div>
 
-                {/* Logo */}
-                <div>
-                    <img 
-                        src={logo} 
-                        alt='Vault of Evidence Logo' 
-                        className='md:max-h-16 lg:max-h-22 xl:max-h-32' />
-                </div>
-            
-                <div className='flex flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
-                    <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
+            {/* Left Side */}
+            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-8 xl:px-14 text-[#F5F5F5]'>
+                <div className='flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
+                    <h1 className='lg:text-4xl xl:text-5xl font-semibold leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
                     </h1>
-                    <p className='max-w-xl lg:text-xl xl:text-2xl font-montserrat font-medium text-white'>
-                        Centralized storage for findings and <br/> investigation records.
+                    <p className='max-w-xl lg:text-xl xl:text-2xl font-medium text-[#F5F5F5]'>
+                        Centralized storage for findings and investigation records.
                     </p>
                 </div>
             </section>
 
-            {/* Right Side - Diperbaiki pembukaan dan penutupan tag Form */}
-            <section className='flex w-3/7 items-center lg:px-14 xl:px-22'>
+            {/* Right Side */}
+            <section className='flex w-3/7 items-center lg:px-14 xl:px-20'>
                 <form 
                     onSubmit={handleLoginSubmit} 
-                    className='flex flex-col lg:gap-y-8 xl:gap-y-12 lg:px-12 lg:py-14 xl:px-16 xl:py-18 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-[#F5F5F5]/40 bg-[#1767AA]/30 shadow-lg shadow-[#002C49]/20 backdrop-blur-md'
                 >
                     <div className='flex flex-col'>
-                        <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
+                        <h2 className='lg:text-3xl xl:text-[2.5rem] font-bold text-[#F5F5F5]'>
                             Welcome Back!
                         </h2>
-                        <p className='font-montserrat font-medium text-white lg:text-sm xl:text-lg'>
+                        <p className='font-medium text-[#F5F5F5] lg:text-sm xl:text-lg'>
                             Continue where you left off.
                         </p>
                     </div>
                     
                     {/* Kotak Error Backend (Warna Merah) */}
                     {serverError && (
-                        <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-2 rounded-lg font-montserrat text-sm">
+                        <div className="bg-[#002C49]/40 border border-[#27D6FF]/40 text-[#F5F5F5] px-4 py-2 rounded-lg text-sm">
                              {serverError}
                         </div>
                     )}
 
                     {/* Email Input */}
                     <div className='flex flex-col gap-y-1 lg:text-sm xl:text-lg'>
-                        <label className='font-montserrat font-medium text-white'>Email address</label>
+                        <label className='font-medium text-[#F5F5F5]'>Email address</label>
                         <input
                             type='email'
                             placeholder='youremail@mail.com'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
+                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-[#F5F5F5] outline-none'
                         />
                         {/* Teks Error Zod (Tepat di bawah input) */}
                         {errors.email && (
-                            <p className='text-sm text-red-300'>{errors.email[0]}</p>
+                            <p className='text-sm text-[#27D6FF]'>{errors.email[0]}</p>
                         )}
                     </div>
 
                     {/* Password Input */}
                     <div className='flex flex-col gap-y-1 lg:text-sm xl:text-lg'>
                         <div className='flex items-center justify-between'>
-                            <label className='font-montserrat font-medium text-white'>Password</label>
-                            <Link to='/ResetPassword' className='font-montserrat font-semibold text-white hover:text-[#27D6FF]'>
+                            <label className='font-medium text-[#F5F5F5]'>Password</label>
+                            <Link to='/reset-password' className='font-semibold text-[#F5F5F5] hover:text-[#27D6FF]'>
                                 Forgot Password?
                             </Link>
                         </div>
@@ -135,17 +131,17 @@ function Login() {
                             placeholder='******'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none' 
+                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-[#F5F5F5] outline-none' 
                         />
                         {/* Teks Error Zod */}
                         {errors.password && (
-                            <p className='text-sm text-red-300'>{errors.password[0]}</p>
+                            <p className='text-sm text-[#27D6FF]'>{errors.password[0]}</p>
                         )}
                     </div>
 
-                    <p className='text-center lg:text-sm xl:text-lg font-montserrat font-medium text-white'>
+                    <p className='text-center lg:text-sm xl:text-lg font-medium text-[#F5F5F5]'>
                         Don't have account?{' '}
-                        <Link to='/SignUp' className='font-montserrat font-bold text-white hover:text-[#27D6FF]'>
+                        <Link to='/signup' className='font-bold text-[#F5F5F5] hover:text-[#27D6FF]'>
                             Create one
                         </Link>
                     </p>
@@ -154,7 +150,7 @@ function Login() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#41B0EC] mx-auto lg:px-4 lg:py-1 xl:px-6 xl:py-2 text-center lg:text-md xl:text-xl font-montserrat font-semibold text-white transition-all hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC] ${
+                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#20A6DA] mx-auto lg:px-4 lg:py-1 xl:px-6 xl:py-2 text-center lg:text-md xl:text-xl font-semibold text-[#F5F5F5] transition-all hover:bg-[#27D6FF] hover:text-[#002C49] hover:border hover:border-[#27D6FF] ${
                             isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                     >

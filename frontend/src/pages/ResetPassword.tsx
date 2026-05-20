@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import logo from '../assets/logo-05.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import api from '../api/axios'; 
+import api from '../api/axios';
 
 function ResetPassword () {
     const navigate = useNavigate();
@@ -34,14 +34,12 @@ function ResetPassword () {
 
         setIsLoading(true);
         try {
-            
             const response = await api.post('/auth/resetPassword', { email });
 
             if (response.status === 201 || response.status === 200) {
-                alert('New password created successfully! Please sign in using your new password.');
-                navigate('/EmailSent', {
-                    state: {email}
-                }); 
+                navigate('/email-sent', {
+                    state: { email }
+                });
             }
         } catch (err: any) {
             setServerError(err.response?.data?.error || 'Failed to reset password. Please try again.');
@@ -51,69 +49,63 @@ function ResetPassword () {
     };
 
     return (
-        <main className='flex min-h-screen justify-center items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
-            <div className='flex flex-col items-center lg:gap-y-6 xl:gap-y-8'>
-                {/* Logo */}
+        <main className='flex min-h-screen items-center justify-center bg-gradient-to-br from-[#27D6FF] to-[#1767AA] px-6'>
+            <div className='flex flex-col items-center gap-6'>
                 <div>
                     <img
                         src={logo}
                         alt='Vault of Evidence Logo'
-                        className='h-22 lg:h-22 xl:h-34' />
+                        className='h-16 lg:h-20 xl:h-24'
+                    />
                 </div>
 
                 <form
                     onSubmit={handleResetPasswordSubmit}
-                    className='flex flex-col lg:gap-y-6 xl:gap-y-10 lg:px-14 lg:py-12 xl:px-14 xl:py-16 w-[90] lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex w-full max-w-xl flex-col gap-6 rounded-[36px] border border-[#F5F5F5]/40 bg-[#1767AA]/30 px-10 py-12 text-[#F5F5F5] shadow-lg shadow-[#002C49]/20 backdrop-blur-md'
                 >
                     <div className='flex flex-col items-center text-center'>
-                        <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
-                            Reset Password
-                        </h2>
+                        <h2 className='text-3xl font-semibold'>Reset Password</h2>
 
-                        <p className='font-montserrat font-medium text-white lg:text-sm xl:text-lg'>
-                            Enter your email and we'll send you a reset link.
+                        <p className='mt-2 text-sm opacity-90'>
+                            Enter your email and we will send you a reset link.
                         </p>
                     </div>
 
-                    {/* Kotak Error Backend (Warna Merah) */}
                     {serverError && (
-                        <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-2 rounded-lg font-montserrat text-sm">
+                        <div className='rounded-lg border border-[#27D6FF]/40 bg-[#002C49]/40 px-4 py-2 text-sm text-[#F5F5F5]'>
                             {serverError}
                         </div>
                     )}
 
-                    {/* Email */}
-                    <div className='flex flex-col gap-y-1 lg:text-sm xl:text-lg'>
-                        <label className='font-montserrat font-medium text-white'>Email address</label>
+                    <div className='flex flex-col gap-y-1 text-sm'>
+                        <label className='font-semibold'>Email address</label>
                         <input
                             type='email'
                             placeholder='youremail@mail.com'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
+                            className='w-full rounded-lg border border-[#27D6FF] bg-[#002C49]/50 px-4 py-2 text-[#F5F5F5] outline-none'
                         />
-                        {/* Teks Error Zod (Tepat di bawah input) */}
                         {errors.email && (
-                            <p className='text-sm text-red-300'>{errors.email[0]}</p>
+                            <p className='text-xs text-[#27D6FF]'>{errors.email[0]}</p>
                         )}
                     </div>
 
-                    {/* Send Reset Link Button */}
                     <button
                         type='submit'
                         disabled={isLoading}
-                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#41B0EC] mx-auto lg:px-6 lg:py-2 xl:px-8 xl:py-3 text-center lg:text-md xl:text-xl font-montserrat font-semibold text-white transition-all hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC] ${
+                        className={`mx-auto w-fit rounded-lg bg-[#20A6DA] px-6 py-2 text-sm font-semibold text-[#F5F5F5] transition-all hover:bg-[#27D6FF] hover:text-[#002C49] hover:border hover:border-[#27D6FF] ${
                             isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                     >
                         {isLoading ? 'Checking...' : 'Send Reset Link'}
                     </button>
 
-                    <p className='text-center lg:text-sm xl:text-lg font-montserrat font-medium text-white'>
+                    <p className='text-center text-sm'>
                         &lt; Go back to{' '}
-                        <Link 
+                        <Link
                             to='/'
-                            className='font-montserrat font-bold text-white hover:text-[#27D6FF]'
+                            className='font-semibold text-[#F5F5F5] hover:text-[#27D6FF]'
                         >
                             Sign In
                         </Link>
