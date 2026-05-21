@@ -20,7 +20,7 @@ function AppLayout () {
     : 'bg-[#F5F5F5] text-[#002C49]'
 
   return (
-    <div className={`min-h-screen ${pageBase} flex`}
+    <div className={`min-h-screen ${pageBase} flex max-w-screen`}
     >
       <Sidebar
         isDark={isDark}
