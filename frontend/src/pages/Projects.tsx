@@ -49,7 +49,7 @@ function Projects () {
   const { isDark } = useOutletContext<LayoutContext>()
 
   const cardBase = isDark
-    ? 'bg-gradient-to-br from-[#1767AA] to-[#002C49] border border-[#27D6FF]/20 text-[#F5F5F5]'
+    ? 'bg-linear-to-br from-[#1767AA] to-[#002C49] border border-[#27D6FF]/20 text-[#F5F5F5]'
     : 'bg-[#F5F5F5] border border-[#27D6FF]/40 text-[#002C49] shadow-sm'
 
   const badgeClass = (status: string) => {
