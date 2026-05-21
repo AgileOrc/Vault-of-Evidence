@@ -34,12 +34,10 @@ function AppLayout () {
         <button
           type='button'
           onClick={() => setIsCollapsed((prev) => !prev)}
-          className={`absolute left-6 top-6 flex h-10 w-10 items-center justify-center rounded-lg border border-[#27D6FF]/30 ${
-            isDark ? 'bg-[#1767AA]' : 'bg-[#F5F5F5]'
-          }`}
+          className={`absolute left-3 xl:left-6 top-6 flex h-7 w-7 xl:h-10 xl:w-10 items-center justify-center rounded-lg bg-[#1767AA] text-white hover:text-[#1767AA] hover:bg-white hover:outline-2 hover:outline-[#1767AA]`}
           aria-label='Toggle sidebar'
         >
-          {isCollapsed ? <ChevronRight className='h-4 w-4' /> : <ChevronLeft className='h-4 w-4' />}
+          {isCollapsed ? <ChevronRight className='h-4 xl:h-7' /> : <ChevronLeft className='h-4 xl:h-7' />}
         </button>
 
         <main className='px-12 pb-12 pt-20'>
