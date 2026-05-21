@@ -32,7 +32,6 @@ type Manager struct {
 type Claims struct {
 	UserID    uuid.UUID       `json:"uid"`
 	Username  string          `json:"username"`
-	Role      domain.UserRole `json:"role"`
 	IssuedAt  int64           `json:"iat"`
 	ExpiresAt int64           `json:"exp"`
 }
@@ -62,7 +61,6 @@ func (m *Manager) GenerateToken(user *domain.User) (string, error) {
 	return m.sign(Claims{
 		UserID:    user.ID,
 		Username:  user.Username,
-		Role:      user.Role,
 		IssuedAt:  now.Unix(),
 		ExpiresAt: now.Add(m.expiry).Unix(),
 	})
@@ -105,7 +103,7 @@ func (m *Manager) ValidateToken(token string) (*Claims, error) {
 	if err := json.Unmarshal(payloadBytes, &claims); err != nil {
 		return nil, ErrInvalidToken
 	}
-	if claims.UserID == uuid.Nil || claims.Username == "" || claims.Role == "" || claims.ExpiresAt == 0 {
+	if claims.UserID == uuid.Nil || claims.Username == "" || claims.ExpiresAt == 0 {
 		return nil, ErrInvalidToken
 	}
 	if time.Now().UTC().Unix() >= claims.ExpiresAt {

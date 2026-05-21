@@ -17,6 +17,7 @@ type Service interface {
 	GetByID(id string) (*domain.Project, error)
 	Update(id string, req *domain.UpdateProjectRequest) (*domain.Project, error)
 	Delete(id string) error
+	InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error // <--- TAMBAHKAN INI
 }
 
 type service struct{ repo Repository }
@@ -87,4 +88,32 @@ func (s *service) Delete(id string) error {
 		return ErrNotFound
 	}
 	return s.repo.Delete(id)
+}
+
+func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error {
+	// 1. Cari user di database berdasarkan email yang diinput PM
+	user, err := s.repo.FindUserByUsername(req.Username)
+	if err != nil {
+		return errors.New("user with this username not found")
+	}
+
+	// 2. Cek apakah user ini ternyata sudah ada di dalam proyek
+	exists, err := s.repo.CheckMemberExists(projectID, user.ID)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return errors.New("user is already a member of this project")
+	}
+
+	// 3. Susun data anggota baru
+	member := &domain.ProjectMember{
+		ProjectID:  projectID,
+		UserID:     user.ID,
+		Role:       req.Role, // Akan berisi "dev" atau "pentester"
+		AssignedBy: pmID,     // ID PM yang mengundang
+	}
+
+	// 4. Minta repository untuk menyimpannya
+	return s.repo.AddMember(member)
 }

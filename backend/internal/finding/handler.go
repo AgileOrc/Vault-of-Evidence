@@ -74,7 +74,17 @@ func (h *Handler) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	f, err := h.service.Update(c.Param("finding_id"), &req)
+
+	// Tangkap role yang sudah dicek oleh satpam middleware
+	roleVal, exists := c.Get("ctx_project_role")
+	if !exists {
+		c.JSON(http.StatusForbidden, gin.H{"error": "role context not found"})
+		return
+	}
+	userRole := roleVal.(domain.ProjectRole)
+
+	// Lempar request DAN role ke service
+	f, err := h.service.Update(c.Param("finding_id"), &req, userRole)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "finding not found"})
