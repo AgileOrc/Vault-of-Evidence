@@ -6,6 +6,7 @@ import SignUp from './pages/Signup'
 import ResetPassword from './pages/ResetPassword'
 import EmailSent from './pages/EmailSent'
 import AppLayout from './components/AppLayout'
+import CreateNewPassword from './pages/CreateNewPassword'
 
 function App () {
   return (
@@ -17,6 +18,7 @@ function App () {
       <Route path='/SignUp' element={<SignUp />} />
       <Route path='/ResetPassword' element={<ResetPassword />} />
       <Route path='/EmailSent' element={<EmailSent />} />
+      <Route path='/CreateNewPassword' element={<CreateNewPassword />} />
     </Routes>
   )
 }

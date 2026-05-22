@@ -7,11 +7,12 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"vault-of-evidence/backend/internal/domain"
+	"vault-of-evidence/backend/internal/pkg/pagination"
 )
 
 type Repository interface {
 	Create(finding *domain.Finding) error
-	FindByProjectID(projectID string) ([]domain.Finding, error)
+	FindByProjectID(projectID string, params pagination.Params) ([]domain.Finding, int64, error)
 	FindByID(id string) (*domain.Finding, error)
 	Update(finding *domain.Finding) error
 	Delete(id string) error
@@ -28,13 +29,24 @@ func (r *repository) Create(f *domain.Finding) error {
 	return nil
 }
 
-func (r *repository) FindByProjectID(projectID string) ([]domain.Finding, error) {
+func (r *repository) FindByProjectID(projectID string, params pagination.Params) ([]domain.Finding, int64, error) {
 	var findings []domain.Finding
-	if err := r.db.Where("project_id = ?", projectID).
-		Order("created_at DESC").Find(&findings).Error; err != nil {
-		return nil, err
+	var total int64
+
+	query := r.db.Model(&domain.Finding{}).Where("project_id = ?", projectID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
 	}
-	return findings, nil
+
+	if err := query.Order("created_at DESC").
+		Limit(params.Limit).
+		Offset(params.Offset).
+		Find(&findings).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return findings, total, nil
 }
 
 func (r *repository) FindByID(id string) (*domain.Finding, error) {

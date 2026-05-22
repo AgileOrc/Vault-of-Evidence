@@ -27,6 +27,8 @@ type Project struct {
 	Findings    []Finding     `gorm:"foreignKey:ProjectID"                           json:"findings,omitempty"`
 	CreatedAt   time.Time     `json:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at"`
+	// Di struct Project, tambahkan setelah field Findings:
+	Members []ProjectMember `gorm:"foreignKey:ProjectID" json:"members,omitempty"`
 }
 
 type CreateProjectRequest struct {

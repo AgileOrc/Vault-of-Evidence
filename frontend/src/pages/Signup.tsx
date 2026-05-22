@@ -32,7 +32,7 @@ function Signup() {
         email: z.string()
             .email('Invalid Email Format'),
         password: z.string()
-            .min(6, 'Password must have at least 6 characters')
+            .min(12, 'Password must have at least 12 characters')
             .regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'),
         confirmPassword: z.string(),
     }).refine((data) => data.password === data.confirmPassword, {
