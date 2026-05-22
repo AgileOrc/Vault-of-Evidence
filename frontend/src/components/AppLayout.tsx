@@ -34,10 +34,10 @@ function AppLayout () {
         <button
           type='button'
           onClick={() => setIsCollapsed((prev) => !prev)}
-          className={`absolute left-3 xl:left-6 top-6 flex h-7 w-7 xl:h-10 xl:w-10 items-center justify-center rounded-lg bg-[#1767AA] text-white hover:text-[#1767AA] hover:bg-white hover:outline-2 hover:outline-[#1767AA]`}
+          className={`absolute left-3 xl:left-6 top-6 flex h-7 w-7 xl:h-10 xl:w-10 items-center justify-center rounded-md xl:rounded-lg bg-[#1767AA] text-white hover:text-[#1767AA] hover:bg-white hover:outline-2 hover:outline-[#1767AA]`}
           aria-label='Toggle sidebar'
         >
-          {isCollapsed ? <ChevronRight className='h-4 xl:h-7' /> : <ChevronLeft className='h-4 xl:h-7' />}
+          {isCollapsed ? <ChevronRight className='h-4 lg:h-5 xl:h-7' /> : <ChevronLeft className='h-4 lg:h-5 xl:h-7' />}
         </button>
 
         <main className='px-12 pb-12 pt-20'>
