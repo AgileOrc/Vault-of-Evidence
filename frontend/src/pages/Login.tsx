@@ -62,7 +62,7 @@ function Login() {
     };
 
     return (
-        <main className='flex flex-col lg:flex-row min-h-screen justify-center items-center lg:items-start lg:pt-20 gap-y-5 md:gap-y-8 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
+        <main className='flex flex-col lg:flex-row min-h-screen justify-center items-center lg:items-start lg:pt-28 xl:pt-20 gap-y-5 md:gap-y-8 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Left Side */}
             <section className='flex w-full lg:w-4/7 flex-col items-center lg:items-start justify-center px-6 lg:gap-y-18 lg:px-14 xl:px-20 text-white'>
                 {/* Logo */}
