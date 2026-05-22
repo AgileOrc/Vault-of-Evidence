@@ -43,7 +43,7 @@ func (s *service) Signup(req *domain.SignupRequest) (*domain.User, error) {
 		Username:     req.Username,
 		Email:        req.Email,
 		PasswordHash: hash,
-		Role:         domain.RolePentester, // default; admin promote secara manual
+
 	}
 	if err := s.repo.CreateUser(user); err != nil {
 		return nil, fmt.Errorf("signup: db: %w", err)

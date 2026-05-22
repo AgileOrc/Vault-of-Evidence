@@ -3,7 +3,7 @@ package project
 import (
 	"errors"
 	"net/http"
-
+	"github.com/google/uuid"
 	"github.com/gin-gonic/gin"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/middleware"
@@ -96,4 +96,50 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "project deleted"})
+}
+
+func (h *Handler) InviteMember(c *gin.Context) {
+	// 1. Tangkap ID Proyek dari URL
+	projectIDStr := c.Param("id")
+	projectID, err := uuid.Parse(projectIDStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid project ID format"})
+		return
+	}
+
+	// 2. Tangkap JSON body (Username & Role) dari frontend
+	var req domain.InviteMemberRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 3. Ambil ID PM yang sedang login
+	pmIDVal, exists := c.Get(middleware.CtxUserID)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	pmID := pmIDVal.(uuid.UUID)
+
+	// 4. Jalankan Service InviteMember
+	if err := h.service.InviteMember(projectID, pmID, req); err != nil {
+		if err.Error() == "user with this username not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if err.Error() == "user is already a member of this project" {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to invite member"})
+		return
+	}
+
+	// 5. Berhasil!
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "Member successfully invited to the project",
+		"username": req.Username,
+		"role":     req.Role,
+	})
 }
