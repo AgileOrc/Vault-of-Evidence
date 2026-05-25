@@ -82,40 +82,44 @@ function Signup() {
     };
 
     return (
-        <main className='flex min-h-screen items-center bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
-            {/* Logo */}
-            <div className='mt-2 absolute w-md lg:top-10 lg:left-14 xl:top-16 xl:left-14'>
-                <img src={logo} alt='Vault of Evidence Logo' className='md:max-h-12 lg:max-h-22 xl:max-h-32' />
-            </div>
+        <main className='flex flex-col lg:flex-row min-h-screen justify-center items-center lg:items-start lg:pt-28 xl:pt-16 gap-y-5 md:gap-y-8 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
 
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-40 lg:px-12 xl:px-18 text-white'>
-                <div className= 'flex flex-1 flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
-                    <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
+            <section className='flex w-full lg:w-4/7 flex-col items-center lg:items-start justify-center px-6 lg:gap-y-24 lg:px-14 xl:px-20 text-white'>
+                {/* Logo */}
+                <div>
+                    <img 
+                        src={logo} 
+                        alt='Vault of Evidence Logo' 
+                        className='items-center min-h-12 md:min-h-16 lg:min-h-20 xl:min-h-28 object-contain' />
+                </div>
+            
+                <div className='hidden lg:flex flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
+                    <h1 className='lg:text-3xl xl:text-5xl font-semibold font-montserrat leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
                     </h1>
                     <p className='max-w-xl lg:text-xl xl:text-2xl font-montserrat font-medium text-white'>
-                        Centralized storage for findings and investigation records.
+                        Centralized storage for findings and <br/> investigation records.
                     </p>
                 </div>
             </section>
 
-            {/* Right Side - Diubah dari div menjadi tag <form> */}
-            <section className='flex w-3/7 items-center lg:px-12 xl:px-18'>
+            {/* Right Side */}
+            <section className='flex w-full md:w-xl lg:w-[60vh] xl:w-3/7 max-h-screen items-center justify-center px-10 md:px-12 lg:px-12 xl:px-18'>
                 <form 
                     onSubmit={handleSignupSubmit}
-                    className='flex flex-col lg:gap-y-4 xl:gap-y-8 lg:px-10 lg:py-12 xl:px-14 xl:py-16 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex flex-col gap-y-4 md:gap-y-6 lg:gap-y-4 xl:gap-y-4 px-10 py-12 md:px-12 lg:px-10 lg:py-12 xl:px-14 xl:py-14 w-full md:w-xl rounded-4xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
                 >
-                    <div className='flex flex-col'>
-                        <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
+                    <div className='flex flex-col gap-y-1'>
+                        <h2 className='text-2xl md:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
                             Get Started
                         </h2>
-                        <p className='font-montserrat font-medium text-white lg:text-sm xl:text-lg'>
+                        <p className='font-montserrat font-medium text-white text-xs md:text-sm xl:text-lg'>
                             Create your secure workspace.
                         </p>
                     </div>
 
-                    {/* Alert Error dari Backend (Contoh: Email sudah terdaftar) */}
+                    {/* Alert Error dari Backend */}
                     {serverError && (
                         <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-2 rounded-lg font-montserrat text-sm">
                              {serverError}
