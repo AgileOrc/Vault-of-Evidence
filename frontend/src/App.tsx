@@ -13,7 +13,7 @@ function App () {
     <Routes>
       <Route path='/' element={<Login />} />
       <Route element={<AppLayout />}>
-        <Route path='/dashboard' element={<Dashboard />} />
+        <Route path='/Dashboard' element={<Dashboard />} />
       </Route>
       <Route path='/SignUp' element={<SignUp />} />
       <Route path='/ResetPassword' element={<ResetPassword />} />
