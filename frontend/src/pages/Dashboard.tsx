@@ -41,7 +41,7 @@ function Dashboard () {
     const theme = isDark
         ? {
             cardBase:
-                'bg-gradient-to-br from-[#294B63] via-[#173B56] to-[#0B2E46] border border-[#2BA7D6]/40 text-[#F5F5F5] shadow-[0_8px_30px_rgba(0,0,0,0.35)]',
+                'bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#FFFFFF]',
@@ -73,7 +73,7 @@ function Dashboard () {
 
         : {
             cardBase:
-                'bg-linear-to-br from-[#F5F5F5] to-[#27D6FF]/20 border border-[#27D6FF]/40 border border-[#BDEEFF] text-[#002C49] shadow-md',
+                'bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 border border-[#27D6FF]/10 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#002C49]',
