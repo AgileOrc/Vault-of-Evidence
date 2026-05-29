@@ -44,7 +44,7 @@ function Dashboard () {
     const theme = isDark
         ? {
             cardBase:
-                'bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+                'rounded-4xl bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#FFFFFF]',
@@ -76,7 +76,7 @@ function Dashboard () {
 
         : {
             cardBase:
-                'bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 border border-[#27D6FF]/10 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+                'rounded-4xl bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 border border-[#27D6FF]/10 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#002C49]',
@@ -167,7 +167,7 @@ function Dashboard () {
             </header>
 
             <div className='grid gap-6 md:grid-cols-4 xl:grid-cols-4'>
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+                <div className={`p-6 ${theme.cardBase}`}>
                     <div className='flex items-start justify-between'>
                         <div>
                             <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active projects</p>
@@ -179,7 +179,7 @@ function Dashboard () {
                         </div>
                     </div>
                 </div>
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+                <div className={`${theme.cardBase}`}>
                     <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active worklists</p>
                     <div className='mt-3 flex items-end gap-2'>
                         <ClipboardList className='h-10 w-12' />
@@ -187,7 +187,7 @@ function Dashboard () {
                     </div>
                     <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Ongoing</p>
                 </div>
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+                <div className={`${theme.cardBase}`}>
                     <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Awaiting response</p>
                     <div className='mt-3 flex items-end gap-2'>
                         <Timer className='h-11 w-12' />
@@ -195,7 +195,7 @@ function Dashboard () {
                     </div>
                     <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Unresolved</p>
                 </div>
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+                <div className={`${theme.cardBase}`}>
                     <p className={`min-h-14 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Unresolved critical & high</p>
                     <div className='mt-3 flex items-end gap-2'>
                         <AlertTriangle className='h-10 w-12' />
@@ -206,7 +206,7 @@ function Dashboard () {
             </div>
 
             <div className='grid gap-6 lg:grid-cols-2'>
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+                <div className={`${theme.cardBase}`}>
                     <div className='flex items-center justify-between'>
                         <h2 className={`text-2xl font-montserrat font-semibold ${theme.titles}`}>Project Overview</h2>
                         <Link
@@ -232,7 +232,7 @@ function Dashboard () {
                     </div>
                 </div>
 
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+                <div className={`${theme.cardBase}`}>
                     <div className='flex items-center justify-between'>
                         <h2 className={`text-2xl font-montserrat font-semibold ${theme.titles}`}>Recent Activity</h2>
                         <Link
@@ -259,7 +259,7 @@ function Dashboard () {
                 </div>
             </div>
 
-            <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
+            <div className={`${theme.cardBase}`}>
                 <div className='flex items-center justify-between'>
                     <h2 className={`text-2xl font-montserrat font-semibold ${theme.titles}`}>Recent Findings</h2>
                     <Link
