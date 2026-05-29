@@ -1,10 +1,11 @@
 package project
 
 import (
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/pkg/pagination"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Repository interface {
@@ -18,6 +19,9 @@ type Repository interface {
 	AddMember(member *domain.ProjectMember) error
 	FindUserByUsername(username string) (*domain.User, error)
 	CheckMemberExists(projectID, userID uuid.UUID) (bool, error)
+
+	// Fitur Dashboard
+	GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error)
 }
 
 type repository struct{ db *gorm.DB }
@@ -46,7 +50,6 @@ func (r *repository) FindAll(params pagination.Params) ([]domain.Project, int64,
 
 func (r *repository) FindByID(id string) (*domain.Project, error) {
 	var p domain.Project
-	// Preload Members agar saat mengambil data proyek, daftar anggotanya ikut terbawa
 	err := r.db.Preload("Members").Preload("Members.User").Where("id = ?", id).First(&p).Error
 	return &p, err
 }
@@ -77,4 +80,43 @@ func (r *repository) CheckMemberExists(projectID, userID uuid.UUID) (bool, error
 		Where("project_id = ? AND user_id = ?", projectID, userID).
 		Count(&count).Error
 	return count > 0, err
+}
+
+// Implementasi Query Dashboard
+func (r *repository) GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error) {
+	var totalProjects int64
+	var activeProjects int64
+	var criticalHighCount int64
+	var recentProjects []domain.Project
+	var recentFindings []domain.Finding
+
+	r.db.Table("projects").
+		Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ?", userID).Count(&totalProjects)
+
+	r.db.Table("projects").
+		Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ? AND (projects.status = ? OR projects.status = ?)", userID, "active", "Active").Count(&activeProjects)
+
+	r.db.Table("projects").Select("projects.*").
+		Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ?", userID).
+		Order("projects.created_at DESC").Limit(5).Find(&recentProjects)
+
+	r.db.Table("findings").Select("findings.*").
+		Joins("JOIN project_members ON project_members.project_id = findings.project_id").
+		Where("project_members.user_id = ?", userID).
+		Order("findings.created_at DESC").Limit(5).Find(&recentFindings)
+
+	r.db.Table("findings").
+		Joins("JOIN project_members ON project_members.project_id = findings.project_id").
+		Where("project_members.user_id = ? AND findings.status = ? AND findings.severity IN (?, ?)", userID, "open", "Critical", "High").Count(&criticalHighCount)
+
+	return map[string]interface{}{
+		"totalProjects":     totalProjects,
+		"activeProjects":    activeProjects,
+		"criticalHighCount": criticalHighCount,
+		"recentProjects":    recentProjects,
+		"recentFindings":    recentFindings,
+	}, nil
 }
