@@ -157,42 +157,37 @@ function Dashboard () {
 
             {/* Statistik Atas */}
             <div className='grid gap-6 md:grid-cols-4 xl:grid-cols-4'>
-                <div className={`p-6 ${theme.cardBase}`}>
-                    <div className='flex items-start justify-between'>
-                        <div>
-                            <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active projects</p>
-                            <div className='mt-3 flex items-end gap-2'>
-                                <Folder className='h-10 w-12' />
-                                <span className={`text-5xl font-semibold font-montserrat ${theme.statNumber}`}>4</span>
-                            </div>
-                            <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>of {data?.totalProjects || 0} total</p>
-                        </div>
+                <div className={`py-12 px-10 h-68 flex flex-col gap-3 justify-center ${theme.cardBase}`}>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Active projects</p>
+                    <div className='flex items-center gap-3'>
+                        <Folder className='h-12 w-12 text-[#0E65AD]' />
+                            <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>4</span>
                     </div>
-                    
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>of {data?.totalProjects || 0} total</p>
                 </div>
-                <div className={`${theme.cardBase}`}>
-                    <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active worklists</p>
-                    <div className='mt-3 flex items-end gap-2'>
-                        <ClipboardList className='h-10 w-12' />
-                        <span className={`text-5xl font-semibold font-montserrat ${theme.statNumber}`}>5</span>
+                <div className={`py-12 px-10 h-68 flex flex-col justify-center gap-3 ${theme.cardBase}`}>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Active worklists</p>
+                    <div className='flex items-center gap-3'>
+                        <ClipboardList className='h-12 w-12 text-[#0E65AD]' />
+                        <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>5</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Ongoing (Dummy)</p>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Ongoing</p>
                 </div>
-                <div className={`${theme.cardBase}`}>
-                    <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Awaiting response</p>
-                    <div className='mt-3 flex items-end gap-2'>
-                        <Timer className='h-11 w-12' />
-                        <span className={`text-5xl font-semibold font-montserrat ${theme.statNumber}`}>7</span>
+                <div className={`py-12 px-10 h-68 flex flex-col justify-center gap-3 ${theme.cardBase}`}>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Waiting response</p>
+                    <div className='flex items-center gap-3'>
+                        <Timer className='h-12 w-12 text-[#0E65AD]' />
+                        <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>7</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Unresolved (Dummy)</p>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Unresolved</p>
                 </div>
-                <div className={`${theme.cardBase}`}>
-                    <p className={`min-h-14 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Unresolved critical & high</p>
-                    <div className='mt-3 flex items-end gap-2'>
-                        <AlertTriangle className='h-10 w-12' />
-                        <span className={`text-5xl font-semibold font-montserrat`}>{data?.criticalHighCount || 0}</span>
+                <div className={`py-12 px-10 h-68 flex flex-col justify-center gap-3 ${theme.cardBase}`}>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Unresolved critical & high</p>
+                    <div className='flex items-center gap-3'>
+                        <AlertTriangle className='h-12 w-12 text-[#0E65AD]' />
+                        <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>2</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Needs Attention</p>
+                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Needs attention</p>
                 </div>
             </div>
 
