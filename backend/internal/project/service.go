@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/pkg/pagination"
+
+	"github.com/google/uuid"
 )
 
 var ErrNotFound = errors.New("project not found")
@@ -17,7 +18,10 @@ type Service interface {
 	GetByID(id string) (*domain.Project, error)
 	Update(id string, req *domain.UpdateProjectRequest) (*domain.Project, error)
 	Delete(id string) error
-	InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error // <--- TAMBAHKAN INI
+	InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error
+
+	// Fitur Dashboard
+	GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error)
 }
 
 type service struct{ repo Repository }
@@ -91,13 +95,11 @@ func (s *service) Delete(id string) error {
 }
 
 func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error {
-	// 1. Cari user di database berdasarkan email yang diinput PM
 	user, err := s.repo.FindUserByUsername(req.Username)
 	if err != nil {
 		return errors.New("user with this username not found")
 	}
 
-	// 2. Cek apakah user ini ternyata sudah ada di dalam proyek
 	exists, err := s.repo.CheckMemberExists(projectID, user.ID)
 	if err != nil {
 		return err
@@ -106,14 +108,15 @@ func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMembe
 		return errors.New("user is already a member of this project")
 	}
 
-	// 3. Susun data anggota baru
 	member := &domain.ProjectMember{
 		ProjectID:  projectID,
 		UserID:     user.ID,
-		Role:       req.Role, // Akan berisi "dev" atau "pentester"
-		AssignedBy: pmID,     // ID PM yang mengundang
+		Role:       req.Role,
+		AssignedBy: pmID,
 	}
-
-	// 4. Minta repository untuk menyimpannya
 	return s.repo.AddMember(member)
+}
+
+func (s *service) GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error) {
+	return s.repo.GetDashboardSummary(userID)
 }

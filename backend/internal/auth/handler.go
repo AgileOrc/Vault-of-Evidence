@@ -4,10 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/middleware"
 	jwtpkg "vault-of-evidence/backend/internal/pkg/jwt"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -24,6 +25,9 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup, authMw gin.HandlerFunc) {
 	rg.POST("/login", h.Login)
 	rg.POST("/logout", h.Logout)
 	rg.POST("/change-password", authMw, h.ChangePassword)
+
+	// Rute baru untuk dipanggil Sidebar Frontend
+	rg.GET("/me", authMw, h.GetMe)
 }
 
 func (h *Handler) Signup(c *gin.Context) {
@@ -111,7 +115,26 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	// Invalidate session setelah password change — paksa login ulang
 	h.jwtManager.ClearAuthCookie(c.Writer)
 	c.JSON(http.StatusOK, gin.H{"message": "password changed, please log in again"})
+}
+
+// Handler baru untuk Endpoint /me
+func (h *Handler) GetMe(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	user, err := h.service.GetUserByID(userID.String())
+	if err != nil || user == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"name":  user.Username,
+		"email": user.Email,
+	})
 }

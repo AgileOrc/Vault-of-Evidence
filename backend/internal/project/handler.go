@@ -3,11 +3,12 @@ package project
 import (
 	"errors"
 	"net/http"
-	"github.com/google/uuid"
-	"github.com/gin-gonic/gin"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/middleware"
 	"vault-of-evidence/backend/internal/pkg/pagination"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Handler struct{ service Service }
@@ -17,6 +18,10 @@ func NewHandler(service Service) *Handler { return &Handler{service: service} }
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("", h.GetAll)
 	rg.POST("", h.Create)
+
+	// WAJIB DI ATAS /:id
+	rg.GET("/dashboard/summary", h.GetDashboardSummary)
+
 	rg.GET("/:id", h.GetByID)
 	rg.PUT("/:id", h.Update)
 	rg.DELETE("/:id", h.Delete)
@@ -24,13 +29,11 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 
 func (h *Handler) GetAll(c *gin.Context) {
 	params := pagination.ParseFromContext(c)
-
 	projects, total, err := h.service.GetAll(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch projects"})
 		return
 	}
-
 	c.JSON(http.StatusOK, pagination.NewResponse(projects, params, total))
 }
 
@@ -99,7 +102,6 @@ func (h *Handler) Delete(c *gin.Context) {
 }
 
 func (h *Handler) InviteMember(c *gin.Context) {
-	// 1. Tangkap ID Proyek dari URL
 	projectIDStr := c.Param("id")
 	projectID, err := uuid.Parse(projectIDStr)
 	if err != nil {
@@ -107,14 +109,12 @@ func (h *Handler) InviteMember(c *gin.Context) {
 		return
 	}
 
-	// 2. Tangkap JSON body (Username & Role) dari frontend
 	var req domain.InviteMemberRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// 3. Ambil ID PM yang sedang login
 	pmIDVal, exists := c.Get(middleware.CtxUserID)
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -122,7 +122,6 @@ func (h *Handler) InviteMember(c *gin.Context) {
 	}
 	pmID := pmIDVal.(uuid.UUID)
 
-	// 4. Jalankan Service InviteMember
 	if err := h.service.InviteMember(projectID, pmID, req); err != nil {
 		if err.Error() == "user with this username not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -136,10 +135,25 @@ func (h *Handler) InviteMember(c *gin.Context) {
 		return
 	}
 
-	// 5. Berhasil!
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "Member successfully invited to the project",
 		"username": req.Username,
 		"role":     req.Role,
 	})
+}
+
+func (h *Handler) GetDashboardSummary(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "authentication required"})
+		return
+	}
+
+	summary, err := h.service.GetDashboardSummary(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch dashboard stats"})
+		return
+	}
+
+	c.JSON(http.StatusOK, summary)
 }

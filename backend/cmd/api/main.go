@@ -10,7 +10,6 @@ import (
 	"github.com/joho/godotenv"
 	"golang.org/x/time/rate"
 
-	// Modul admin dihapus karena role global sudah tidak ada
 	"vault-of-evidence/backend/internal/auth"
 	"vault-of-evidence/backend/internal/config"
 	"vault-of-evidence/backend/internal/database"
@@ -59,8 +58,6 @@ func main() {
 	evidenceSvc := evidence.NewService(evidenceRepo)
 	evidenceHandler := evidence.NewHandler(evidenceSvc, cfg.EvidenceStoragePath, cfg.MaxUploadSizeMB)
 
-	// Inisialisasi adminHandler dihapus
-
 	authLimiter := middleware.NewRateLimiter(rate.Every(20*time.Second), 3)
 
 	router := gin.New()
@@ -75,7 +72,7 @@ func main() {
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", cfg.AllowedOrigin)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Max-Age", "86400")
 		if c.Request.Method == http.MethodOptions {
@@ -91,8 +88,6 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "healthy", "service": "voe-backend"})
 	})
 
-	// ─── ROUTING LAYERS ───────────────────────────────────────────────────────
-
 	api := router.Group("/api/v1")
 
 	// 1. Auth Routes
@@ -107,7 +102,6 @@ func main() {
 		projectRoutes.GET("", projectHandler.GetAll)
 		projectRoutes.POST("", projectHandler.Create)
 
-		// Sub-Group khusus untuk aksi yang membutuhkan ID Proyek (:id)
 		singleProject := projectRoutes.Group("/:id")
 		{
 			singleProject.GET("",
@@ -119,36 +113,27 @@ func main() {
 			singleProject.DELETE("",
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.Delete)
-				
+
 			// singleProject.POST("/invite", middleware.RequireProjectRole(db, "id", domain.RolePM), projectHandler.InviteMember)
 
-// 3. Findings Sub-Group
 			findingRoutes := singleProject.Group("/findings")
 			{
-				// Read (Semua Boleh)
 				findingRoutes.GET("",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 					findingHandler.GetByProject)
 				findingRoutes.GET("/:finding_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 					findingHandler.GetByID)
-				
-				// Create (HANYA PM) <--- Pentester dicabut haknya dari sini
 				findingRoutes.POST("",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					findingHandler.Create)
-				
-				// Update (PM, Pentester, Dev) -> Filternya ada di service.go
 				findingRoutes.PUT("/:finding_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester, domain.RoleDev),
 					findingHandler.Update)
-				
-				// Delete (HANYA PM)
 				findingRoutes.DELETE("/:finding_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					findingHandler.Delete)
 
-				// 4. Evidence Sub-Group
 				evidenceRoutes := findingRoutes.Group("/:finding_id/evidence")
 				{
 					evidenceRoutes.GET("",

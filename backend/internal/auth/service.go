@@ -19,6 +19,7 @@ type Service interface {
 	Signup(req *domain.SignupRequest) (*domain.User, error)
 	Login(req *domain.LoginRequest) (*domain.User, error)
 	ChangePassword(userID, currentPw, newPw string) error
+	GetUserByID(id string) (*domain.User, error) // Tambahan baru
 }
 
 type service struct{ repo Repository }
@@ -26,7 +27,6 @@ type service struct{ repo Repository }
 func NewService(repo Repository) Service { return &service{repo: repo} }
 
 func (s *service) Signup(req *domain.SignupRequest) (*domain.User, error) {
-	// Cek duplikasi dulu sebelum Argon2id (operasi mahal) — fail fast
 	if s.repo.EmailExists(req.Email) {
 		return nil, ErrEmailExists
 	}
@@ -43,8 +43,8 @@ func (s *service) Signup(req *domain.SignupRequest) (*domain.User, error) {
 		Username:     req.Username,
 		Email:        req.Email,
 		PasswordHash: hash,
-
 	}
+
 	if err := s.repo.CreateUser(user); err != nil {
 		return nil, fmt.Errorf("signup: db: %w", err)
 	}
@@ -57,12 +57,7 @@ func (s *service) Login(req *domain.LoginRequest) (*domain.User, error) {
 		return nil, fmt.Errorf("login: db: %w", err)
 	}
 
-	// User enumeration prevention:
-	// Return error YANG SAMA baik untuk "email tidak ada" maupun "password salah".
-	// Attacker tidak bisa tahu apakah email terdaftar atau tidak.
 	if user == nil {
-		// Tetap jalankan Verify walaupun user tidak ada → constant-time response
-		// Tanpa ini, response time lebih cepat untuk email yang tidak ada → timing leak
 		_ = password.Verify(req.Password, "$argon2id$v=19$m=65536,t=1,p=4$ZHVtbXlzYWx0ZHVtbXk$ZHVtbXloYXNoZHVtbXloYXNo")
 		return nil, ErrInvalidCreds
 	}
@@ -86,4 +81,9 @@ func (s *service) ChangePassword(userID, currentPw, newPw string) error {
 		return fmt.Errorf("change-password: hash: %w", err)
 	}
 	return s.repo.UpdatePasswordHash(userID, newHash)
+}
+
+// Service baru untuk Endpoint /me
+func (s *service) GetUserByID(id string) (*domain.User, error) {
+	return s.repo.FindByID(id)
 }
