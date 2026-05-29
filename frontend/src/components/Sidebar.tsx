@@ -1,12 +1,7 @@
 import { Bell, Calculator, FolderKanban, LayoutDashboard, Settings, User, Sun, Moon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useUser } from '../context/UserContext'
 import { NavLink } from 'react-router-dom'
 import logo from '../assets/logo-01.svg'
-
-type User = {
-  name: string
-  email: string
-}
 
 type SidebarProps = {
   isDark: boolean
@@ -23,22 +18,12 @@ function Sidebar ({
   onOpenSettings,
   onOpenNotifications
 }: SidebarProps) {
-  const [user, setUser] = useState<User>({ name: 'Your Name', email: 'youremail@mail.com' })
-
-  useEffect(() => {
-    fetch('http://localhost:8080/api/me', {
-      credentials: 'include'
-    })
-      .then(res => res.json())
-      .then(data => setUser({ name: data.name, email: data.email }))
-      .catch(() => {}) // fallback ke default kalau backend belum nyambung
-  }, [])
+  const { user } = useUser()
   const navItemBase = `flex items-center gap-2 xl:gap-3 rounded-md xl:rounded-lg px-1 py-2 xl:px-3 xl:py-3 text-[0.8rem] xl:text-[1.1rem] font-semibold transition ${
     isCollapsed ? 'justify-center' : ''
   }`
 
   const navItemActive = 'bg-[#DCF3F8] text-[#1767AA]'
-
   const navItemIdle = 'text-white hover:bg-[#20A6DA]'
 
   return (

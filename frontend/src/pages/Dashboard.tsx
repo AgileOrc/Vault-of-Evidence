@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import { Link, useOutletContext } from 'react-router-dom'
 import type { LayoutContext } from '../components/AppLayout'
+import { useUser } from '../context/UserContext'
+
 
 const projectOverview = [
     { name: 'mycompany.com', type: 'Web Application', status: 'Active' },
@@ -37,6 +39,7 @@ const recentFindings = [
 function Dashboard () {
 
     const { isDark } = useOutletContext<LayoutContext>()
+    const { user } = useUser()
 
     const theme = isDark
         ? {
@@ -121,10 +124,10 @@ function Dashboard () {
             return 'bg-[#22BBDE] text-[#00375C]'
         }
         
-        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold shadow-sm'
-        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold shadow-sm'
-        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold shadow-sm'
-        return 'bg-[#00375C] text-[#22BBDE] font-semibold shadow-sm'
+        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
+        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
+        return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     }
 
     const severityClass = (severity: string) => {
@@ -141,17 +144,17 @@ function Dashboard () {
             return 'bg-[#17E58F] text-[#005B35]'
         }
 
-        if (severity === 'Critical') return 'bg-[#5B0000] text-[#EC2828] font-semibold shadow-sm'
-        if (severity === 'High') return 'bg-[#5B3100] text-[#E67219] font-semibold shadow-sm'
-        if (severity === 'Medium') return 'bg-[#5B4100] text-[#E6DF14] font-semibold shadow-sm'
-        return 'bg-[#005B35] text-[#17E58F] font-semibold shadow-sm'
+        if (severity === 'Critical') return 'bg-[#5B0000] text-[#EC2828] font-semibold'
+        if (severity === 'High') return 'bg-[#5B3100] text-[#E67219] font-semibold'
+        if (severity === 'Medium') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        return 'bg-[#005B35] text-[#17E58F] font-semibold'
     }
 
     return (
         <div className='space-y-6'>
             <header className='flex flex-wrap items-start justify-between gap-4'>
                 <div>
-                    <h1 className={`text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, User</h1>
+                    <h1 className={`text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, {user.name}</h1>
                     <p className={`mt-1 text-lg opacity-80 font-montserrat ${theme.greetings}`}>Here is what is happening across your projects today.</p>
                 </div>
                 <Link
