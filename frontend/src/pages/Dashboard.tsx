@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     AlertTriangle,
     ArrowUpRight,
@@ -57,7 +57,7 @@ function Dashboard () {
             titles: 'text-[#FFFFFF]',
             cardText: 'text-[#FFFFFF]',
             description: 'text-[#41B0EC]',
-            viewAllBUtton: 'text-[#41B0EC] hover:text-[#BDEEFF] transition-colors',
+            viewAllBUtton: 'text-[#FFFFFF] hover:text-[#0EB8DF] transition-colors',
             buttonNewProject: 'bg-[#0EB8DF] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-white',
             divider: 'divide-[#27D6FF]/50',
             icon: 'bg-[#0B2E46] text-[#41B0EC]',
@@ -95,71 +95,74 @@ function Dashboard () {
     }
 
     return (
-        <div className='space-y-6'>
+        <div className='space-y-4 md:space-y-6'>
             <header className='flex flex-wrap items-start justify-between gap-4'>
                 <div>
-                    <h1 className={`text-3xl font-semibold font-montserrat ${theme.greetings}`}>Workspace Dashboard</h1>
-                    <p className={`mt-1 text-lg opacity-80 font-montserrat ${theme.greetings}`}>Sistem terenkripsi pemantauan evidence dan vulnerability report.</p>
+                    <h1 className={`text-2xl md:text-3xl xl:text-4xl font-semibold font-montserrat ${theme.greetings}`}>Workspace Dashboard</h1>
+                    <p className={`mt-1 text-sm md:text-base xl:text-lg opacity-80 font-montserrat ${theme.greetings}`}>Sistem terenkripsi pemantauan evidence dan vulnerability report.</p>
                 </div>
-                <Link to='/Projects' className={`flex items-center gap-2 rounded-lg px-4 py-2 text-ls font-semibold font-montserrat ${theme.buttonNewProject}`}>
+                <Link 
+                    to={`/projects/new`} 
+                    className={`flex items-center gap-2 rounded-lg px-3 py-2 md:px-4 md:py-2 xl:px-5 xl:py-3 text-sm md:text-base font-semibold font-montserrat ${theme.buttonNewProject}`}
+                >
                     <Plus className='h-4 w-4' /> New Project
                 </Link>
             </header>
 
             {/* Statistik Atas */}
-            <div className='grid gap-6 md:grid-cols-4 xl:grid-cols-4'>
-                <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
-                    <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active Projects</p>
+            <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6'>
+                <div className={`rounded-xl md:rounded-2xl p-4 md:p-6 ${theme.cardBase}`}>
+                    <p className={`mt-4.5 min-h-9 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active Projects</p>
                     <div className='mt-3 flex items-end gap-2'>
-                        <Folder className='h-10 w-12' />
-                        <span className={`text-5xl font-semibold font-montserrat ${theme.statNumber}`}>{data?.activeProjects || 0}</span>
+                        <Folder className='h-7 w-7 md:h-9 md:w-9 xl:h-10 xl:w-12' />
+                        <span className={`text-3xl md:text-4xl xl:text-5xl font-semibold font-montserrat ${theme.statNumber}`}>{data?.activeProjects || 0}</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>of {data?.totalProjects || 0} total</p>
+                    <p className={`mt-2 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>of {data?.totalProjects || 0} total</p>
                 </div>
                 <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
-                    <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active Tasks</p>
+                    <p className={`mt-4.5 min-h-9 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Active Tasks</p>
                     <div className='mt-3 flex items-end gap-2'>
-                        <ClipboardList className='h-10 w-12' />
-                        <span className={`text-5xl font-semibold font-montserrat ${theme.statNumber}`}>5</span>
+                        <ClipboardList className='h-7 w-7 md:h-9 md:w-9 xl:h-10 xl:w-12' />
+                        <span className={`text-3xl md:text-4xl xl:text-5xl font-semibold font-montserrat ${theme.statNumber}`}>5</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Ongoing (Dummy)</p>
+                    <p className={`mt-2 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Ongoing (Dummy)</p>
                 </div>
                 <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
-                    <p className={`mt-4.5 min-h-9 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Awaiting Response</p>
+                    <p className={`mt-4.5 min-h-9 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Awaiting Response</p>
                     <div className='mt-3 flex items-end gap-2'>
-                        <Timer className='h-11 w-12' />
-                        <span className={`text-5xl font-semibold font-montserrat ${theme.statNumber}`}>7</span>
+                        <Timer className='h-7 w-7 md:h-9 md:w-9 xl:h-10 xl:w-12' />
+                        <span className={`text-3xl md:text-4xl xl:text-5xl font-semibold font-montserrat ${theme.statNumber}`}>7</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Unresolved (Dummy)</p>
+                    <p className={`mt-2 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Unresolved (Dummy)</p>
                 </div>
                 <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
-                    <p className={`min-h-14 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Critical & High Bug</p>
+                    <p className={`min-h-14 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Critical & High Bug</p>
                     <div className='mt-3 flex items-end gap-2'>
-                        <AlertTriangle className='h-10 w-12 text-red-500' />
-                        <span className={`text-5xl font-semibold font-montserrat text-red-500`}>{data?.criticalHighCount || 0}</span>
+                        <AlertTriangle className='h-7 w-7 md:h-9 md:w-9 xl:h-10 xl:w-12 text-red-500' />
+                        <span className={`text-3xl md:text-4xl xl:text-5xl font-semibold font-montserrat text-red-500`}>{data?.criticalHighCount || 0}</span>
                     </div>
-                    <p className={`mt-2 text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Needs Attention</p>
+                    <p className={`mt-2 text-sm md:text-lg xl:text-xl opacity-80 font-montserrat font-medium ${theme.cardText}`}>Needs Attention</p>
                 </div>
             </div>
 
-            <div className='grid gap-6 lg:grid-cols-2'>
+            <div className='grid gap-4 md:gap-6 lg:grid-cols-2'>
                 {/* Project Overview */}
                 <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
                     <div className='flex items-center justify-between'>
-                        <h2 className={`text-2xl font-montserrat font-semibold ${theme.titles}`}>Project Overview</h2>
-                        <Link to='/Projects' className={`flex items-center gap-1 text-lg font-semibold font-montserrat ${theme.viewAllBUtton}`}>
+                        <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold ${theme.titles}`}>Project Overview</h2>
+                        <Link to='/Projects' className={`flex items-center gap-1 text-sm md:text-base xl:text-lg font-semibold font-montserrat ${theme.viewAllBUtton}`}>
                             View all <ArrowUpRight className='h-4 w-4' />
                         </Link>
                     </div>
                     <div className={`mt-4 divide-y ${theme.divider}`}>
                         {data?.recentProjects && data.recentProjects.length > 0 ? (
                             data.recentProjects.map((project) => (
-                                <div key={project.id} className='flex items-center justify-between py-3'>
+                                <div key={project.id} className='flex flex-col md:flex-row md:items-center md:justify-between gap-2 py-3'>
                                     <div>
-                                        <p className={`text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
-                                        <p className={`text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
+                                        <p className={`text-sm md:text-base xl:text-lg font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
+                                        <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
-                                    <span className={`rounded-full px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
+                                    <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
                                         {project.status}
                                     </span>
                                 </div>
@@ -173,18 +176,18 @@ function Dashboard () {
                 {/* Recent Activity (Tetap dummy karena tidak ada tabel log aktivitas di DB saat ini) */}
                 <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
                     <div className='flex items-center justify-between'>
-                        <h2 className={`text-2xl font-montserrat font-semibold ${theme.titles}`}>Recent Activity</h2>
-                        <Link to='/Projects' className={`flex items-center gap-1 text-lg font-montserrat font-semibold ${theme.viewAllBUtton}`}>
+                        <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold ${theme.titles}`}>Recent Activity</h2>
+                        <Link to='/Projects' className={`flex items-center gap-1 text-sm md:text-base xl:text-lg font-semibold font-montserrat ${theme.viewAllBUtton}`}>
                             View all <ArrowUpRight className='h-4 w-4' />
                         </Link>
                     </div>
                     <div className={`mt-4 divide-y ${theme.divider}`}>
-                        <div className='flex gap-3 py-3'>
-                            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${theme.icon}`}>
+                        <div className='flex gap-2 md:gap-3 py-3'>
+                            <div className={`flex h-9 w-9 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-full ${theme.icon}`}>
                                 <UserPlus className='h-6 w-6' />
                             </div>
                             <div>
-                                <p className={`text-md font-semibold font-montserrat ${theme.titles}`}>System ready and fully encrypted.</p>
+                                <p className={`text-sm md:text-base font-semibold font-montserrat ${theme.titles}`}>System ready and fully encrypted.</p>
                                 <p className={`text-xs font-medium font-montserrat opacity-80 ${theme.description}`}>Just now</p>
                             </div>
                         </div>
@@ -195,20 +198,20 @@ function Dashboard () {
             {/* Recent Findings dari Backend */}
             <div className={`rounded-2xl p-6 ${theme.cardBase}`}>
                 <div className='flex items-center justify-between'>
-                    <h2 className={`text-2xl font-montserrat font-semibold ${theme.titles}`}>Recent Findings Across Projects</h2>
-                    <Link to='/Projects' className={`flex items-center gap-1 text-lg font-semibold font-montserrat ${theme.viewAllBUtton}`}>
+                    <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold ${theme.titles}`}>Recent Findings Across Projects</h2>
+                    <Link to='/Projects' className={`flex items-center gap-1 text-sm md:text-base xl:text-lg font-semibold font-montserrat ${theme.viewAllBUtton}`}>
                         View all <ArrowUpRight className='h-4 w-4' />
                     </Link>
                 </div>
                 <div className={`mt-4 divide-y ${theme.divider}`}>
                     {data?.recentFindings && data.recentFindings.length > 0 ? (
                         data.recentFindings.map((finding) => (
-                            <div key={finding.id} className='flex items-center justify-between py-3'>
+                            <div key={finding.id} className='flex flex-col md:flex-row md:items-center md:justify-between gap-2 py-3'>
                                 <div>
-                                    <p className={`text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
+                                    <p className={`text-sm md:text-base xl:text-lg font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
                                     <p className={`text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>Status: {finding.status}</p>
                                 </div>
-                                <span className={`rounded-full px-6 py-1 text-sm font-montserrat font-semibold ${severityClass(finding.severity)}`}>
+                                <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs md:text-sm font-montserrat font-semibold ${severityClass(finding.severity)}`}>
                                     {finding.severity}
                                 </span>
                             </div>
