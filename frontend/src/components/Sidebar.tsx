@@ -28,8 +28,8 @@ function Sidebar ({
 
   return (
     <aside
-      className={`font-montserrat sticky shrink-0 top-0 items-center md:flex flex-col min-h-screen md:h-screen px-5 py-6 md:px-4 ${isDark ? 'bg-[#1767AA]' : 'bg-gradient-to-b from-[#0E5998] to-[#0EB8DF]'} text-white transition-all ${
-        isCollapsed ? 'hidden xl:w-20' : 'w-48 md:w-48 xl:w-64'
+      className={`font-montserrat z-40 overflow-hidden fixed md:sticky shrink-0 top-0 items-center flex flex-col min-h-screen md:h-screen px-5 py-6 md:px-4 ${isDark ? 'bg-[#1767AA]' : 'bg-gradient-to-b from-[#0E5998] to-[#0EB8DF]'} text-white transition-[width] duration-300 ${
+        isCollapsed ? 'hidden md:flex xl:w-20' : 'w-48 md:w-48 xl:w-64'
       }`}
     >
       <div className='flex flex-col gap-y-10'>
