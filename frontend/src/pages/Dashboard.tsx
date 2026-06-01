@@ -13,14 +13,6 @@ import type { LayoutContext } from '../components/AppLayout'
 import { useUser } from '../context/UserContext'
 import api from '../api/axios'
 
-const dummyFindings = [
-    { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
-    { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
-    { id: '3', title: 'Broken Authentication on /forgot-password', project: 'mycompany.com', worklist: 'Forgot Password', severity: 'High' },
-    { id: '4', title: 'Sensitive Data Exposure on /api/v1/users', project: 'staging.app.io', worklist: 'User Profile', severity: 'Medium' },
-    { id: '5', title: 'Missing Secure Flag on session cookie', project: 'corp.enterprise.com', worklist: 'Login Page', severity: 'Low' },
-]
-
 type ProjectData = {
     id: string
     name: string
@@ -47,19 +39,24 @@ type DashboardSummary = {
 function Dashboard () {
     const { isDark } = useOutletContext<LayoutContext>()
     const { user } = useUser()
-    const [loading, setLoading] = useState(true)
+
+    // AKU COMMENT DULU LOADINGNYA, NANTI KALAU MAU DITAMBAHKAN KETIKA BACKEND SUDAH CONNECT, BOLEH YGY
+    // const [loading, setLoading] = useState(true)
+
     const [data, setData] = useState<DashboardSummary | null>(null)
 
-    useEffect(() => {
-        api.get('/projects/dashboard/summary')
-            .then((res) => {
-                setData(res.data)
-                setLoading(false)
-            })
-            .catch(() => {
-                setLoading(false)
-            })
-    }, [])
+    
+    // useEffect(() => {
+    //     api.get('/projects/dashboard/summary')
+    //         .then((res) => {
+    //             setData(res.data)
+    //             setLoading(false)
+    //         })
+    //         .catch(() => {
+    //             setLoading(false)
+    //         })
+    // }, [])
+
     const theme = isDark
         ? {
             cardBase:
@@ -164,7 +161,7 @@ function Dashboard () {
             </header>
 
             {/* Statistik Atas */}
-            <div className='grid gap-6 md:grid-cols-4 xl:grid-cols-4'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-4 xl:grid-cols-4'>
                 <div className={`py-12 px-10 h-68 flex flex-col gap-3 justify-center ${theme.cardBase}`}>
                     <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Active projects</p>
                     <div className='flex items-center gap-3'>
