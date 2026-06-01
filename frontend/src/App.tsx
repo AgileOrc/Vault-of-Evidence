@@ -10,6 +10,7 @@ import AppLayout from './components/AppLayout'
 import CreateNewPassword from './pages/CreateNewPassword'
 import NewProject from './pages/NewProject'
 import ProjectDetails from './pages/ProjectDetails'
+import Profile from './pages/UserProfile'
 
 function App () {
   return (
@@ -20,6 +21,7 @@ function App () {
         <Route path='/Projects' element={<Projects />} />
         <Route path="/Projects/New" element={<NewProject />} />
         <Route path="/Projects/:id" element={<ProjectDetails />} />
+        <Route path='/Profile' element={<Profile />} /> 
       </Route>
       <Route path='/SignUp' element={<SignUp />} />
       <Route path='/ResetPassword' element={<ResetPassword />} />

@@ -82,7 +82,7 @@ function Sidebar ({
           onClick={onOpenNotifications}
           className={`flex gap-1 xl:gap-2 text-[0.8rem] xl:text-[1.1rem] rounded-lg px-1 xl:px-3 py-3 font-semibold transition ${
             isCollapsed ? 'justify-center' : ''
-          } text-white hover:bg-[#20A6DA]`}
+          } text-white hover:bg-[#F5F5F5]/30`}
         >
           <Bell className='h-4 xl:h-6' />
           {!isCollapsed && <span>Notifications</span>}
@@ -111,17 +111,22 @@ function Sidebar ({
           )}
         </button>
 
-        <div className={`flex items-center px-1 py-2 xl:px-1.5 gap-2 ${isCollapsed ? 'justify-center' : ''}`}>
+        <NavLink
+          to='/profile'
+          className={`flex items-center px-1 py-2 xl:px-1.5 gap-2 rounded-lg hover:bg-[#20A6DA] transition ${
+              isCollapsed ? 'justify-center' : ''
+          }`}
+      >
           <div className='flex items-center justify-center p-1 xl:p-1.5 rounded-full bg-[#20A6DA]'>
-            <User className='h-3.5 w-3.5 xl:h-6 xl:w-6' />
+              <User className='h-3.5 w-3.5 xl:h-6 xl:w-6' />
           </div>
           {!isCollapsed && (
-            <div className=''>
-              <p className='text-xs xl:text-[1.1rem] font-semibold'>{user.name}</p>
-              <p className='text-[0.5rem] xl:text-xs opacity-80'>{user.email}</p>
-            </div>
+              <div>
+                  <p className='text-xs xl:text-[1.15rem] font-semibold'>{user.name}</p>
+                  <p className='text-[0.5rem] xl:text-xs opacity-80'>{user.email}</p>
+              </div>
           )}
-        </div>
+        </NavLink>
       </div>
     </aside>
   )
