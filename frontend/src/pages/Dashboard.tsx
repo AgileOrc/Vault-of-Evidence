@@ -36,34 +36,35 @@ type DashboardSummary = {
     recentFindings: FindingData[]
 }
 
-// const dummyProjects = [
-//     { id: '1', name: 'mycompany.com', description: 'Web Application', status: 'Active' },
-//     { id: '2', name: 'api.startup.io', description: 'API Security', status: 'Active' },
-//     { id: '3', name: 'staging.app.io', description: 'Web Application', status: 'Paused' },
-//     { id: '4', name: 'newclient.com', description: 'Web Application', status: 'Upcoming' },
-//     { id: '5', name: 'corp.enterprise.com', description: 'Internal Network', status: 'Completed' },
-// ]
+const dummyProjects = [
+    { id: '1', name: 'mycompany.com', description: 'Web Application', status: 'Active' },
+    { id: '2', name: 'api.startup.io', description: 'API Security', status: 'Active' },
+    { id: '3', name: 'staging.app.io', description: 'Web Application', status: 'Paused' },
+    { id: '4', name: 'newclient.com', description: 'Web Application', status: 'Upcoming' },
+    { id: '5', name: 'corp.enterprise.com', description: 'Internal Network', status: 'Completed' },
+]
 
-// const dummyFindings = [
-//     { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
-//     { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
-//     { id: '3', title: 'Broken Authentication on /forgot-password', project: 'mycompany.com', worklist: 'Forgot Password', severity: 'High' },
-//     { id: '4', title: 'Sensitive Data Exposure on /api/v1/users', project: 'staging.app.io', worklist: 'User Profile', severity: 'Medium' },
-//     { id: '5', title: 'Missing Secure Flag on session cookie', project: 'corp.enterprise.com', worklist: 'Login Page', severity: 'Low' },
-// ]
+const dummyFindings = [
+    { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
+    { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
+    { id: '3', title: 'Broken Authentication on /forgot-password', project: 'mycompany.com', worklist: 'Forgot Password', severity: 'High' },
+    { id: '4', title: 'Sensitive Data Exposure on /api/v1/users', project: 'staging.app.io', worklist: 'User Profile', severity: 'Medium' },
+    { id: '5', title: 'Missing Secure Flag on session cookie', project: 'corp.enterprise.com', worklist: 'Login Page', severity: 'Low' },
+]
 
-function StatCard({ title, value, subtitle, icon: Icon, theme }: {
+function StatCard({ title, value, subtitle, icon: Icon, theme, iconClass }: {
     title: string | React.ReactNode
     value: number | string
     subtitle: string
     icon: React.ElementType
     theme: any
+    iconClass?: string
 }) {
     return (
         <div className={`px-10 lg:px-14 xl:px-10 h-52 md:h-56 xl:h-68 flex flex-col gap-2 xl:gap-3 justify-center ${theme.cardBase}`}>
             <p className={`text-lg md:text-xl xl:text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>{title}</p>
             <div className='flex items-center gap-2 xl:gap-3'>
-                <Icon className='h-10 w-10 md:h-12 md:w-12 text-[#0E65AD]' />
+                <Icon className={`h-10 w-10 md:h-12 md:w-12 ${iconClass}`} />
                 <span className={`text-5xl xl:text-6xl font-semibold font-montserrat ${theme.statNumber}`}>{value}</span>
             </div>
             <p className={`text-lg md:text-xl xl:text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>{subtitle}</p>
@@ -106,13 +107,13 @@ function Dashboard () {
                 'text-[#FFFFFF]',
 
             description:
-                'text-[#0E65AD]',
+                'text-[#41B0EC]',
 
             viewAllBUtton:
                 'text-[#41B0EC] hover:text-[#BDEEFF] transition-colors',
 
             buttonNewProject:
-                'bg-[#0EB8DF] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-white hover:border hover:border-white',
+                'bg-linear-to-br from-[#0EB8DF] to-[#138FC5] text-white hover:bg-white hover:bg-none hover:text-[#138FC5] hover:border-2 hover:border-[#0EB8DF]',
 
             divider:
                 'divide-[#27D6FF]/50',
@@ -121,7 +122,10 @@ function Dashboard () {
                 'bg-[#0B2E46] text-[#41B0EC]',
 
             statNumber:
-                'text-[#41B0EC]'
+                'text-[#41B0EC]',
+
+            statIcon:
+                'text-[#F5F5F5]'
         }
         : {
             cardBase:
@@ -152,7 +156,9 @@ function Dashboard () {
                 'bg-[#20A6DA] text-[#F5F5F5]',
 
             statNumber:
-                'text-[#002C49]'
+                'text-[#002C49]',
+            statIcon:
+                'text-[#0E65AD]'
         }
 
     const badgeClass = (status: string) => {
@@ -196,14 +202,14 @@ function Dashboard () {
             
             {/* Statistik Atas */}
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4'>
-                <StatCard title='Active projects' value={4} subtitle={`of ${data?.totalProjects || 0} total`} icon={Folder} theme={theme} />
-                <StatCard title='Active worklists' value={5} subtitle='Ongoing' icon={ClipboardList} theme={theme} />
-                <StatCard title='Waiting response' value={7} subtitle='Unresolved' icon={Timer} theme={theme} />
-                <StatCard title= {<>Unresolved <br /> critical & high</>} value={2} subtitle='Needs attention' icon={AlertTriangle} theme={theme} />
+                <StatCard title='Active projects' value={4} subtitle={`of ${data?.totalProjects || 0} total`} icon={Folder} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title='Active worklists' value={5} subtitle='Ongoing' icon={ClipboardList} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title='Waiting response' value={7} subtitle='Unresolved' icon={Timer} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title= {<>Unresolved <br /> critical & high</>} value={2} subtitle='Needs attention' icon={AlertTriangle} iconClass={theme.statIcon} theme={theme} />
             </div>
 
             {/* Project Overview Card & Recent Activity*/}
-            <div className='flex flex-col xl:flex-row gap-6'>
+            <div className='flex flex-col xl:flex-row gap-5'>
                 {/* Project Overview */}
                 <div className={`w-full px-8 py-8 lg:px-10 ${theme.cardBase}`}>
                     <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
@@ -213,7 +219,7 @@ function Dashboard () {
                         </Link>
                     </div>
                     <div className={`divide-y ${theme.divider}`}>
-                        {data?.recentProjects && data.recentProjects.length > 0 ? (
+                        {/* {data?.recentProjects && data.recentProjects.length > 0 ? (
                             data.recentProjects.map((project) => (
                                 <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                     <div>
@@ -227,8 +233,8 @@ function Dashboard () {
                             ))
                         ) : (
                             <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">You haven't joined any projects yet.</p>
-                        )}
-                        {/* {dummyProjects.map((project) => (
+                        )} */}
+                        {dummyProjects.map((project) => (
                             <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                     <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
@@ -238,12 +244,12 @@ function Dashboard () {
                                     {project.status}
                                 </span>
                             </div>
-                        ))} */}
+                        ))}
                     </div>
                 </div>
 
                 {/* Recent Activity (Tetap dummy karena tidak ada tabel log aktivitas di DB saat ini) */}
-                <div className={`px-8 py-8 lg:px-10 min-w-1/3 ${theme.cardBase}`}>
+                <div className={`px-8 py-8 lg:px-8 min-w-1/3 ${theme.cardBase}`}>
                     <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
                         <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Recent Activity</h2>
                         <Link to='/Projects' className={`flex items-center gap-0.5 md:gap-1 text-md md:text-lg xl:text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
@@ -273,7 +279,7 @@ function Dashboard () {
                     </Link>
                 </div>
                 <div className={`divide-y ${theme.divider}`}>
-                    {data?.recentFindings && data.recentFindings.length > 0 ? (
+                    {/* {data?.recentFindings && data.recentFindings.length > 0 ? (
                         data.recentFindings.map((finding) => (
                             <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
@@ -287,8 +293,8 @@ function Dashboard () {
                         ))
                     ) : (
                         <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">No vulnerabilities reported yet.</p>
-                    )}
-                    {/* {dummyFindings.map((finding) => (
+                    )} */}
+                    {dummyFindings.map((finding) => (
                         <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                             <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                 <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
@@ -298,7 +304,7 @@ function Dashboard () {
                                 {finding.severity}
                             </span>
                         </div>
-                    ))} */}
+                    ))}
                 </div>
             </div>
         </div>
