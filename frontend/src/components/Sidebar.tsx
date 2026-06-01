@@ -113,11 +113,11 @@ function Sidebar ({
 
         <div className={`flex items-center px-1 py-2 xl:px-1.5 gap-2 ${isCollapsed ? 'justify-center' : ''}`}>
           <div className='flex items-center justify-center p-1 xl:p-1.5 rounded-full bg-[#20A6DA]'>
-            <User className='h-3.5 w-3.5 xl:h-5 xl:w-5' />
+            <User className='h-3.5 w-3.5 xl:h-6 xl:w-6' />
           </div>
           {!isCollapsed && (
             <div className=''>
-              <p className='text-xs xl:text-md font-semibold'>{user.name}</p>
+              <p className='text-xs xl:text-[1.1rem] font-semibold'>{user.name}</p>
               <p className='text-[0.5rem] xl:text-xs opacity-80'>{user.email}</p>
             </div>
           )}

@@ -14,7 +14,7 @@ const UserContext = createContext<UserContextType>({
 })
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>({ name: 'User', email: '' })
+  const [user, setUser] = useState<User>({ name: 'User', email: 'mail@mail.com' })
 
   useEffect(() => {
     fetch('http://localhost:8080/api/me', {

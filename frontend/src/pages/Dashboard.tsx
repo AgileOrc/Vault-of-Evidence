@@ -36,31 +36,65 @@ type DashboardSummary = {
     recentFindings: FindingData[]
 }
 
+// const dummyProjects = [
+//     { id: '1', name: 'mycompany.com', description: 'Web Application', status: 'Active' },
+//     { id: '2', name: 'api.startup.io', description: 'API Security', status: 'Active' },
+//     { id: '3', name: 'staging.app.io', description: 'Web Application', status: 'Paused' },
+//     { id: '4', name: 'newclient.com', description: 'Web Application', status: 'Upcoming' },
+//     { id: '5', name: 'corp.enterprise.com', description: 'Internal Network', status: 'Completed' },
+// ]
+
+// const dummyFindings = [
+//     { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
+//     { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
+//     { id: '3', title: 'Broken Authentication on /forgot-password', project: 'mycompany.com', worklist: 'Forgot Password', severity: 'High' },
+//     { id: '4', title: 'Sensitive Data Exposure on /api/v1/users', project: 'staging.app.io', worklist: 'User Profile', severity: 'Medium' },
+//     { id: '5', title: 'Missing Secure Flag on session cookie', project: 'corp.enterprise.com', worklist: 'Login Page', severity: 'Low' },
+// ]
+
+function StatCard({ title, value, subtitle, icon: Icon, theme }: {
+    title: string | React.ReactNode
+    value: number | string
+    subtitle: string
+    icon: React.ElementType
+    theme: any
+}) {
+    return (
+        <div className={`px-10 lg:px-14 xl:px-10 h-52 md:h-56 xl:h-68 flex flex-col gap-2 xl:gap-3 justify-center ${theme.cardBase}`}>
+            <p className={`text-lg md:text-xl xl:text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>{title}</p>
+            <div className='flex items-center gap-2 xl:gap-3'>
+                <Icon className='h-10 w-10 md:h-12 md:w-12 text-[#0E65AD]' />
+                <span className={`text-5xl xl:text-6xl font-semibold font-montserrat ${theme.statNumber}`}>{value}</span>
+            </div>
+            <p className={`text-lg md:text-xl xl:text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>{subtitle}</p>
+        </div>
+    )
+}
+
 function Dashboard () {
     const { isDark } = useOutletContext<LayoutContext>()
     const { user } = useUser()
 
-    // AKU COMMENT DULU LOADINGNYA, NANTI KALAU MAU DITAMBAHKAN KETIKA BACKEND SUDAH CONNECT, BOLEH YGY
-    // const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
 
     const [data, setData] = useState<DashboardSummary | null>(null)
 
     
-    // useEffect(() => {
-    //     api.get('/projects/dashboard/summary')
-    //         .then((res) => {
-    //             setData(res.data)
-    //             setLoading(false)
-    //         })
-    //         .catch(() => {
-    //             setLoading(false)
-    //         })
-    // }, [])
+    useEffect(() => {
+        api.get('/projects/dashboard/summary')
+            .then((res) => {
+                setData(res.data)
+                setLoading(false)
+            })
+            .catch(() => {
+                setLoading(false)
+            })
+    }, [])
 
     const theme = isDark
         ? {
             cardBase:
-                'rounded-4xl bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+                'rounded-3xl xl:rounded-4xl bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#FFFFFF]',
@@ -91,7 +125,7 @@ function Dashboard () {
         }
         : {
             cardBase:
-                'rounded-4xl bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 border border-[#27D6FF]/10 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+                'rounded-3xl xl:rounded-4xl bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#002C49]',
@@ -149,68 +183,42 @@ function Dashboard () {
     }
     
     return (
-        <div className='space-y-6'>
-            <header className='flex flex-wrap items-start justify-between gap-4'>
-                <div>
-                    <h1 className={`text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, {user.name}</h1>
-                    <p className={`mt-1 text-lg opacity-80 font-montserrat ${theme.greetings}`}>Here is what is happening across your projects today.</p>
-                </div>
-                <Link to='/Projects' className={`flex items-center gap-2 rounded-lg px-4 py-2 text-ls font-semibold font-montserrat ${theme.buttonNewProject}`}>
+        <div className='space-y-8 md:space-y-12 xl:space-y-6'>
+            <header className='flex flex-wrap gap-6 items-start justify-between'>
+                <div className='flex flex-col xl:gap-1'>
+                    <h1 className={`text-2xl xl:text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, {user.name}</h1>
+                    <p className={`text-sm md:text-md xl:text-lg opacity-80 font-montserrat ${theme.greetings}`}>Here is what is happening across your projects today.</p>
+                </div> 
+                <Link to='/Projects' className={`flex items-center gap-1 xl:gap-2 rounded-md md:rounded-lg px-3 xl:px-4 py-1.5 xl:py-2 text-sm md:text-md xl:text-lg font-semibold font-montserrat ${theme.buttonNewProject}`}>
                     <Plus className='h-4 w-4' /> New Project
                 </Link>
             </header>
-
+            
             {/* Statistik Atas */}
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-4 xl:grid-cols-4'>
-                <div className={`py-12 px-10 h-68 flex flex-col gap-3 justify-center ${theme.cardBase}`}>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Active projects</p>
-                    <div className='flex items-center gap-3'>
-                        <Folder className='h-12 w-12 text-[#0E65AD]' />
-                            <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>4</span>
-                    </div>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>of {data?.totalProjects || 0} total</p>
-                </div>
-                <div className={`py-12 px-10 h-68 flex flex-col justify-center gap-3 ${theme.cardBase}`}>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Active worklists</p>
-                    <div className='flex items-center gap-3'>
-                        <ClipboardList className='h-12 w-12 text-[#0E65AD]' />
-                        <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>5</span>
-                    </div>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Ongoing</p>
-                </div>
-                <div className={`py-12 px-10 h-68 flex flex-col justify-center gap-3 ${theme.cardBase}`}>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Waiting response</p>
-                    <div className='flex items-center gap-3'>
-                        <Timer className='h-12 w-12 text-[#0E65AD]' />
-                        <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>7</span>
-                    </div>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Unresolved</p>
-                </div>
-                <div className={`py-12 px-10 h-68 flex flex-col justify-center gap-3 ${theme.cardBase}`}>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Unresolved critical & high</p>
-                    <div className='flex items-center gap-3'>
-                        <AlertTriangle className='h-12 w-12 text-[#0E65AD]' />
-                        <span className={`text-6xl font-semibold font-montserrat ${theme.statNumber}`}>2</span>
-                    </div>
-                    <p className={`text-[1.4rem] font-montserrat font-medium ${theme.cardText}`}>Needs attention</p>
-                </div>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4'>
+                <StatCard title='Active projects' value={4} subtitle={`of ${data?.totalProjects || 0} total`} icon={Folder} theme={theme} />
+                <StatCard title='Active worklists' value={5} subtitle='Ongoing' icon={ClipboardList} theme={theme} />
+                <StatCard title='Waiting response' value={7} subtitle='Unresolved' icon={Timer} theme={theme} />
+                <StatCard title= {<>Unresolved <br /> critical & high</>} value={2} subtitle='Needs attention' icon={AlertTriangle} theme={theme} />
             </div>
 
-            <div className='flex gap-6 lg:grid-cols-2 '>
-                <div className={`w-full px-10 py-8 ${theme.cardBase}`}>
-                    <div className='flex items-center justify-between'>
-                        <h2 className={`text-2xl font-montserrat font-semibold py-3 ${theme.titles}`}>Project Overview</h2>
-                        <Link to='/Projects' className={`flex items-center gap-1 text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
-                            View all <ArrowUpRight className='h-6 w-6' />
+            {/* Project Overview Card & Recent Activity*/}
+            <div className='flex flex-col xl:flex-row gap-6'>
+                {/* Project Overview */}
+                <div className={`w-full px-8 py-8 lg:px-10 ${theme.cardBase}`}>
+                    <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
+                        <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Project Overview</h2>
+                        <Link to='/Projects' className={`flex items-center gap-0.5 md:gap-1 text-md md:text-lg xl:text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
+                            View all <ArrowUpRight className='h-4 w-4 md:h-5 md:w-5 xl:h-6 xl:w-6' />
                         </Link>
                     </div>
                     <div className={`divide-y ${theme.divider}`}>
                         {data?.recentProjects && data.recentProjects.length > 0 ? (
                             data.recentProjects.map((project) => (
-                                <div key={project.id} className='flex items-center justify-between py-3'>
+                                <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                     <div>
-                                        <p className={`text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
-                                        <p className={`text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
+                                        <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
+                                        <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
                                     <span className={`rounded-full px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
                                         {project.status}
@@ -218,23 +226,37 @@ function Dashboard () {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-sm py-4 text-center opacity-60 font-montserrat">You haven't joined any projects yet.</p>
+                            <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">You haven't joined any projects yet.</p>
                         )}
+                        {/* {dummyProjects.map((project) => (
+                            <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
+                                <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
+                                    <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
+                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description}</p>
+                                </div>
+                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
+                                    {project.status}
+                                </span>
+                            </div>
+                        ))} */}
                     </div>
                 </div>
 
                 {/* Recent Activity (Tetap dummy karena tidak ada tabel log aktivitas di DB saat ini) */}
-                <div className={`px-10 py-8 min-w-1/3 ${theme.cardBase}`}>
-                    <div className='flex items-center justify-between'>
-                        <h2 className={`text-2xl font-montserrat font-semibold py-3 ${theme.titles}`}>Recent Activity</h2>
+                <div className={`px-8 py-8 lg:px-10 min-w-1/3 ${theme.cardBase}`}>
+                    <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
+                        <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Recent Activity</h2>
+                        <Link to='/Projects' className={`flex items-center gap-0.5 md:gap-1 text-md md:text-lg xl:text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
+                            View all <ArrowUpRight className='h-4 w-4 md:h-5 md:w-5 xl:h-6 xl:w-6' />
+                        </Link>
                     </div>
                     <div className={`divide-y ${theme.divider}`}>
                         <div className='flex gap-3 py-3'>
-                            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${theme.icon}`}>
-                                <UserPlus className='h-6 w-6' />
+                            <div className={`hidden md:flex h-9 w-9 md:h-11 md:w-11 shrink-0 items-center justify-center rounded-full ${theme.icon}`}>
+                                <UserPlus className='h-4 w-4 md:h-6 md:w-6' />
                             </div>
-                            <div>
-                                <p className={`text-md font-semibold font-montserrat ${theme.titles}`}>System ready and fully encrypted.</p>
+                            <div className='flex flex-col gap-0.5'>
+                                <p className={`text-sm md:text-md font-semibold font-montserrat ${theme.titles}`}>System ready and fully encrypted.</p>
                                 <p className={`text-xs font-medium font-montserrat opacity-80 ${theme.description}`}>Just now</p>
                             </div>
                         </div>
@@ -243,30 +265,40 @@ function Dashboard () {
             </div>
 
             {/* Recent Findings dari Backend */}
-            <div className={`px-10 py-8 ${theme.cardBase}`}>
-                <div className='flex items-center justify-between'>
-                    <h2 className={`text-2xl font-montserrat font-semibold py-3 ${theme.titles}`}>Recent Findings Across Projects</h2>
-                    <Link to='/Projects' className={`flex items-center gap-1 text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
-                        View all <ArrowUpRight className='h-6 w-6' />
+            <div className={`px-8 py-8 lg:px-10 ${theme.cardBase}`}>
+                <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
+                    <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Recent Findings</h2>
+                    <Link to='/Projects' className={`flex items-center gap-0.5 md:gap-1 text-md md:text-lg xl:text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
+                        View all <ArrowUpRight className='h-4 w-4 md:h-5 md:w-5 xl:h-6 xl:w-6' />
                     </Link>
                 </div>
                 <div className={`divide-y ${theme.divider}`}>
                     {data?.recentFindings && data.recentFindings.length > 0 ? (
                         data.recentFindings.map((finding) => (
-                            <div key={finding.id} className='flex items-center justify-between py-3'>
-                                <div>
-                                    <p className={`text-lg font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
-                                    <p className={`text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{finding.project} - {finding.worklist}</p>
+                            <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
+                                <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
+                                    <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
+                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{finding.project} - {finding.worklist}</p>
                                 </div>
-                                <span className={`rounded-full px-6 py-1 text-sm font-montserrat font-semibold ${severityClass(finding.severity)}`}>
+                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${severityClass(finding.severity)}`}>
                                     {finding.severity}
                                 </span>
                             </div>
                         ))
                     ) : (
-                        <p className="text-sm py-4 text-center opacity-60 font-montserrat">No vulnerabilities reported yet.</p>
+                        <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">No vulnerabilities reported yet.</p>
                     )}
-                    
+                    {/* {dummyFindings.map((finding) => (
+                        <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
+                            <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
+                                <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
+                                <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{finding.project} - {finding.worklist}</p>
+                            </div>
+                            <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${severityClass(finding.severity)}`}>
+                                {finding.severity}
+                            </span>
+                        </div>
+                    ))} */}
                 </div>
             </div>
         </div>

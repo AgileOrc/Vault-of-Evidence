@@ -20,7 +20,7 @@ function AppLayout () {
     : 'bg-[#F5F5F5] text-[#002C49]'
 
   return (
-    <div className={`min-h-screen ${pageBase} flex max-w-screen`}
+    <div className={`min-h-screen ${pageBase} md:flex md:max-w-screen`}
     >
       <Sidebar
         isDark={isDark}
@@ -30,7 +30,7 @@ function AppLayout () {
         onOpenNotifications={() => setShowNotifications(true)}
       />
 
-      <div className='relative flex-1'>
+      <div className='relative flex-1 overflow-x-hidden'>
         <button
           type='button'
           onClick={() => setIsCollapsed((prev) => !prev)}
