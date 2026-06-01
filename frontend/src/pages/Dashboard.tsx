@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
     AlertTriangle,
     ArrowUpRight,
@@ -220,7 +220,7 @@ function Dashboard () {
                                         <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
                                         <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
-                                    <span className={`rounded-full px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
+                                    <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
                                         {project.status}
                                     </span>
                                 </div>
