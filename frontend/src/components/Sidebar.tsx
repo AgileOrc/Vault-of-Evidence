@@ -76,7 +76,6 @@ function Sidebar ({
         </nav>
       </div>
 
-{/* INI KE BAWAH BLM KELAR YGY */}
       <div className='mt-24 md:mt-auto flex flex-col gap-2 xl:gap-4'>
         <button
           type='button'
