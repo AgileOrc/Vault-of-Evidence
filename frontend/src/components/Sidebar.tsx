@@ -113,7 +113,7 @@ function Sidebar ({
 
         <NavLink
           to='/profile'
-          className={`flex items-center px-1 py-2 xl:px-1.5 gap-2 rounded-lg hover:bg-[#20A6DA] transition ${
+          className={`flex items-center px-1 py-2 xl:px-1.5 gap-2 rounded-lg hover:bg-[#F5F5F5]/30 transition ${
               isCollapsed ? 'justify-center' : ''
           }`}
       >
