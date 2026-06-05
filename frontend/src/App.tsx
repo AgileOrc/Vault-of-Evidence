@@ -9,7 +9,7 @@ import EmailSent from './pages/EmailSent'
 import AppLayout from './components/AppLayout'
 import CreateNewPassword from './pages/CreateNewPassword'
 import NewProject from './pages/NewProject'
-import ProjectDetails from './pages/ProjectDetails'
+import Worklist from './pages/Worklist'
 import Profile from './pages/UserProfile'
 import CVSSCalculator from './pages/CVSSCalculator'
 
@@ -21,7 +21,7 @@ function App () {
         <Route path='/Dashboard' element={<Dashboard />} />
         <Route path='/Projects' element={<Projects />} />
         <Route path="/Projects/New" element={<NewProject />} />
-        <Route path="/Projects/:id" element={<ProjectDetails />} />
+        <Route path="/projects/:projectId/worklists" element={<Worklist />} />
         <Route path='/cvss' element={<CVSSCalculator />} />
         <Route path='/Profile' element={<Profile />} /> 
       </Route>

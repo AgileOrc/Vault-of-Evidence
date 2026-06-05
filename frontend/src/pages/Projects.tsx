@@ -20,6 +20,7 @@ type ProjectData = {
     worklists: number
     findings: number
     status: string
+    describtion: string
 }
 
 function Projects () {
@@ -47,7 +48,8 @@ function Projects () {
                         members: 5,
                         worklists: 6,
                         findings: 23,
-                        status: 'Active'
+                        status: 'Active',
+                        describtion: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.'
                     },
                     {
                         id: '2',
@@ -56,7 +58,8 @@ function Projects () {
                         members: 3,
                         worklists: 4,
                         findings: 11,
-                        status: 'Active'
+                        status: 'Active',
+                        describtion: '-'
                     },
                     {
                         id: '3',
@@ -65,7 +68,8 @@ function Projects () {
                         members: 4,
                         worklists: 7,
                         findings: 15,
-                        status: 'Paused'
+                        status: 'Paused',
+                        describtion: '-'
                     }
                 ])
                 
@@ -101,10 +105,23 @@ function Projects () {
         }
 
     const badgeClass = (status: string) => {
-        const cleanStatus = status.toLowerCase()
-        if (cleanStatus === 'active') return isDark ? 'bg-[#17E58F] text-[#005B35]' : 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (cleanStatus === 'paused') return isDark ? 'bg-[#E6DF14] text-[#5B4100]' : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        return isDark ? 'bg-[#22BBDE] text-[#00375C]' : 'bg-[#00375C] text-[#22BBDE] font-semibold'
+        if (isDark) {
+            if (status === 'Active')
+                return 'bg-[#17E58F] text-[#005B35]'
+
+            if (status === 'Paused')
+                return 'bg-[#E6DF14] text-[#5B4100]'
+
+            if (status === 'Upcoming')
+                return 'bg-[#C017DE] text-[#40005B]'
+
+            return 'bg-[#22BBDE] text-[#00375C]'
+        }
+        
+        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
+        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
+        return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     }
 
     if (loading) {
@@ -172,7 +189,7 @@ function Projects () {
                     filteredProjects.map((project) => (
                         <Link
                             key={project.id}
-                            to={`/projects/${project.id}`}
+                            to={`/projects/${project.id}/worklists`}
                             className={`block rounded-xl md:rounded-2xl p-4 md:p-6 transition hover:scale-[1.01] ${theme.cardBase}`}
                         >
                             <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-3'>
