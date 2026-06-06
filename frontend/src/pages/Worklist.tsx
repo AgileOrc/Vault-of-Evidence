@@ -178,7 +178,7 @@ function Worklist () {
             <h1 className={`text-2xl xl:text-3xl font-semibold font-montserrat ${theme.projectName}`}>Project</h1>
             
             <div className='flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6'>
-                <div className='space-y-2 flex-1'>
+                <div className='space-y-2 flex-1 min-w-0'>
                     <div className='flex items-center gap-6 min-w-0'>
                         <h2 className={`min-w-0 truncate text-2xl xl:text-3xl font-semibold font-montserrat ${theme.projectName}`}> {project?.name} </h2>
                     
@@ -202,7 +202,7 @@ function Worklist () {
                     </div>
                 </div>
                 
-                <div className='flex flex-wrap gap-4 shrink-0'>
+                <div className='flex flex-wrap justify-end gap-4 shrink-0 w-fit'>
                     <button className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold font-montserrat ${theme.buttonEditProject}`}>
                         <Pencil size={18} /> Edit Project
                     </button>
@@ -211,7 +211,7 @@ function Worklist () {
                         <Users size={18} /> Manage Members
                     </button>
                         
-                    <button className={`xl:w-auto 2xl:w-auto flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold font-montserrat ${theme.buttonDelete}`}>
+                    <button className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold font-montserrat ${theme.buttonDelete}`}>
                         <Trash2 size={18} /> Delete Project
                     </button>
                 </div>
@@ -227,7 +227,7 @@ function Worklist () {
 
                     <input
                         type='text'
-                        placeholder='Search Worklists...'
+                        placeholder='Search Worklist...'
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className={`w-full rounded-lg md:rounded-xl pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base border font-Montserrat focus:outline-none focus:ring-2 ${
@@ -275,28 +275,28 @@ function Worklist () {
             {/* Worklist List */}
             <div className='mt-8 grid gap-4'>
                 {filteredWorklists.length > 0 ? (
-                    filteredWorklists.map((project) => (
+                    filteredWorklists.map((worklist) => (
                         <Link
-                            key={project.id}
-                            to={`/projects/${project.id}/worklists/${project.id}/findings`}
+                            key={worklist.id}
+                            to={`/projects/${projectId}/worklists/${worklist.id}/findings`}
                             className={`block rounded-xl md:rounded-2xl p-4 md:p-6 transition hover:scale-[1.01] ${theme.cardBase}`}
                         >
                             <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-3'>
                                 <div>
-                                    <h3 className={`text-lg md:text-xl xl:text-2xl font-semibold font-montserrat ${theme.projectName}`}> {project.name} </h3>
+                                    <h3 className={`text-lg md:text-xl xl:text-2xl font-semibold font-montserrat ${theme.projectName}`}> {worklist.name} </h3>
 
-                                    <p className={`mt-2 text-lg md:text-lg xl:text-xl font-medium font-montserrat ${theme.projectDetails}`}> {project.code} </p>
+                                    <p className={`mt-2 text-lg md:text-lg xl:text-xl font-medium font-montserrat ${theme.projectDetails}`}> {worklist.code} </p>
                                 </div>
 
                                 <div className='mt-3 flex flex-wrap items-center gap-3 md:gap-5 xl:gap-6 text-xs md:text-sm xl:text-base'>
                                     <div className={`flex items-center gap-2 text-lg md:text-lg xl:text-xl font-medium font-montserrat ${theme.projectDetails}`}>
-                                        <Bug size={20} /> {project.findings} findings
+                                        <Bug size={20} /> {worklist.findings} findings
                                     </div>
 
                                     <span className={`rounded-full px-3 md:px-4 xl:px-6 py-1 text-xs md:text-lg font-semibold ${
-                                        badgeClass(project.status)}`}
+                                        badgeClass(worklist.status)}`}
                                     >
-                                        {project.status}
+                                        {worklist.status}
                                     </span>
 
                                     <button className={`flex items-center rounded-lg md:rounded-xl px-3 md:px-1 xl:px-2 py-1 gap-2 text-xs md:text-sm xl:text-lg font-medium font-montserrat ${theme.buttonDeleteWorklist}`}>
@@ -310,7 +310,7 @@ function Worklist () {
                     <div
                         className={`rounded-xl p-8 text-center ${theme.cardBase}`}
                     >
-                        No projects found.
+                        No worklist found.
                     </div>
                 )}
             </div>
