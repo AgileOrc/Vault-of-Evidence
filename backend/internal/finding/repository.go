@@ -13,6 +13,7 @@ import (
 type Repository interface {
 	Create(finding *domain.Finding) error
 	FindByProjectID(projectID string, params pagination.Params) ([]domain.Finding, int64, error)
+	FindByWorklistID(worklistID string, params pagination.Params) ([]domain.Finding, int64, error)
 	FindByID(id string) (*domain.Finding, error)
 	Update(finding *domain.Finding) error
 	Delete(id string) error
@@ -34,6 +35,26 @@ func (r *repository) FindByProjectID(projectID string, params pagination.Params)
 	var total int64
 
 	query := r.db.Model(&domain.Finding{}).Where("project_id = ?", projectID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if err := query.Order("created_at DESC").
+		Limit(params.Limit).
+		Offset(params.Offset).
+		Find(&findings).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return findings, total, nil
+}
+
+func (r *repository) FindByWorklistID(worklistID string, params pagination.Params) ([]domain.Finding, int64, error) {
+	var findings []domain.Finding
+	var total int64
+
+	query := r.db.Model(&domain.Finding{}).Where("worklist_id = ?", worklistID)
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err

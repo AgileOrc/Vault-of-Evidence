@@ -152,6 +152,33 @@ func main() {
 				worklistRoutes.DELETE("/:worklist_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					worklistHandler.Delete)
+					
+				// Nested routes untuk finding di dalam sebuah worklist: /projects/:id/worklists/:worklist_id/findings
+				worklistFindingsRoutes := worklistRoutes.Group("/:worklist_id/findings")
+				{
+					// Di sini, auth & role middleware diwariskan dari group worklistRoutes/singleProject
+					worklistFindingsRoutes.Use(middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester))
+					findingHandler.RegisterWorklistRoutes(worklistFindingsRoutes)
+					
+					worklistEvidenceRoutes := worklistFindingsRoutes.Group("/:finding_id/evidence")
+					{
+						worklistEvidenceRoutes.GET("",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+							evidenceHandler.GetByFinding)
+
+						worklistEvidenceRoutes.GET("/:evidence_id/download",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+							evidenceHandler.Download)
+
+						worklistEvidenceRoutes.POST("",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+							evidenceHandler.Upload)
+
+						worklistEvidenceRoutes.DELETE("/:evidence_id",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+							evidenceHandler.Delete)
+					}
+				}
 			}
 
 			findingRoutes := singleProject.Group("/findings")

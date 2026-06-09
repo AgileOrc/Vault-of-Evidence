@@ -29,8 +29,9 @@ func (s *service) Create(projectID string, req *domain.CreateWorklistRequest) (*
 	w := &domain.Worklist{
 		ProjectID:   pid,
 		Name:        req.Name,
+		Code:        req.Code,
 		Description: req.Description,
-		Status:      domain.WorklistOpen,
+		Status:      domain.WorklistNotStarted,
 	}
 	if err := s.repo.Create(w); err != nil {
 		return nil, err
@@ -54,6 +55,7 @@ func (s *service) Update(id string, req *domain.UpdateWorklistRequest) (*domain.
 	if err != nil || w == nil { return nil, ErrNotFound }
 
 	if req.Name != "" { w.Name = req.Name }
+	if req.Code != "" { w.Code = req.Code }
 	if req.Description != "" { w.Description = req.Description }
 	if req.Status != "" { w.Status = req.Status }
 

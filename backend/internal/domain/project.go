@@ -25,10 +25,10 @@ type Project struct {
 	CreatedByID uuid.UUID     `gorm:"type:uuid;not null"                             json:"created_by_id"`
 	CreatedBy   User          `gorm:"foreignKey:CreatedByID"                         json:"created_by,omitempty"`
 	Findings    []Finding     `gorm:"foreignKey:ProjectID"                           json:"findings,omitempty"`
+	Worklists   []Worklist    `gorm:"foreignKey:ProjectID"                           json:"worklists,omitempty"`
 	CreatedAt   time.Time     `json:"created_at"`
 	UpdatedAt   time.Time     `json:"updated_at"`
-	// Di struct Project, tambahkan setelah field Findings:
-	Members []ProjectMember `gorm:"foreignKey:ProjectID" json:"members,omitempty"`
+	Members     []ProjectMember `gorm:"foreignKey:ProjectID"                         json:"members,omitempty"`
 }
 
 type CreateProjectRequest struct {

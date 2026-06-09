@@ -51,7 +51,19 @@ function Findings () {
         .then(([projectRes, worklistRes, findingsRes]) => {
             setProject(projectRes.data.data)
             setWorklist(worklistRes.data.data)
-            setFindings(findingsRes.data.data || [])
+            
+            const rawFindings = findingsRes.data.data || [];
+            const mappedFindings = rawFindings.map((f: any) => ({
+                id: f.id,
+                name: f.title || 'Untitled',
+                code: '-', // Backend doesn't have finding code yet
+                status: f.status || 'open',
+                confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString() : '-',
+                severity: f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : 'Low',
+                member: '-' // Backend doesn't have assignee yet
+            }))
+            
+            setFindings(mappedFindings)
             setLoading(false)
         })
         .catch(() => {

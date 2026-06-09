@@ -38,13 +38,29 @@ function Worklist () {
     const { projectId } = useParams()
 
     useEffect(() => {
-        api.get(`/projects/${projectId}`)
-            .then((res) => {
-                setProject(res.data.project)
-                setWorklists(res.data.worklists)
-                setLoading(false)
+        Promise.all([
+            api.get(`/projects/${projectId}`),
+            api.get(`/projects/${projectId}/worklists`)
+        ])
+        .then(([projectRes, worklistsRes]) => {
+            const wList = worklistsRes.data.data || [];
+            const mappedWorklists = wList.map((w: any) => ({
+                ...w,
+                findings: w.findings ? w.findings.length : 0
+            }))
+            
+            const p = projectRes.data.data;
+            setProject({
+                ...p,
+                members: p.members ? p.members.length : 0,
+                worklists: wList.length,
+                findings: mappedWorklists.reduce((acc: number, curr: any) => acc + curr.findings, 0)
             })
-            .catch(() => {
+            
+            setWorklists(mappedWorklists)
+            setLoading(false)
+        })
+        .catch(() => {
                 setProject({
                     id: projectId || '1',
                     name: 'mycompany.com (Dummy)',
