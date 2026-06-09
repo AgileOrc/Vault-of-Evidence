@@ -26,6 +26,7 @@ const (
 type Finding struct {
 	ID                uuid.UUID     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
 	ProjectID         uuid.UUID     `gorm:"type:uuid;not null;index"                       json:"project_id"`
+	WorklistID  *uuid.UUID `gorm:"type:uuid;index"          json:"worklist_id,omitempty"` 
 	Title             string        `gorm:"type:varchar(255);not null"                     json:"title"`
 	Description       string        `gorm:"type:text"                                      json:"description"`
 	Severity          Severity      `gorm:"type:varchar(20);not null"                      json:"severity"`

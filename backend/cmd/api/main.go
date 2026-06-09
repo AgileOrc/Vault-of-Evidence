@@ -19,6 +19,7 @@ import (
 	"vault-of-evidence/backend/internal/middleware"
 	jwtpkg "vault-of-evidence/backend/internal/pkg/jwt"
 	"vault-of-evidence/backend/internal/project"
+	"vault-of-evidence/backend/internal/worklist" // 1. IMPORT MODUL BARU DI SINI
 )
 
 func main() {
@@ -49,6 +50,11 @@ func main() {
 	projectRepo := project.NewRepository(db)
 	projectSvc := project.NewService(projectRepo)
 	projectHandler := project.NewHandler(projectSvc)
+
+	// 2. INISIALISASI WORKLIST
+	worklistRepo := worklist.NewRepository(db)
+	worklistSvc := worklist.NewService(worklistRepo)
+	worklistHandler := worklist.NewHandler(worklistSvc)
 
 	findingRepo := finding.NewRepository(db)
 	findingSvc := finding.NewService(findingRepo)
@@ -102,6 +108,9 @@ func main() {
 		projectRoutes.GET("", projectHandler.GetAll)
 		projectRoutes.POST("", projectHandler.Create)
 
+		// 3. DAFTARKAN DASHBOARD API (Wajib di atas rute /:id agar tidak dibaca sebagai ID proyek)
+		projectRoutes.GET("/dashboard/summary", projectHandler.GetDashboardSummary)
+
 		singleProject := projectRoutes.Group("/:id")
 		{
 			singleProject.GET("",
@@ -114,7 +123,25 @@ func main() {
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.Delete)
 
-			// singleProject.POST("/invite", middleware.RequireProjectRole(db, "id", domain.RolePM), projectHandler.InviteMember)
+			// 4. DAFTARKAN WORKLIST ROUTES DI DALAM GROUP PROJECT
+			worklistRoutes := singleProject.Group("/worklists")
+			{
+				worklistRoutes.GET("",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+					worklistHandler.GetByProject)
+				worklistRoutes.GET("/:worklist_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+					worklistHandler.GetByID)
+				worklistRoutes.POST("",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					worklistHandler.Create)
+				worklistRoutes.PUT("/:worklist_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					worklistHandler.Update)
+				worklistRoutes.DELETE("/:worklist_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					worklistHandler.Delete)
+			}
 
 			findingRoutes := singleProject.Group("/findings")
 			{

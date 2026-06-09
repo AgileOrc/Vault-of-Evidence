@@ -15,10 +15,10 @@ import api from '../api/axios'
 type ProjectData = {
     id: string
     name: string
-    type: string
-    members: number
-    worklists: number
-    findings: number
+    type?: string       // Dibuat opsional agar tidak error jika backend tidak mengirim
+    members?: number    // Dibuat opsional
+    worklists?: number  // Dibuat opsional
+    findings?: number   // Dibuat opsional
     status: string
 }
 
@@ -31,58 +31,29 @@ function Projects () {
 
     const [projects, setProjects] = useState<ProjectData[]>([])
 
-    //ini jujur aku blm tau bener apa engganya, tolong di koreksi ges kalo salah
+    // Koneksi ke backend sudah BENAR
     useEffect(() => {
-        api.get('/projects/lists')
+        api.get('/projects')
             .then((res) => {
-                setProjects(res.data.projects)
+                // Mengambil array data dari struktur pagination backend
+                setProjects(res.data.data || []) 
                 setLoading(false)
             })
             .catch(() => {
-                setProjects([
-                    {
-                        id: '1',
-                        name: 'mycompany.com (Dummy)',
-                        type: 'Web Application',
-                        members: 5,
-                        worklists: 6,
-                        findings: 23,
-                        status: 'Active'
-                    },
-                    {
-                        id: '2',
-                        name: 'api.startup.io (Dummy)',
-                        type: 'API Security',
-                        members: 3,
-                        worklists: 4,
-                        findings: 11,
-                        status: 'Active'
-                    },
-                    {
-                        id: '3',
-                        name: 'staging.app.io (Dummy)',
-                        type: 'Web Application',
-                        members: 4,
-                        worklists: 7,
-                        findings: 15,
-                        status: 'Paused'
-                    }
-                ])
-                
                 setLoading(false)
             })
     }, [])
 
     const filteredProjects = projects.filter((project) => {
+        // [BUG FIX]: Tambahkan fallback string kosong (|| '') agar tidak crash jika nama/status null
         const matchesSearch =
-            project.name.toLowerCase().includes(searchTerm.toLowerCase())
+            (project.name || '').toLowerCase().includes(searchTerm.toLowerCase())
 
         const matchesStatus =
-            statusFilter === 'all' || project.status.toLowerCase() === statusFilter.toLowerCase()
+            statusFilter === 'all' || (project.status || 'planning').toLowerCase() === statusFilter.toLowerCase()
 
         return matchesSearch && matchesStatus
     })
-
 
     const theme = isDark
         ? {
@@ -101,7 +72,8 @@ function Projects () {
         }
 
     const badgeClass = (status: string) => {
-        const cleanStatus = status.toLowerCase()
+        // [BUG FIX]: Tambahkan fallback 'planning' agar toLowerCase() tidak crash
+        const cleanStatus = (status || 'planning').toLowerCase()
         if (cleanStatus === 'active') return isDark ? 'bg-[#17E58F] text-[#005B35]' : 'bg-[#005B35] text-[#17E58F] font-semibold'
         if (cleanStatus === 'paused') return isDark ? 'bg-[#E6DF14] text-[#5B4100]' : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
         return isDark ? 'bg-[#22BBDE] text-[#00375C]' : 'bg-[#00375C] text-[#22BBDE] font-semibold'
@@ -182,22 +154,26 @@ function Projects () {
                                     <div className='mt-3 flex flex-wrap items-center gap-2 md:gap-4 xl:gap-5 text-xs md:text-sm xl:text-base'>
                                         <div className={`flex items-center gap-1 ${theme.info}`}>
                                             <Globe size={16} />
-                                            <span>{project.type}</span>
+                                            {/* [BUG FIX]: Tambahkan fallback 'General Project' jika type kosong */}
+                                            <span>{project.type || 'General Project'}</span>
                                         </div>
 
                                         <div className={`flex items-center gap-1 ${theme.info}`}>
                                             <Users size={16} />
-                                            <span>{project.members} members</span>
+                                            {/* [BUG FIX]: Tambahkan fallback 0 jika members kosong */}
+                                            <span>{project.members || 0} members</span>
                                         </div>
 
                                         <div className={`flex items-center gap-1 ${theme.info}`}>
                                             <FileText size={16} />
-                                            <span>{project.worklists} worklists</span>
+                                            {/* [BUG FIX]: Tambahkan fallback 0 jika worklists kosong */}
+                                            <span>{project.worklists || 0} worklists</span>
                                         </div>
 
                                         <div className={`flex items-center gap-1 ${theme.info}`}>
                                             <Bug size={16} />
-                                            <span>{project.findings} findings</span>
+                                            {/* [BUG FIX]: Tambahkan fallback 0 jika findings kosong */}
+                                            <span>{project.findings || 0} findings</span>
                                         </div>
                                     </div>
                                 </div>
@@ -205,7 +181,8 @@ function Projects () {
                                 <span className={`rounded-full px-3 md:px-4 xl:px-5 py-1 text-xs md:text-sm font-semibold ${
                                     badgeClass(project.status)}`}
                                 >
-                                    {project.status}
+                                    {/* [BUG FIX]: Tangani status kosong */}
+                                    {project.status || 'planning'}
                                 </span>
                             </div>
                         </Link>
