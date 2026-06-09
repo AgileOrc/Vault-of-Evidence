@@ -7,6 +7,7 @@ import NotificationsModal from './NotificationsModal'
 
 export type LayoutContext = {
   isDark: boolean
+  isCollapsed: boolean
 }
 
 function AppLayout () {
@@ -42,8 +43,8 @@ function AppLayout () {
           {isCollapsed ? <ChevronRight className='h-5 xl:h-7 ' /> : <ChevronLeft className='h-5 xl:h-7' />}
         </button>
 
-        <main className='px-18 md:px-16 xl:px-18 pb-12 pt-20 md:pt-18 xl:pt-20'>
-          <Outlet context={{ isDark }} />
+        <main className='px-12 md:px-16 xl:px-18 pb-12 pt-20 md:pt-18 xl:pt-20'>
+          <Outlet context={{ isDark, isCollapsed }} />
         </main>
       </div>
 

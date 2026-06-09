@@ -3,9 +3,11 @@ import logo from '../assets/logo-05.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../api/axios'; 
+import { useUser } from '../context/UserContext';
 
 function Login() {
     const navigate = useNavigate();
+    const { refreshUser } = useUser();
 
     // State untuk input
     const [email, setEmail] = useState('');
@@ -50,7 +52,8 @@ function Login() {
             const response = await api.post('/auth/login', { email, password });
 
             if (response.status === 200) {
-                // Jika sukses, baru arahkan ke Dashboard
+                // Refresh user context lalu arahkan ke Dashboard
+                await refreshUser();
                 navigate('/Dashboard');
             }
         } catch (err: any) {
