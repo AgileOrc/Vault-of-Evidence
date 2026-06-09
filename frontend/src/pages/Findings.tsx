@@ -282,7 +282,18 @@ function Findings () {
                 isDark={isDark}
                 onClose={() => setShowEditWorklist(false)}
                 worklist={worklist}
-                onSubmit={(data) => console.log('edit worklist', data)}
+                onSubmit={async (data) => {
+                    try {
+                        const payload = {
+                            name: data.name,
+                            code: data.code,
+                            status: data.status?.toLowerCase() || 'not started'
+                        }
+                        await api.put(`/projects/${projectId}/worklists/${worklistId}`, payload)
+                        const res = await api.get(`/projects/${projectId}/worklists/${worklistId}`)
+                        setWorklist(res.data.data)
+                    } catch (err) { console.error('Failed to edit worklist', err) }
+                }}
             />
 
             <DeleteWorklistModal
@@ -290,7 +301,12 @@ function Findings () {
                 isDark={isDark}
                 onClose={() => setShowDeleteWorklist(false)}
                 worklistName={worklist?.name ?? ''}
-                onConfirm={() => console.log('delete worklist')}
+                onConfirm={async () => {
+                    try {
+                        await api.delete(`/projects/${projectId}/worklists/${worklistId}`)
+                        window.location.href = `/projects/${projectId}/worklists`
+                    } catch (err) { console.error('Failed to delete worklist', err) }
+                }}
             />
 
             <AddFindingModal
@@ -298,7 +314,32 @@ function Findings () {
                 isDark={isDark}
                 onClose={() => setShowAddFinding(false)}
                 members={[]}
-                onSubmit={(data) => console.log('add finding', data)}
+                onSubmit={async (data) => {
+                    try {
+                        await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
+                            title: data.vulnName,
+                            status: 'open',
+                            severity: data.cvssScore >= 9.0 ? 'Critical' : data.cvssScore >= 7.0 ? 'High' : data.cvssScore >= 4.0 ? 'Medium' : 'Low',
+                            cvss_score: data.cvssScore,
+                            cvss_vector: data.cvssVector,
+                            impact: data.impactedSystem,
+                            description: data.executiveSummary,
+                            reproduction_steps: data.str,
+                            remediation: data.remediation
+                        })
+                        const res = await api.get(`/projects/${projectId}/worklists/${worklistId}/findings`)
+                        const mapped = (res.data.data || []).map((f: any) => ({
+                            id: f.id,
+                            name: f.title || 'Untitled',
+                            code: '-',
+                            status: f.status || 'open',
+                            confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString() : '-',
+                            severity: f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : 'Low',
+                            member: '-'
+                        }))
+                        setFindings(mapped)
+                    } catch (err) { console.error('Failed to add finding', err) }
+                }}
             />
 
         </div>

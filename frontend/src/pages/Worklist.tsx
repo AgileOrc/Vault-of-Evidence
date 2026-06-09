@@ -46,6 +46,7 @@ function Worklist () {
     const [showDeleteProject, setShowDeleteProject] = useState(false)
     const [showAddWorklist, setShowAddWorklist] = useState(false)
     const [showDeleteWorklist, setShowDeleteWorklist] = useState(false)
+    const [selectedWorklist, setSelectedWorklist] = useState<WorklistData | null>(null)
 
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklists, setWorklists] = useState<WorklistData[]>([])
@@ -243,6 +244,7 @@ function Worklist () {
                                         onClick={(e) => {
                                             e.preventDefault()
                                             e.stopPropagation()
+                                            setSelectedWorklist(worklist)
                                             setShowDeleteWorklist(true)
                                         }}
                                         className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium font-montserrat ${theme.buttonOutline}`}
@@ -265,7 +267,24 @@ function Worklist () {
                 isDark={isDark}
                 onClose={() => setShowEditProject(false)}
                 project={project}
-                onSubmit={(data) => console.log('edit project', data)}
+                onSubmit={async (data) => {
+                    try {
+                        const statusMap: Record<string, string> = {
+                            'Active': 'active',
+                            'Paused': 'planning', // Backend doesn't have paused
+                            'Upcoming': 'planning',
+                            'Completed': 'completed'
+                        }
+                        const payload = {
+                            name: data.name,
+                            description: data.description,
+                            status: statusMap[data.status ?? 'Active'] || 'active'
+                        }
+                        await api.put(`/projects/${projectId}`, payload)
+                        const res = await api.get(`/projects/${projectId}`)
+                        setProject({ ...project, ...res.data.data })
+                    } catch (err) { console.error('Failed to edit project', err) }
+                }}
             />
 
             <ManageMembersModal
@@ -282,22 +301,42 @@ function Worklist () {
                 isDark={isDark}
                 onClose={() => setShowDeleteProject(false)}
                 projectName={project?.name ?? ''}
-                onConfirm={() => console.log('delete project')}
+                onConfirm={async () => {
+                    try {
+                        await api.delete(`/projects/${projectId}`)
+                        window.location.href = '/projects'
+                    } catch (err) { console.error('Failed to delete project', err) }
+                }}
             />
 
             <AddWorklistModal
                 isOpen={showAddWorklist}
                 isDark={isDark}
                 onClose={() => setShowAddWorklist(false)}
-                onSubmit={(data) => console.log('add worklist', data)}
+                onSubmit={async (data) => {
+                    try {
+                        await api.post(`/projects/${projectId}/worklists`, data)
+                        const res = await api.get(`/projects/${projectId}/worklists`)
+                        const wList = res.data.data || []
+                        setWorklists(wList.map((w: unknown) => ({ ...(w as any), findings: (w as any).findings ? (w as any).findings.length : 0 })))
+                    } catch (err) { console.error('Failed to add worklist', err) }
+                }}
             />
 
             <DeleteWorklistModal
                 isOpen={showDeleteWorklist}
                 isDark={isDark}
                 onClose={() => setShowDeleteWorklist(false)}
-                worklistName={''}
-                onConfirm={() => console.log('delete worklist')}
+                worklistName={selectedWorklist?.name ?? ''}
+                onConfirm={async () => {
+                    if (!selectedWorklist) return
+                    try {
+                        await api.delete(`/projects/${projectId}/worklists/${selectedWorklist.id}`)
+                        const res = await api.get(`/projects/${projectId}/worklists`)
+                        const wList = res.data.data || []
+                        setWorklists(wList.map((w: unknown) => ({ ...(w as any), findings: (w as any).findings ? (w as any).findings.length : 0 })))
+                    } catch (err) { console.error('Failed to delete worklist', err) }
+                }}
             />
 
         </div>
