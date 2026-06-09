@@ -174,7 +174,7 @@ function Dashboard () {
                                         <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
                                     <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
-                                        {project.status || 'Planning'}
+                                        {project.status ? project.status.charAt(0).toUpperCase() + project.status.slice(1) : 'Planning'}
                                     </span>
                                 </div>
                             ))

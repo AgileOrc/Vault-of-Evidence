@@ -31,6 +31,7 @@ func NewService(repo Repository) Service { return &service{repo: repo} }
 func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) (*domain.Project, error) {
 	p := &domain.Project{
 		Name:        req.Name,
+		Type:        req.Type,
 		Description: req.Description,
 		Status:      domain.StatusPlanning,
 		StartDate:   req.StartDate,
@@ -78,6 +79,9 @@ func (s *service) Update(id string, req *domain.UpdateProjectRequest) (*domain.P
 
 	if req.Name != "" {
 		p.Name = req.Name
+	}
+	if req.Type != "" {
+		p.Type = req.Type
 	}
 	if req.Description != "" {
 		p.Description = req.Description

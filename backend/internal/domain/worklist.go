@@ -28,14 +28,15 @@ type Worklist struct {
 }
 
 type CreateWorklistRequest struct {
-	Name        string `json:"name"        binding:"required,min=3,max=255"`
-	Code        string `json:"code"        binding:"omitempty,max=100"`
-	Description string `json:"description" binding:"max=5000"`
+	Name        string         `json:"name"        binding:"required,min=3,max=255"`
+	Code        string         `json:"code"        binding:"omitempty,max=100"`
+	Description string         `json:"description" binding:"omitempty,max=5000"`
+	Status      WorklistStatus `json:"status"      binding:"omitempty"`
 }
 
 type UpdateWorklistRequest struct {
 	Name        string         `json:"name"        binding:"omitempty,min=3,max=255"`
 	Code        string         `json:"code"        binding:"omitempty,max=100"`
 	Description string         `json:"description" binding:"omitempty,max=5000"`
-	Status      WorklistStatus `json:"status"`
+	Status      WorklistStatus `json:"status"      binding:"omitempty"`
 }

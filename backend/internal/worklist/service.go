@@ -26,12 +26,16 @@ func (s *service) Create(projectID string, req *domain.CreateWorklistRequest) (*
 	if err != nil {
 		return nil, fmt.Errorf("invalid project id")
 	}
+	status := domain.WorklistNotStarted
+	if req.Status != "" {
+		status = req.Status
+	}
 	w := &domain.Worklist{
 		ProjectID:   pid,
 		Name:        req.Name,
 		Code:        req.Code,
 		Description: req.Description,
-		Status:      domain.WorklistNotStarted,
+		Status:      status,
 	}
 	if err := s.repo.Create(w); err != nil {
 		return nil, err

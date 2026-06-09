@@ -44,7 +44,8 @@ func (r *repository) FindAll(params pagination.Params, userID uuid.UUID) ([]doma
 		return nil, 0, err
 	}
 
-	err := query.Order("projects.created_at DESC").
+	err := query.Preload("Members").Preload("Worklists").Preload("Findings").
+		Order("projects.created_at DESC").
 		Limit(params.Limit).
 		Offset(params.Offset).
 		Find(&projects).Error
