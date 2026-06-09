@@ -18,9 +18,9 @@ import { NewProjectModal } from '../components/PopUp'
 type ProjectData = {
     id: string
     name: string
-    type: string
+    type?: string
     members?: { id: string }[]
-    worklists: number
+    worklists?: { id: string }[]
     findings?: { id: string }[]
     status: string
     description: string
@@ -95,22 +95,16 @@ function Projects () {
     const theme = getPageTheme(isDark)
 
     const badgeClass = (status: string) => {
+        const s = status.toLowerCase()
         if (isDark) {
-            if (status === 'Active')
-                return 'bg-[#17E58F] text-[#005B35]'
-
-            if (status === 'Paused')
-                return 'bg-[#E6DF14] text-[#5B4100]'
-
-            if (status === 'Upcoming')
-                return 'bg-[#C017DE] text-[#40005B]'
-
+            if (s === 'active')   return 'bg-[#17E58F] text-[#005B35]'
+            if (s === 'paused')   return 'bg-[#E6DF14] text-[#5B4100]'
+            if (s === 'upcoming') return 'bg-[#C017DE] text-[#40005B]'
             return 'bg-[#22BBDE] text-[#00375C]'
         }
-        
-        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
+        if (s === 'active')   return 'bg-[#005B35] text-[#17E58F] font-semibold'
+        if (s === 'paused')   return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        if (s === 'upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
         return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     }
 
@@ -198,7 +192,7 @@ function Projects () {
                                     </div>
                                     <div className={`flex items-center gap-1 ${theme.textMuted}`}>
                                         <FileText size={16} />
-                                        <span>{project.worklists} worklists</span>
+                                        <span>{project.worklists?.length ?? 0} worklists</span>
                                     </div>
                                     <div className={`flex items-center gap-1 ${theme.textMuted}`}>
                                         <Bug size={16} />

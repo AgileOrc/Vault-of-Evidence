@@ -17,6 +17,7 @@ type FindingData  = {
     member: string
     cvssScore: number | null
     cvssVector: string
+    wstgCode: string
     impactedSystem: string
     executiveSummary: string
     stepsToReproduce: string
@@ -26,7 +27,7 @@ type PoC = { id: string; type: 'screenshot' | 'request'; caption: string; conten
 
 const btnBase  = 'flex items-center gap-2 px-2 md:px-2.5 xl:px-4 py-2 xl:py-2.5 rounded-md md:rounded-lg border font-semibold text-xs xl:text-sm font-montserrat'
 const iconSize = 'w-3 h-3 md:w-4 md:h-4'
-const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed on notes'] as const
+const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed_on_notes'] as const
 const inputClass = (isDark: boolean) =>
     `w-full rounded-lg px-3 py-2 text-sm border font-montserrat focus:outline-none ${
         isDark ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40'
@@ -93,13 +94,14 @@ function FindingDetail () {
             setFinding({
                 id: raw.id,
                 name: raw.title,
-                code: '—', // Backend does not have code for finding natively yet
+                code: raw.wstg_code || '—',
                 status: raw.status,
                 severity: raw.severity,
                 confirmDate: new Date(raw.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
-                member: 'Pentester',
+                member: raw.contributor || '—',
                 cvssScore: raw.cvss_score,
                 cvssVector: raw.cvss_vector || '',
+                wstgCode: raw.wstg_code || '',
                 impactedSystem: raw.impact || '',
                 executiveSummary: raw.description || '',
                 stepsToReproduce: raw.reproduction_steps || '',
@@ -141,18 +143,18 @@ function FindingDetail () {
             if (s === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (s === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (s === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (s === 'closed on notes') return 'bg-[#27D6FF] text-[#00375C]'
+            if (s === 'closed_on_notes') return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (s === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (s === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (s === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (s === 'closed on notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (s === 'closed_on_notes') return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
     const capitalize = (s: string) =>
-        s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+        s.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
     // ── grid col helper ─────────────────────────────────────────────────────────
     // "Sidebar extend: flex col 1" → 1 col when sidebar is extended, 2 col when collapsed
@@ -161,6 +163,7 @@ function FindingDetail () {
     const modalTitle = (key: string) => {
         const map: Record<string, string> = {
             cvss: 'CVSS Score',
+            wstgCode: 'WSTG Code',
             impactedSystem: 'Impacted System',
             executiveSummary: 'Executive Summary',
             steps: 'Steps to Reproduce',
@@ -185,6 +188,7 @@ function FindingDetail () {
                 severity: editData.severity,
                 cvss_score: editData.cvssScore,
                 cvss_vector: editData.cvssVector,
+                wstg_code: editData.wstgCode,
                 impact: editData.impactedSystem,
                 description: editData.executiveSummary,
                 reproduction_steps: editData.stepsToReproduce,
@@ -342,6 +346,19 @@ function FindingDetail () {
                 </button>
             </div>
 
+            {/* WSTG Code */}
+            <button
+                onClick={() => setOpenModal('wstgCode')}
+                className={`w-full text-left rounded-xl md:rounded-2xl px-6 py-5 md:px-7 md:py-6 transition hover:scale-[1.01] ${theme.cardBase}`}
+            >
+                <div className='flex flex-col gap-1'>
+                    <p className={`text-lg lg:text-xl font-semibold ${theme.text}`}>WSTG Code</p>
+                    <p className={`text-sm lg:text-base font-medium ${theme.textMuted}`}>
+                        {currentFinding.wstgCode || '—'}
+                    </p>
+                </div>
+            </button>
+
             {/* Executive Summary */}
             <button
                 onClick={() => setOpenModal('executiveSummary')}
@@ -478,6 +495,22 @@ function FindingDetail () {
                                     <p className={`font-mono text-sm lg:text-base font-medium break-all ${theme.text}`}>{currentFinding.cvssVector || '—'}</p>
                                 )}
                             </div>
+                        </div>
+                    )}
+
+                    {/* WSTG Code */}
+                    {openModal === 'wstgCode' && (
+                        <div>
+                            <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>WSTG Code</label>
+                            {isEditing && !isDev ? (
+                                <input type='text' maxLength={50} placeholder='e.g. WSTG-ATHN-01'
+                                    value={editData?.wstgCode ?? ''}
+                                    onChange={e => setEdit({ wstgCode: e.target.value })}
+                                    className={inputClass(isDark)}
+                                />
+                            ) : (
+                                <p className={`text-sm lg:text-base font-medium leading-relaxed ${theme.text}`}>{currentFinding.wstgCode || '—'}</p>
+                            )}
                         </div>
                     )}
 

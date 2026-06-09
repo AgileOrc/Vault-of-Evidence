@@ -277,12 +277,21 @@ function Worklist () {
                         }
                         const payload = {
                             name: data.name,
+                            type: data.type,
                             description: data.description,
                             status: statusMap[data.status ?? 'Active'] || 'active'
                         }
                         await api.put(`/projects/${projectId}`, payload)
                         const res = await api.get(`/projects/${projectId}`)
-                        setProject({ ...project, ...res.data.data })
+                        const p = res.data.data
+                        setProject(prev => prev ? {
+                            ...prev,
+                            name: p.name ?? prev.name,
+                            type: p.type ?? prev.type,
+                            description: p.description ?? prev.description,
+                            status: p.status ?? prev.status,
+                            members: p.members ? p.members.length : prev.members,
+                        } : prev)
                     } catch (err) { console.error('Failed to edit project', err) }
                 }}
             />

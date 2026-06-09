@@ -88,11 +88,10 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 		
 		// Cek syarat Notes: Hanya boleh diisi jika statusnya (yang baru atau lama) adalah "closed"
 		if req.Notes != "" {
-			if f.Status == domain.FindingStatusClosed {
+			if f.Status == domain.FindingStatusClosedOnNotes {
 				f.Notes = req.Notes
 			} else {
-				// Lempar error jika Dev mencoba mengisi notes tanpa menutup bug-nya
-				return nil, errors.New("developer is only allowed to write notes when the status is 'closed'")
+				return nil, errors.New("developer is only allowed to write notes when the status is 'closed_on_notes'")
 			}
 		}
 
@@ -102,6 +101,8 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 		if req.Description != "" { f.Description = req.Description }
 		if req.Severity != "" { f.Severity = req.Severity }
 		if req.CVSSScore > 0 { f.CVSSScore = req.CVSSScore }
+		if req.CVSSVector != "" { f.CVSSVector = req.CVSSVector }
+		if req.WSTGCode != "" { f.WSTGCode = req.WSTGCode }
 		if req.AffectedEndpoints != "" { f.AffectedEndpoints = req.AffectedEndpoints }
 		if req.ReproductionSteps != "" { f.ReproductionSteps = req.ReproductionSteps }
 		if req.Impact != "" { f.Impact = req.Impact }
@@ -114,6 +115,8 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 		if req.Description != "" { f.Description = req.Description }
 		if req.Severity != "" { f.Severity = req.Severity }
 		if req.CVSSScore > 0 { f.CVSSScore = req.CVSSScore }
+		if req.CVSSVector != "" { f.CVSSVector = req.CVSSVector }
+		if req.WSTGCode != "" { f.WSTGCode = req.WSTGCode }
 		if req.AffectedEndpoints != "" { f.AffectedEndpoints = req.AffectedEndpoints }
 		if req.ReproductionSteps != "" { f.ReproductionSteps = req.ReproductionSteps }
 		if req.Impact != "" { f.Impact = req.Impact }

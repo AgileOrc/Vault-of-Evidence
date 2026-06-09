@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
     X,
     // Trash2,
@@ -255,9 +255,14 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
     })
 
     // Sync when project changes
-    useState(() => {
-        if (project) setForm({ name: project.name, type: project.type, status: project.status, description: project.description })
-    })
+    useEffect(() => {
+        if (project) setForm({
+            name: project.name ?? '',
+            type: project.type ?? '',
+            status: project.status ?? 'Active',
+            description: project.description ?? '',
+        })
+    }, [project])
 
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
@@ -444,13 +449,13 @@ type AddWorklistModalProps = BaseModalProps & {
 }
 
 export function AddWorklistModal({ isOpen, isDark, onClose, onSubmit }: AddWorklistModalProps) {
-    const [form, setForm] = useState({ name: '', code: '', status: 'Not Started' })
+    const [form, setForm] = useState({ name: '', code: '', status: 'not started' })
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
     const handleSubmit = () => {
         if (!form.name.trim()) return
         onSubmit(form)
-        setForm({ name: '', code: '', status: 'Not Started' })
+        setForm({ name: '', code: '', status: 'not started' })
         onClose()
     }
 
@@ -472,9 +477,9 @@ export function AddWorklistModal({ isOpen, isDark, onClose, onSubmit }: AddWorkl
             <div>
                 <Label isDark={isDark}>Status</Label>
                 <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                    <option className={optClass} value="Not Started">Not Started</option>
-                    <option className={optClass} value="In Progress">In Progress</option>
-                    <option className={optClass} value="Completed">Completed</option>
+                    <option className={optClass} value="not started">Not Started</option>
+                    <option className={optClass} value="in progress">In Progress</option>
+                    <option className={optClass} value="completed">Completed</option>
                 </Select>
             </div>
 
@@ -704,7 +709,7 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
         cvssScore: 0, cvssVector: '', str: '', remediation: '',
         pocText: '', pocFiles: [], contributorName: '',
     })
-    const [showCvss, setShowCvss] = useState(false)
+
     const fileRef = useRef<HTMLInputElement>(null)
 
     const set = (key: keyof FindingFormData, val: unknown) => setForm((p) => ({ ...p, [key]: val }))
@@ -754,30 +759,37 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
                     </div>
 
                     {/* CVSS */}
-                    <div className="sm:col-span-2">
-                        <Label isDark={isDark}>CVSS Score</Label>
-                        <div className="flex gap-3 items-center">
-                            <div className={`flex-1 rounded-xl px-4 py-2.5 border text-sm font-montserrat ${
-                                isDark ? 'bg-[#1767AA]/20 border-[#2BA7D6]/50 text-white' : 'bg-[#F5F5F5] border-[#1767AA]/30 text-[#002C49]'
-                            }`}>
-                                {form.cvssScore > 0 ? (
-                                    <span>
-                                        <span className={`font-bold ${cvssColor}`}>{form.cvssScore.toFixed(1)} — {cvssLabel}</span>
-                                        <span className={`ml-2 text-xs font-mono opacity-60`}>{form.cvssVector}</span>
-                                    </span>
-                                ) : (
-                                    <span className="opacity-40">Not calculated</span>
-                                )}
-                            </div>
+                    <div>
+                        <Label isDark={isDark}>CVSS Score <span className="opacity-50 font-normal">(0–10)</span></Label>
+                        <div className="flex gap-2 items-center">
+                            <input
+                                type="number" min={0} max={10} step={0.1}
+                                value={form.cvssScore || ''}
+                                onChange={e => set('cvssScore', parseFloat(e.target.value) || 0)}
+                                placeholder="0.0"
+                                className={`w-24 rounded-xl px-3 py-2.5 border text-sm font-montserrat font-bold focus:outline-none ${
+                                    isDark ? 'bg-[#0B2E46] border-[#2BA7D6]/50 text-white placeholder:text-white/30' : 'bg-white border-[#1767AA]/30 text-[#002C49] placeholder:text-[#002C49]/30'
+                                } ${form.cvssScore > 0 ? cvssColor : ''}`}
+                            />
+                            {form.cvssScore > 0 && (
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cvssColor} ${isDark ? 'bg-white/10' : 'bg-[#002C49]/5'}`}>
+                                    {cvssLabel}
+                                </span>
+                            )}
                             <button
-                                onClick={() => setShowCvss(true)}
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
+                                onClick={() => window.open('/cvss', '_blank')}
+                                className={`ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
                                     isDark ? 'border-[#41B0EC] text-[#41B0EC] hover:bg-[#2BA7D6]/20' : 'border-[#1767AA] text-[#1767AA] hover:bg-[#27D6FF]/20'
                                 }`}
                             >
                                 <Calculator size={16} /> Calculate
                             </button>
                         </div>
+                    </div>
+
+                    <div>
+                        <Label isDark={isDark}>CVSS Vector</Label>
+                        <Input isDark={isDark} placeholder="CVSS:4.0/AV:N/AC:L/..." value={form.cvssVector} onChange={e => set('cvssVector', e.target.value)} />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -834,13 +846,6 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
                 <ModalFooter isDark={isDark} onClose={onClose} onConfirm={handleSubmit} confirmLabel="Add Finding" />
             </PopUpBase>
 
-            {/* CVSS sub-modal */}
-            <CvssCalculatorModal
-                isOpen={showCvss}
-                isDark={isDark}
-                onClose={() => setShowCvss(false)}
-                onApply={(score, vector) => { set('cvssScore', score); set('cvssVector', vector) }}
-            />
         </>
     )
 }
@@ -867,7 +872,7 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
         pocFiles: finding?.pocFiles ?? [],
         contributorName: finding?.contributorName ?? '',
     })
-    const [showCvss, setShowCvss] = useState(false)
+
     const fileRef = useRef<HTMLInputElement>(null)
 
     const set = (key: keyof FindingFormData, val: unknown) => setForm((p) => ({ ...p, [key]: val }))
@@ -918,30 +923,37 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
                         <Textarea isDark={isDark} rows={3} value={form.executiveSummary} onChange={(e) => set('executiveSummary', e.target.value)} />
                     </div>
 
-                    <div className="sm:col-span-2">
-                        <Label isDark={isDark}>CVSS Score</Label>
-                        <div className="flex gap-3 items-center">
-                            <div className={`flex-1 rounded-xl px-4 py-2.5 border text-sm font-montserrat ${
-                                isDark ? 'bg-[#1767AA]/20 border-[#2BA7D6]/50 text-white' : 'bg-[#F5F5F5] border-[#1767AA]/30 text-[#002C49]'
-                            }`}>
-                                {form.cvssScore > 0 ? (
-                                    <span>
-                                        <span className={`font-bold ${cvssColor}`}>{form.cvssScore.toFixed(1)} — {cvssLabel}</span>
-                                        <span className="ml-2 text-xs font-mono opacity-60">{form.cvssVector}</span>
-                                    </span>
-                                ) : (
-                                    <span className="opacity-40">Not calculated</span>
-                                )}
-                            </div>
+                    <div>
+                        <Label isDark={isDark}>CVSS Score <span className="opacity-50 font-normal">(0–10)</span></Label>
+                        <div className="flex gap-2 items-center">
+                            <input
+                                type="number" min={0} max={10} step={0.1}
+                                value={form.cvssScore || ''}
+                                onChange={e => set('cvssScore', parseFloat(e.target.value) || 0)}
+                                placeholder="0.0"
+                                className={`w-24 rounded-xl px-3 py-2.5 border text-sm font-montserrat font-bold focus:outline-none ${
+                                    isDark ? 'bg-[#0B2E46] border-[#2BA7D6]/50 text-white placeholder:text-white/30' : 'bg-white border-[#1767AA]/30 text-[#002C49] placeholder:text-[#002C49]/30'
+                                } ${form.cvssScore > 0 ? cvssColor : ''}`}
+                            />
+                            {form.cvssScore > 0 && (
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cvssColor} ${isDark ? 'bg-white/10' : 'bg-[#002C49]/5'}`}>
+                                    {cvssLabel}
+                                </span>
+                            )}
                             <button
-                                onClick={() => setShowCvss(true)}
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
+                                onClick={() => window.open('/cvss', '_blank')}
+                                className={`ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
                                     isDark ? 'border-[#41B0EC] text-[#41B0EC] hover:bg-[#2BA7D6]/20' : 'border-[#1767AA] text-[#1767AA] hover:bg-[#27D6FF]/20'
                                 }`}
                             >
                                 <Calculator size={16} /> Recalculate
                             </button>
                         </div>
+                    </div>
+
+                    <div>
+                        <Label isDark={isDark}>CVSS Vector</Label>
+                        <Input isDark={isDark} placeholder="CVSS:4.0/AV:N/AC:L/..." value={form.cvssVector} onChange={e => set('cvssVector', e.target.value)} />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -993,12 +1005,6 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
                 <ModalFooter isDark={isDark} onClose={onClose} onConfirm={handleSubmit} confirmLabel="Save Changes" />
             </PopUpBase>
 
-            <CvssCalculatorModal
-                isOpen={showCvss}
-                isDark={isDark}
-                onClose={() => setShowCvss(false)}
-                onApply={(score, vector) => { set('cvssScore', score); set('cvssVector', vector) }}
-            />
         </>
     )
 }
