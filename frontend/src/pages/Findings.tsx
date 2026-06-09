@@ -105,13 +105,13 @@ function Findings () {
             if (status === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (status === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (status === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (status === 'closed' || status === 'closed_on_notes') return 'bg-[#27D6FF] text-[#00375C]'
+            if (status === 'closed')          return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (status === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (status === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (status === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (status === 'closed' || status === 'closed_on_notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (status === 'closed')          return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
@@ -224,12 +224,16 @@ function Findings () {
                                     onChange={setStatusFilter}
                                     options={[
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8c06e8d (fix: resolve major routing bugs, permission roles, and findings status enums)
                                         { value: 'all',       label: 'All Status' },
                                         { value: 'open',      label: 'Open'       },
                                         { value: 'confirmed', label: 'Confirmed'  },
                                         { value: 'fixing',    label: 'Fixing'     },
                                         { value: 'fixed',     label: 'Fixed'      },
                                         { value: 'closed',    label: 'Closed'     },
+<<<<<<< HEAD
 =======
                                         { value: 'all',             label: 'All Status'      },
                                         { value: 'open',            label: 'Open'            },
@@ -238,6 +242,8 @@ function Findings () {
                                         { value: 'fixed',           label: 'Fixed'           },
                                         { value: 'closed_on_notes', label: 'Closed on Notes' },
 >>>>>>> 629f6ae (feat: fix project status alignment, PoC file upload, delete flows, date format, CVSS input, and add closed-on-notes inline textarea)
+=======
+>>>>>>> 8c06e8d (fix: resolve major routing bugs, permission roles, and findings status enums)
                                     ]}
                                     isDark={isDark}
                                 />

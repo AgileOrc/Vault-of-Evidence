@@ -37,10 +37,14 @@ type PoC = {
 const btnBase  = 'flex items-center gap-2 px-2 md:px-2.5 xl:px-4 py-2 xl:py-2.5 rounded-md md:rounded-lg border font-semibold text-xs xl:text-sm font-montserrat'
 const iconSize = 'w-3 h-3 md:w-4 md:h-4'
 <<<<<<< HEAD
+<<<<<<< HEAD
 const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed'] as const
 =======
 const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed_on_notes'] as const
 >>>>>>> 8bce92a (fixing backend fetch api and variables into frontend)
+=======
+const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed'] as const
+>>>>>>> 8c06e8d (fix: resolve major routing bugs, permission roles, and findings status enums)
 const inputClass = (isDark: boolean) =>
     `w-full rounded-lg px-3 py-2 text-sm border font-montserrat focus:outline-none ${
         isDark ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40'
@@ -220,13 +224,13 @@ function FindingDetail () {
             if (s === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (s === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (s === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (s === 'closed' || s === 'closed_on_notes') return 'bg-[#27D6FF] text-[#00375C]'
+            if (s === 'closed')          return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (s === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (s === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (s === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (s === 'closed' || s === 'closed_on_notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (s === 'closed')          return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
@@ -556,8 +560,8 @@ function FindingDetail () {
             addSectionTitle('Remediation Strategy')
             addBody(f.remediationStrategy)
 
-            // ── Notes (only if closed_on_notes) ──────────────────────────────
-            if (f.status === 'closed_on_notes') {
+            // ── Notes (only if closed) ──────────────────────────────
+            if (f.status === 'closed') {
                 addSectionTitle('Notes')
                 addBody(f.notes)
             }
@@ -762,8 +766,8 @@ function FindingDetail () {
                     })}
                 </div>
 
-                {/* Notes — muncul hanya saat status closed_on_notes */}
-                {currentFinding.status === 'closed_on_notes' && (
+                {/* Notes — muncul hanya saat status closed */}
+                {currentFinding.status === 'closed' && (
                     <div className='space-y-1.5'>
                         <label className={`flex items-center gap-1.5 text-md font-semibold px-1 ${theme.textMuted}`}>
                             {/* <span className={`inline-block w-2 h-2 rounded-full ${statusBadgeClass('closed_on_notes')}`} /> */}
