@@ -18,9 +18,11 @@ const (
 )
 
 const (
-	FindingStatusOpen   FindingStatus = "open"
-	FindingStatusFixed  FindingStatus = "fixed"
-	FindingStatusClosed FindingStatus = "closed"
+	FindingStatusOpen      FindingStatus = "open"
+	FindingStatusConfirmed FindingStatus = "confirmed"
+	FindingStatusFixing    FindingStatus = "fixing"
+	FindingStatusFixed     FindingStatus = "fixed"
+	FindingStatusClosed    FindingStatus = "closed"
 )
 
 type Finding struct {
@@ -57,7 +59,7 @@ type UpdateFindingRequest struct {
 	Title             string   `json:"title"       binding:"omitempty,min=3,max=255"`
 	Description       string   `json:"description" binding:"omitempty,min=10"`
 	Severity          Severity `json:"severity"    binding:"omitempty,oneof=critical high medium low informational"`
-	Status            FindingStatus `json:"status"      binding:"omitempty,oneof=open fixed closed"` 
+	Status            FindingStatus `json:"status"      binding:"omitempty,oneof=open confirmed fixing fixed closed"` 
 	Notes             string        `json:"notes"       binding:"omitempty"`                         	
 	CVSSScore         float64  `json:"cvss_score"  binding:"omitempty,min=0,max=10"`
 	AffectedEndpoints string   `json:"affected_endpoints"`

@@ -26,7 +26,7 @@ type PoC = { id: string; type: 'screenshot' | 'request'; caption: string; conten
 
 const btnBase  = 'flex items-center gap-2 px-2 md:px-2.5 xl:px-4 py-2 xl:py-2.5 rounded-md md:rounded-lg border font-semibold text-xs xl:text-sm font-montserrat'
 const iconSize = 'w-3 h-3 md:w-4 md:h-4'
-const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed on notes'] as const
+const STATUSES = ['open', 'confirmed', 'fixing', 'fixed', 'closed'] as const
 const inputClass = (isDark: boolean) =>
     `w-full rounded-lg px-3 py-2 text-sm border font-montserrat focus:outline-none ${
         isDark ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40'
@@ -140,13 +140,13 @@ function FindingDetail () {
             if (s === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (s === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (s === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (s === 'closed on notes') return 'bg-[#27D6FF] text-[#00375C]'
+            if (s === 'closed')          return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (s === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (s === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (s === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (s === 'closed on notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (s === 'closed')          return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 

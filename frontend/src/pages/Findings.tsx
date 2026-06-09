@@ -92,13 +92,13 @@ function Findings () {
             if (status === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (status === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (status === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (status === 'closed on notes') return 'bg-[#27D6FF] text-[#00375C]'
+            if (status === 'closed')          return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (status === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (status === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (status === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (status === 'closed on notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (status === 'closed')          return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
@@ -210,12 +210,12 @@ function Findings () {
                                     value={statusFilter}
                                     onChange={setStatusFilter}
                                     options={[
-                                        { value: 'all',             label: 'All Status'      },
-                                        { value: 'open',            label: 'Open'            },
-                                        { value: 'confirmed',       label: 'Confirmed'       },
-                                        { value: 'fixing',          label: 'Fixing'          },
-                                        { value: 'fixed',           label: 'Fixed'           },
-                                        { value: 'closed on notes', label: 'Closed on Notes' },
+                                        { value: 'all',       label: 'All Status' },
+                                        { value: 'open',      label: 'Open'       },
+                                        { value: 'confirmed', label: 'Confirmed'  },
+                                        { value: 'fixing',    label: 'Fixing'     },
+                                        { value: 'fixed',     label: 'Fixed'      },
+                                        { value: 'closed',    label: 'Closed'     },
                                     ]}
                                     isDark={isDark}
                                 />
