@@ -16,7 +16,6 @@ func TestGenerateValidateAndSetCookie(t *testing.T) {
 	user := &domain.User{
 		ID:       uuid.New(),
 		Username: "tester",
-		Role:     domain.RolePentester,
 	}
 
 	token, err := manager.GenerateToken(user)
@@ -28,8 +27,8 @@ func TestGenerateValidateAndSetCookie(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ValidateToken returned error: %v", err)
 	}
-	if claims.UserID != user.ID || claims.Username != user.Username || claims.Role != user.Role {
-		t.Fatalf("claims = %+v, want user %s/%s/%s", claims, user.ID, user.Username, user.Role)
+	if claims.UserID != user.ID || claims.Username != user.Username {
+		t.Fatalf("claims = %+v, want user %s/%s", claims, user.ID, user.Username)
 	}
 
 	response := httptest.NewRecorder()
@@ -45,7 +44,7 @@ func TestGenerateValidateAndSetCookie(t *testing.T) {
 
 func TestValidateTokenRejectsTampering(t *testing.T) {
 	manager := NewManager(strings.Repeat("a", 32), 1, false)
-	user := &domain.User{ID: uuid.New(), Username: "tester", Role: domain.RolePentester}
+	user := &domain.User{ID: uuid.New(), Username: "tester"}
 
 	token, err := manager.GenerateToken(user)
 	if err != nil {
@@ -63,7 +62,6 @@ func TestValidateTokenRejectsExpiredToken(t *testing.T) {
 	token, err := manager.sign(Claims{
 		UserID:    uuid.New(),
 		Username:  "tester",
-		Role:      domain.RolePentester,
 		IssuedAt:  time.Now().Add(-2 * time.Hour).Unix(),
 		ExpiresAt: time.Now().Add(-time.Hour).Unix(),
 	})
