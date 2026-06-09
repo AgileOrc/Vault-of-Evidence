@@ -20,49 +20,6 @@ type Notification = {
   role?: string
 }
 
-const DUMMY_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'invitation',
-    title: 'Gary invited you to join mycompany.com',
-    time: '3 hours ago',
-    read: false,
-    invitedBy: 'Gary',
-    projectName: 'mycompany.com',
-    role: 'Pentester',
-  },
-  {
-    id: '2',
-    type: 'invitation',
-    title: 'Alice invited you to join api.startup.io',
-    time: '1 day ago',
-    read: false,
-    invitedBy: 'Alice',
-    projectName: 'api.startup.io',
-    role: 'Developer',
-  },
-  {
-    id: '3',
-    type: 'info',
-    title: 'Bob added a critical finding on mycompany.com',
-    time: '5 minutes ago',
-    read: false,
-  },
-  {
-    id: '4',
-    type: 'info',
-    title: 'Alice updated status to Fixing on api.startup.io',
-    time: '1 hour ago',
-    read: true,
-  },
-  {
-    id: '5',
-    type: 'info',
-    title: 'Bob created worklist Login Page on mycompany.com',
-    time: '5 hours ago',
-    read: true,
-  },
-]
 
 function NotificationsModal ({ isOpen, isDark, onClose }: NotificationsModalProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
