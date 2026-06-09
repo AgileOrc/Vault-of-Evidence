@@ -319,7 +319,7 @@ function Findings () {
                         await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
                             title: data.vulnName,
                             status: 'open',
-                            severity: data.cvssScore >= 9.0 ? 'Critical' : data.cvssScore >= 7.0 ? 'High' : data.cvssScore >= 4.0 ? 'Medium' : 'Low',
+                            severity: data.cvssScore >= 9.0 ? 'critical' : data.cvssScore >= 7.0 ? 'high' : data.cvssScore >= 4.0 ? 'medium' : 'low',
                             cvss_score: data.cvssScore,
                             cvss_vector: data.cvssVector,
                             impact: data.impactedSystem,

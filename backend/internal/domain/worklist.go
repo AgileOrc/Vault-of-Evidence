@@ -37,5 +37,5 @@ type UpdateWorklistRequest struct {
 	Name        string         `json:"name"        binding:"omitempty,min=3,max=255"`
 	Code        string         `json:"code"        binding:"omitempty,max=100"`
 	Description string         `json:"description" binding:"omitempty,max=5000"`
-	Status      WorklistStatus `json:"status"      binding:"omitempty,oneof='not started' 'in progress' completed"`
+	Status      WorklistStatus `json:"status"`
 }

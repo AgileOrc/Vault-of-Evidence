@@ -35,6 +35,7 @@ type Finding struct {
 	Status            FindingStatus `gorm:"type:varchar(20);not null;default:'open'"       json:"status"` // <--- TAMBAHKAN INI
 	Notes             string        `gorm:"type:text"                                      json:"notes"`  // <--- TAMBAHKAN INI
 	CVSSScore         float64       `gorm:"type:decimal(4,1);default:0.0"                  json:"cvss_score"`
+	CVSSVector        string        `gorm:"type:varchar(100)"                              json:"cvss_vector"`
 	AffectedEndpoints string        `gorm:"type:text"                                      json:"affected_endpoints"`
 	ReproductionSteps string        `gorm:"type:text"                                      json:"reproduction_steps"`
 	Impact            string        `gorm:"type:text"                                      json:"impact"`
@@ -49,6 +50,7 @@ type CreateFindingRequest struct {
 	Description       string   `json:"description"        binding:"required,min=10"`
 	Severity          Severity `json:"severity"           binding:"required,oneof=critical high medium low informational"`
 	CVSSScore         float64  `json:"cvss_score"         binding:"min=0,max=10"`
+	CVSSVector        string   `json:"cvss_vector"        binding:"omitempty,max=100"`
 	AffectedEndpoints string   `json:"affected_endpoints"`
 	ReproductionSteps string   `json:"reproduction_steps"`
 	Impact            string   `json:"impact"`
@@ -62,6 +64,7 @@ type UpdateFindingRequest struct {
 	Status            FindingStatus `json:"status"      binding:"omitempty,oneof=open confirmed fixing fixed closed"` 
 	Notes             string        `json:"notes"       binding:"omitempty"`                         	
 	CVSSScore         float64  `json:"cvss_score"  binding:"omitempty,min=0,max=10"`
+	CVSSVector        string   `json:"cvss_vector" binding:"omitempty,max=100"`
 	AffectedEndpoints string   `json:"affected_endpoints"`
 	ReproductionSteps string   `json:"reproduction_steps"`
 	Impact            string   `json:"impact"`
