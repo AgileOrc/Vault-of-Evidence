@@ -3,9 +3,11 @@ import logo from '../assets/logo-05.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../api/axios'; 
+import { useUser } from '../context/UserContext';
 
 function Login() {
     const navigate = useNavigate();
+    const { refreshUser } = useUser();
 
     // State untuk input
     const [email, setEmail] = useState('');
@@ -24,7 +26,7 @@ function Login() {
     // Skema Validasi ZOD
     const loginSchema = z.object({
         email: z.string().email('Invalid Email Format'),
-        password: z.string().min(6, 'Password must have at least 6 characters').regex(
+        password: z.string().min(12, 'Password must have at least 12 characters').regex(
             /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'
         ),
     });
@@ -50,7 +52,8 @@ function Login() {
             const response = await api.post('/auth/login', { email, password });
 
             if (response.status === 200) {
-                // Jika sukses, baru arahkan ke Dashboard
+                // Refresh user context lalu arahkan ke Dashboard
+                await refreshUser();
                 navigate('/Dashboard');
             }
         } catch (err: any) {
@@ -62,20 +65,19 @@ function Login() {
     };
 
     return (
-        <main className='flex min-h-screen items-start pt-20 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
+        <main className='flex flex-col lg:flex-row min-h-screen justify-center items-center lg:items-start lg:pt-28 xl:pt-20 gap-y-5 md:gap-y-8 bg-linear-to-br from-[#0EB8DF] to-[#0E5998]'>
             {/* Left Side */}
-            <section className='flex w-4/7 flex-col justify-center lg:gap-y-18 lg:px-14 xl:px-20 text-white'>
-
+            <section className='flex w-full lg:w-4/7 flex-col items-center lg:items-start justify-center px-6 lg:gap-y-18 lg:px-14 xl:px-20 text-white'>
                 {/* Logo */}
                 <div>
                     <img 
                         src={logo} 
                         alt='Vault of Evidence Logo' 
-                        className='md:max-h-16 lg:max-h-22 xl:max-h-32' />
+                        className='items-center min-h-12 md:min-h-16 lg:min-h-20 xl:min-h-28' />
                 </div>
             
-                <div className='flex flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
-                    <h1 className='lg:text-4xl xl:text-5xl font-semibold font-montserrat leading-tight'>
+                <div className='hidden lg:flex flex-col lg:px-5 xl:px-6 lg:gap-y-3 xl:gap-y-4'>
+                    <h1 className='lg:text-3xl xl:text-5xl font-semibold font-montserrat leading-tight'>
                         Your Evidence, <br/> Protected and Organized.
                     </h1>
                     <p className='max-w-xl lg:text-xl xl:text-2xl font-montserrat font-medium text-white'>
@@ -84,46 +86,40 @@ function Login() {
                 </div>
             </section>
 
-            {/* Right Side - Diperbaiki pembukaan dan penutupan tag Form */}
-            <section className='flex w-3/7 items-center lg:px-14 xl:px-22'>
+            {/* Right Side */}
+            <section className='flex w-full md:w-xl lg:w-[60vh] xl:w-3/7 items-center justify-center px-10 md:px-12 xl:px-22'>
                 <form 
                     onSubmit={handleLoginSubmit} 
-                    className='flex flex-col lg:gap-y-8 xl:gap-y-12 lg:px-12 lg:py-14 xl:px-16 xl:py-18 w-xl max-w-xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
+                    className='flex flex-col gap-y-4 md:gap-y-6 lg:gap-y-8 px-10 py-12 md:px-12 lg:px-14 lg:py-14 xl:px-16 xl:py-18 w-full md:w-xl rounded-4xl lg:rounded-[36px] xl:rounded-[40px] border border-white/40 bg-linear-to-br from-white/20 to-white/10 shadow-lg shadow-black/5 backdrop-blur-md'
                 >
-                    <div className='flex flex-col'>
-                        <h2 className='lg:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
+                    <div className='flex flex-col gap-y-1'>
+                        <h2 className='text-2xl md:text-3xl xl:text-[2.5rem] font-montserrat font-bold text-white'>
                             Welcome Back!
                         </h2>
-                        <p className='font-montserrat font-medium text-white lg:text-sm xl:text-lg'>
+                        <p className='font-montserrat font-medium text-white text-xs md:text-sm xl:text-lg'>
                             Continue where you left off.
                         </p>
                     </div>
                     
-                    {/* Kotak Error Backend (Warna Merah) */}
-                    {serverError && (
-                        <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-2 rounded-lg font-montserrat text-sm">
-                             {serverError}
-                        </div>
-                    )}
 
                     {/* Email Input */}
-                    <div className='flex flex-col gap-y-1 lg:text-sm xl:text-lg'>
+                    <div className='flex flex-col gap-y-1 text-xs md:text-sm xl:text-lg'>
                         <label className='font-montserrat font-medium text-white'>Email address</label>
                         <input
                             type='email'
                             placeholder='youremail@mail.com'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
-                        />
+                            className='w-full rounded-md md:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-1.5 py-1 md:px-2 md:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
+                            />
                         {/* Teks Error Zod (Tepat di bawah input) */}
                         {errors.email && (
-                            <p className='text-sm text-red-300'>{errors.email[0]}</p>
+                            <p className='text-sm text-red-white'>{errors.email[0]}</p>
                         )}
                     </div>
 
                     {/* Password Input */}
-                    <div className='flex flex-col gap-y-1 lg:text-sm xl:text-lg'>
+                    <div className='flex flex-col gap-y-1 text-xs md:text-sm xl:text-lg'>
                         <div className='flex items-center justify-between'>
                             <label className='font-montserrat font-medium text-white'>Password</label>
                             <Link to='/ResetPassword' className='font-montserrat font-semibold text-white hover:text-[#27D6FF]'>
@@ -135,15 +131,22 @@ function Login() {
                             placeholder='******'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className='w-full lg:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 lg:px-2 lg:py-1.5 xl:px-4 xl:py-3 text-white outline-none' 
-                        />
+                            className='w-full rounded-md md:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-1.5 py-1 md:px-2 md:py-1.5 xl:px-4 xl:py-3 text-white outline-none' 
+                            />
                         {/* Teks Error Zod */}
                         {errors.password && (
                             <p className='text-sm text-red-300'>{errors.password[0]}</p>
                         )}
+
+                        {/* Kotak Error Backend (Warna Merah) */}
+                        {serverError && (
+                            <div className="text-white px-1 py-2 lg:py-4 rounded-lg font-montserrat text-sm">
+                                 {serverError}
+                            </div>
+                        )}
                     </div>
 
-                    <p className='text-center lg:text-sm xl:text-lg font-montserrat font-medium text-white'>
+                    <p className='text-center text-xs md:text-sm xl:text-lg font-montserrat font-medium text-white'>
                         Don't have account?{' '}
                         <Link to='/SignUp' className='font-montserrat font-bold text-white hover:text-[#27D6FF]'>
                             Create one
@@ -154,11 +157,11 @@ function Login() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-fit lg:rounded-lg xl:rounded-xl bg-[#41B0EC] mx-auto lg:px-4 lg:py-1 xl:px-6 xl:py-2 text-center lg:text-md xl:text-xl font-montserrat font-semibold text-white transition-all hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC] ${
+                        className={`w-fit rounded-md md:rounded-lg xl:rounded-xl bg-[#41B0EC] shadow-sm shadow-black/2 mx-auto px-3 py-0.5 md:px-4 md:py-1 xl:px-6 xl:py-2 text-center text-sm md:text-md xl:text-xl font-montserrat font-semibold text-white transition-all hover:bg-white hover:text-[#41B0EC] hover:border hover:border-[#41B0EC] ${
                             isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
                         }`}
                     >
-                        {isLoading ? 'Checking...' : 'Sign In'}
+                        {isLoading ? 'Verifying...' : 'Sign In'}
                     </button>
                 </form>
             </section>

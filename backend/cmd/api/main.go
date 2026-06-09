@@ -19,6 +19,7 @@ import (
 	"vault-of-evidence/backend/internal/middleware"
 	jwtpkg "vault-of-evidence/backend/internal/pkg/jwt"
 	"vault-of-evidence/backend/internal/project"
+	"vault-of-evidence/backend/internal/worklist"
 )
 
 func main() {
@@ -50,6 +51,10 @@ func main() {
 	projectSvc := project.NewService(projectRepo)
 	projectHandler := project.NewHandler(projectSvc)
 
+	worklistRepo := worklist.NewRepository(db)
+	worklistSvc := worklist.NewService(worklistRepo)
+	worklistHandler := worklist.NewHandler(worklistSvc)
+
 	findingRepo := finding.NewRepository(db)
 	findingSvc := finding.NewService(findingRepo)
 	findingHandler := finding.NewHandler(findingSvc)
@@ -72,13 +77,15 @@ func main() {
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", cfg.AllowedOrigin)
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Header("Access-Control-Allow-Headers", "Content-Type")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Max-Age", "86400")
+
 		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
+
 		c.Next()
 	})
 
@@ -91,54 +98,136 @@ func main() {
 	api := router.Group("/api/v1")
 
 	authRoutes := api.Group("/auth")
-	authRoutes.Use(authLimiter.Middleware())
-	authHandler.RegisterRoutes(authRoutes, authMw)
+	{
+		authRoutes.POST("/signup", authLimiter.Middleware(), authHandler.Signup)
+		authRoutes.POST("/login", authLimiter.Middleware(), authHandler.Login)
+		authRoutes.POST("/resetPassword", authLimiter.Middleware(), authHandler.ForgotPassword)
+		authRoutes.POST("/createNewPassword", authLimiter.Middleware(), authHandler.ResetPassword)
+
+		authRoutes.POST("/logout", authHandler.Logout)
+		authRoutes.POST("/change-password", authMw, authHandler.ChangePassword)
+		authRoutes.GET("/me", authMw, authHandler.GetMe)
+	}
 
 	projectRoutes := api.Group("/projects")
 	projectRoutes.Use(authMw)
 	{
 		projectRoutes.GET("", projectHandler.GetAll)
-		projectRoutes.GET("/:id", projectHandler.GetByID)
-		projectRoutes.POST("",
-			middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-			projectHandler.Create)
-		projectRoutes.PUT("/:id",
-			middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-			projectHandler.Update)
-		projectRoutes.DELETE("/:id",
-			middleware.RequireRole(domain.RoleAdmin),
-			projectHandler.Delete)
+		projectRoutes.POST("", projectHandler.Create)
 
-		findingRoutes := projectRoutes.Group("/:id/findings")
+		projectRoutes.GET("/dashboard/summary", projectHandler.GetDashboardSummary)
+
+		singleProject := projectRoutes.Group("/:id")
 		{
-			findingRoutes.GET("", findingHandler.GetByProject)
-			findingRoutes.GET("/:finding_id", findingHandler.GetByID)
-			findingRoutes.POST("",
-				middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-				findingHandler.Create)
-			findingRoutes.PUT("/:finding_id",
-				middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-				findingHandler.Update)
-			findingRoutes.DELETE("/:finding_id",
-				middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-				findingHandler.Delete)
+			singleProject.GET("",
+				middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+				projectHandler.GetByID)
 
-			evidenceRoutes := findingRoutes.Group("/:finding_id/evidence")
+			singleProject.PUT("",
+				middleware.RequireProjectRole(db, "id", domain.RolePM),
+				projectHandler.Update)
+
+			singleProject.DELETE("",
+				middleware.RequireProjectRole(db, "id", domain.RolePM),
+				projectHandler.Delete)
+
+			worklistRoutes := singleProject.Group("/worklists")
 			{
-				evidenceRoutes.GET("", evidenceHandler.GetByFinding)
-				evidenceRoutes.GET("/:evidence_id/download", evidenceHandler.Download)
-				evidenceRoutes.POST("",
-					middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-					evidenceHandler.Upload)
-				evidenceRoutes.DELETE("/:evidence_id",
-					middleware.RequireRole(domain.RoleAdmin, domain.RolePentester),
-					evidenceHandler.Delete)
+				worklistRoutes.GET("",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+					worklistHandler.GetByProject)
+
+				worklistRoutes.GET("/:worklist_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+					worklistHandler.GetByID)
+
+				worklistRoutes.POST("",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					worklistHandler.Create)
+
+				worklistRoutes.PUT("/:worklist_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					worklistHandler.Update)
+
+				worklistRoutes.DELETE("/:worklist_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					worklistHandler.Delete)
+					
+				// Nested routes untuk finding di dalam sebuah worklist: /projects/:id/worklists/:worklist_id/findings
+				worklistFindingsRoutes := worklistRoutes.Group("/:worklist_id/findings")
+				{
+					// Di sini, auth & role middleware diwariskan dari group worklistRoutes/singleProject
+					worklistFindingsRoutes.Use(middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester))
+					findingHandler.RegisterWorklistRoutes(worklistFindingsRoutes)
+					
+					worklistEvidenceRoutes := worklistFindingsRoutes.Group("/:finding_id/evidence")
+					{
+						worklistEvidenceRoutes.GET("",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+							evidenceHandler.GetByFinding)
+
+						worklistEvidenceRoutes.GET("/:evidence_id/download",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+							evidenceHandler.Download)
+
+						worklistEvidenceRoutes.POST("",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+							evidenceHandler.Upload)
+
+						worklistEvidenceRoutes.DELETE("/:evidence_id",
+							middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+							evidenceHandler.Delete)
+					}
+				}
+			}
+
+			findingRoutes := singleProject.Group("/findings")
+			{
+				findingRoutes.GET("",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+					findingHandler.GetByProject)
+
+				findingRoutes.GET("/:finding_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+					findingHandler.GetByID)
+
+				findingRoutes.POST("",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					findingHandler.Create)
+
+				findingRoutes.PUT("/:finding_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester, domain.RoleDev),
+					findingHandler.Update)
+
+				findingRoutes.DELETE("/:finding_id",
+					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					findingHandler.Delete)
+
+				evidenceRoutes := findingRoutes.Group("/:finding_id/evidence")
+				{
+					evidenceRoutes.GET("",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+						evidenceHandler.GetByFinding)
+
+					evidenceRoutes.GET("/:evidence_id/download",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+						evidenceHandler.Download)
+
+					evidenceRoutes.POST("",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+						evidenceHandler.Upload)
+
+					evidenceRoutes.DELETE("/:evidence_id",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+						evidenceHandler.Delete)
+				}
 			}
 		}
 	}
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
 	log.Printf("[SERVER] Listening on %s (mode: %s)", addr, cfg.GinMode)
+
 	if err := router.Run(addr); err != nil {
 		log.Fatalf("[FATAL] Server: %v", err)
 	}

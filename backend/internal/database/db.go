@@ -50,6 +50,7 @@ func AutoMigrate(db *gorm.DB) error {
 		&domain.Project{},
 		&domain.ProjectMember{},     // NEW
 		&domain.PasswordResetToken{}, // NEW
+		&domain.Worklist{},
 		&domain.Finding{},
 		&domain.Evidence{},
 	); err != nil {

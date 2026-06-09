@@ -15,6 +15,11 @@ type Repository interface {
 	UpdatePasswordHash(userID, hash string) error
 	EmailExists(email string) bool
 	UsernameExists(username string) bool
+
+	// Metode Baru untuk Mengelola Token Reset Password di DB
+	CreateResetToken(token *domain.PasswordResetToken) error
+	FindResetTokenByHash(hash string) (*domain.PasswordResetToken, error)
+	UpdateResetToken(token *domain.PasswordResetToken) error
 }
 
 type repository struct{ db *gorm.DB }
@@ -53,8 +58,7 @@ func (r *repository) FindByID(id string) (*domain.User, error) {
 }
 
 func (r *repository) UpdatePasswordHash(userID, hash string) error {
-	return r.db.Model(&domain.User{}).Where("id = ?", userID).
-		Update("password_hash", hash).Error
+	return r.db.Model(&domain.User{}).Where("id = ?", userID).Update("password_hash", hash).Error
 }
 
 func (r *repository) EmailExists(email string) bool {
@@ -67,4 +71,21 @@ func (r *repository) UsernameExists(username string) bool {
 	var count int64
 	r.db.Model(&domain.User{}).Where("username = ?", username).Count(&count)
 	return count > 0
+}
+
+func (r *repository) CreateResetToken(token *domain.PasswordResetToken) error {
+	return r.db.Create(token).Error
+}
+
+func (r *repository) FindResetTokenByHash(hash string) (*domain.PasswordResetToken, error) {
+	var token domain.PasswordResetToken
+	err := r.db.Preload("User").Where("token_hash = ? AND used = ?", hash, false).First(&token).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &token, err
+}
+
+func (r *repository) UpdateResetToken(token *domain.PasswordResetToken) error {
+	return r.db.Save(token).Error
 }
