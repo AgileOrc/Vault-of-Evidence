@@ -5,6 +5,13 @@ import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
 import { getPageTheme } from '../utils/theme'
+import { 
+    EditProjectModal, 
+    ManageMembersModal,
+    DeleteProjectModal, 
+    AddWorklistModal,
+    DeleteWorklistModal
+} from '../components/PopUp'
 
 type ProjectData = {
     id: string
@@ -33,6 +40,13 @@ function Worklist () {
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
+    
+    const [showEditProject, setShowEditProject] = useState(false)
+    const [showManageMembers, setShowManageMembers] = useState(false)
+    const [showDeleteProject, setShowDeleteProject] = useState(false)
+    const [showAddWorklist, setShowAddWorklist] = useState(false)
+    const [showDeleteWorklist, setShowDeleteWorklist] = useState(false)
+
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklists, setWorklists] = useState<WorklistData[]>([])
     const { projectId } = useParams()
@@ -136,16 +150,22 @@ function Worklist () {
                             
                             {/* Edit + Manage */}
                             <div className={`flex gap-2 md:items-end ${isCollapsed ? 'flex-row md:flex-col lg:flex-row ' : 'flex-row md:flex-col xl:flex-row'}`}>
-                                <button className={`${btnBase} ${theme.buttonPrimary}`}>
+                                <button 
+                                    onClick={() => setShowEditProject(true)}
+                                    className={`${btnBase} ${theme.buttonPrimary}`}>
                                     <Pencil className={iconSize} /> Edit Project
                                 </button>
-                                <button className={`${btnBase} ${theme.buttonOutline}`}>
+                                <button 
+                                    onClick={() => setShowManageMembers(true)}
+                                    className={`${btnBase} ${theme.buttonOutline}`}>
                                     <Users className={iconSize} /> Manage Members
                                 </button>
                             </div>
 
                             {/* Delete */}
-                            <button className={`${btnBase} ${theme.buttonDanger} w-fit`}>
+                            <button 
+                                onClick={() => setShowDeleteProject(true)}
+                                className={`${btnBase} ${theme.buttonDanger} w-fit`}>
                                 <Trash2 className={iconSize} /> Delete Project
                             </button>
 
@@ -184,7 +204,9 @@ function Worklist () {
                             isDark={isDark}
                         />
                     </div>
-                    <button className={`${btnBase} justify-center border-transparent ${theme.buttonPrimary}`}>
+                    <button 
+                        onClick={() => setShowAddWorklist(true)}
+                        className={`${btnBase} justify-center border-transparent ${theme.buttonPrimary}`}>
                         <FilePlusCorner className={`w-4 h-4 lg:w-5 lg:h-5`} /> Add Worklist
                     </button>
                             
@@ -218,7 +240,11 @@ function Worklist () {
                                         {worklist.status.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                     </span>
                                     <button
-                                        onClick={(e) => e.preventDefault()}
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            setShowDeleteWorklist(true)
+                                        }}
                                         className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium font-montserrat ${theme.buttonOutline}`}
                                     >
                                         <Trash2 size={14} /> Delete Worklist
@@ -233,6 +259,47 @@ function Worklist () {
                     </div>
                 )}
             </div>
+
+            <EditProjectModal
+                isOpen={showEditProject}
+                isDark={isDark}
+                onClose={() => setShowEditProject(false)}
+                project={project}
+                onSubmit={(data) => console.log('edit project', data)}
+            />
+
+            <ManageMembersModal
+                isOpen={showManageMembers}
+                isDark={isDark}
+                onClose={() => setShowManageMembers(false)}
+                members={[]}
+                onAddMember={(email, role) => console.log(email, role)}
+                onRemoveMember={(id) => console.log(id)}
+            />
+
+            <DeleteProjectModal
+                isOpen={showDeleteProject}
+                isDark={isDark}
+                onClose={() => setShowDeleteProject(false)}
+                projectName={project?.name ?? ''}
+                onConfirm={() => console.log('delete project')}
+            />
+
+            <AddWorklistModal
+                isOpen={showAddWorklist}
+                isDark={isDark}
+                onClose={() => setShowAddWorklist(false)}
+                onSubmit={(data) => console.log('add worklist', data)}
+            />
+
+            <DeleteWorklistModal
+                isOpen={showDeleteWorklist}
+                isDark={isDark}
+                onClose={() => setShowDeleteWorklist(false)}
+                worklistName={''}
+                onConfirm={() => console.log('delete worklist')}
+            />
+
         </div>
     )
 }

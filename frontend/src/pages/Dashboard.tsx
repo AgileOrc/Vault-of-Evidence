@@ -11,6 +11,7 @@ import {
 import { Link, useOutletContext } from 'react-router-dom'
 import type { LayoutContext } from '../components/AppLayout'
 import { useUser } from '../context/UserContext'
+import { NewProjectModal } from '../components/PopUp'
 import api from '../api/axios'
 
 type ProjectData = {
@@ -63,6 +64,8 @@ function Dashboard () {
 
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState<DashboardSummary | null>(null)
+
+    const [showNewProject, setShowNewProject] = useState(false)
 
     useEffect(() => {
         api.get('/projects/dashboard/summary')
@@ -137,9 +140,11 @@ function Dashboard () {
                     <h1 className={`text-2xl xl:text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, {user.name}</h1>
                     <p className={`text-sm md:text-md xl:text-lg opacity-80 font-montserrat ${theme.greetings}`}>Here is what is happening across your projects today.</p>
                 </div> 
-                <Link to='/Projects' className={`flex items-center gap-1 xl:gap-2 rounded-md md:rounded-lg px-3 xl:px-4 py-1.5 xl:py-2 text-sm md:text-md xl:text-lg font-semibold font-montserrat ${theme.buttonNewProject}`}>
+                <button
+                    onClick={() => setShowNewProject(true)}
+                    className={`flex items-center gap-1 xl:gap-2 rounded-md md:rounded-lg px-3 xl:px-4 py-1.5 xl:py-2 text-sm md:text-md xl:text-lg font-semibold font-montserrat ${theme.buttonNewProject}`}>
                     <Plus className='h-4 w-4' /> New Project
-                </Link>
+                </button>
             </header>
             
             {/* Statistik Atas: Data Asli dari Backend */}
@@ -183,9 +188,6 @@ function Dashboard () {
                 <div className={`px-8 py-8 lg:px-8 min-w-1/3 ${theme.cardBase}`}>
                     <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
                         <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Recent Activity</h2>
-                        <Link to='/Projects' className={`flex items-center gap-0.5 md:gap-1 text-md md:text-lg xl:text-xl font-semibold font-montserrat ${theme.viewAllBUtton}`}>
-                            View all <ArrowUpRight className='h-4 w-4 md:h-5 md:w-5 xl:h-6 xl:w-6' />
-                        </Link>
                     </div>
                     <div className={`divide-y ${theme.divider}`}>
                         <div className='flex gap-3 py-3'>
@@ -229,6 +231,14 @@ function Dashboard () {
                     )}
                 </div>
             </div>
+            
+            <NewProjectModal
+                isOpen={showNewProject}
+                isDark={isDark}
+                onClose={() => setShowNewProject(false)}
+                onSubmit={(data) => console.log('new project', data)}
+            />
+
         </div>
     )
 }
