@@ -11,6 +11,7 @@ type ProjectStatus string
 const (
 	StatusPlanning  ProjectStatus = "planning"
 	StatusActive    ProjectStatus = "active"
+	StatusPaused    ProjectStatus = "paused"
 	StatusCompleted ProjectStatus = "completed"
 	StatusArchived  ProjectStatus = "archived"
 )
@@ -44,7 +45,7 @@ type UpdateProjectRequest struct {
 	Name        string        `json:"name"        binding:"omitempty,min=3,max=255"`
 	Type        string        `json:"type"        binding:"omitempty,max=100"`
 	Description string        `json:"description" binding:"omitempty,max=5000"`
-	Status      ProjectStatus `json:"status"      binding:"omitempty,oneof=planning active completed archived"`
+	Status      ProjectStatus `json:"status"      binding:"omitempty,oneof=planning active paused completed archived"`
 	StartDate   *time.Time    `json:"start_date"`
 	EndDate     *time.Time    `json:"end_date"`
 }
