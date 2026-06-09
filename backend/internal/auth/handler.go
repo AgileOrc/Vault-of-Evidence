@@ -24,9 +24,13 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup, authMw gin.HandlerFunc) {
 	rg.POST("/signup", h.Signup)
 	rg.POST("/login", h.Login)
 	rg.POST("/logout", h.Logout)
-	rg.POST("/change-password", authMw, h.ChangePassword)
 
-	// Rute baru untuk dipanggil Sidebar Frontend
+	// Reset password (public - tidak butuh login)
+	rg.POST("/resetPassword", h.ForgotPassword)
+	rg.POST("/createNewPassword", h.ResetPasswordWithToken)
+
+	// Butuh login
+	rg.POST("/change-password", authMw, h.ChangePassword)
 	rg.GET("/me", authMw, h.GetMe)
 }
 
@@ -137,4 +141,50 @@ func (h *Handler) GetMe(c *gin.Context) {
 		"name":  user.Username,
 		"email": user.Email,
 	})
+}
+
+// Handler untuk Lupa Password — Frontend: POST /api/v1/auth/resetPassword
+func (h *Handler) ForgotPassword(c *gin.Context) {
+	var req struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	rawToken, err := h.service.ForgotPassword(req.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to process request"})
+		return
+	}
+
+	// Security: selalu return 200 terlepas email terdaftar atau tidak
+	response := gin.H{"message": "If that email is registered, a reset link has been sent."}
+	if rawToken != "" {
+		// DEV ONLY: sertakan token di response karena belum ada email service
+		response["dev_token"] = rawToken
+		response["dev_reset_url"] = "http://localhost:5173/CreateNewPassword?token=" + rawToken
+	}
+	c.JSON(http.StatusOK, response)
+}
+
+// Handler untuk Buat Password Baru — Frontend: POST /api/v1/auth/createNewPassword
+func (h *Handler) ResetPasswordWithToken(c *gin.Context) {
+	// Frontend mengirim {token, password}, bukan {token, new_password}
+	var req struct {
+		Token    string `json:"token"    binding:"required,min=32"`
+		Password string `json:"password" binding:"required,min=12,max=128"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.service.ResetPassword(req.Token, req.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired reset link."})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password has been reset. Please sign in."})
 }

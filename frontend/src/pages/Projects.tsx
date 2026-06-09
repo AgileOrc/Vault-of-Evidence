@@ -34,9 +34,9 @@ function Projects () {
 
     //ini jujur aku blm tau bener apa engganya, tolong di koreksi ges kalo salah
     useEffect(() => {
-        api.get('/projects/lists')
+        api.get('/projects')
             .then((res) => {
-                setProjects(res.data.projects)
+                setProjects(res.data.data || [])
                 setLoading(false)
             })
             .catch(() => {

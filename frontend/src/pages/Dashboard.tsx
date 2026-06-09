@@ -36,6 +36,7 @@ type DashboardSummary = {
     recentFindings: FindingData[]
 }
 
+// @ts-ignore: Keeping dummy data for fallback
 const dummyProjects = [
     { id: '1', name: 'mycompany.com', description: 'Web Application', status: 'Active' },
     { id: '2', name: 'api.startup.io', description: 'API Security', status: 'Active' },
@@ -44,6 +45,7 @@ const dummyProjects = [
     { id: '5', name: 'corp.enterprise.com', description: 'Internal Network', status: 'Completed' },
 ]
 
+// @ts-ignore: Keeping dummy data for fallback
 const dummyFindings = [
     { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
     { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
@@ -76,6 +78,7 @@ function Dashboard () {
     const { isDark } = useOutletContext<LayoutContext>()
     const { user } = useUser()
 
+    // @ts-ignore: Loading state might be used later or for UI transitions
     const [loading, setLoading] = useState(true)
 
     const [data, setData] = useState<DashboardSummary | null>(null)

@@ -3,9 +3,11 @@ import logo from '../assets/logo-05.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import api from '../api/axios'; 
+import { useUser } from '../context/UserContext';
 
 function Signup() {
     const navigate = useNavigate();
+    const { refreshUser } = useUser();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -70,8 +72,8 @@ function Signup() {
             });
 
             if (response.status === 201 || response.status === 200) {
-                alert('Account created successfully! Please sign in.');
-                navigate('/'); 
+                await refreshUser();
+                navigate('/Dashboard');
             }
         } catch (err: any) {
             
