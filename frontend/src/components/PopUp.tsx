@@ -175,18 +175,16 @@ type NewProjectModalProps = BaseModalProps & {
 }
 
 export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjectModalProps) {
-    const [form, setForm] = useState({ name: '', type: '', status: 'Active', description: '' })
+    const [form, setForm] = useState({ name: '', type: '', status: 'planning', description: '' })
 
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
     const handleSubmit = () => {
         if (!form.name.trim()) return
         onSubmit(form)
-        setForm({ name: '', type: '', status: 'Active', description: '' })
+        setForm({ name: '', type: '', status: 'planning', description: '' })
         onClose()
     }
-
-    const optClass = isDark ? 'bg-[#0B2E46] text-white' : 'bg-white text-[#002C49]'
 
     return (
         <PopUpBase isOpen={isOpen} isDark={isDark} onClose={onClose} title="New Project">
@@ -195,21 +193,9 @@ export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjec
                 <Input isDark={isDark} placeholder="e.g. mycompany.com" value={form.name} onChange={(e) => set('name', e.target.value)} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label isDark={isDark}>Type <span className="text-red-400">*</span></Label>
-                    <Input isDark={isDark} placeholder='e.g. Web Application, API Security...' value={form.type} onChange={(e) => set('type', e.target.value)} />
-                </div>
-
-                <div>
-                    <Label isDark={isDark}>Status</Label>
-                    <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                        <option className={optClass} value="Active">Active</option>
-                        <option className={optClass} value="Paused">Paused</option>
-                        <option className={optClass} value="Upcoming">Upcoming</option>
-                        <option className={optClass} value="Completed">Completed</option>
-                    </Select>
-                </div>
+            <div>
+                <Label isDark={isDark}>Type <span className="text-red-400">*</span></Label>
+                <Input isDark={isDark} placeholder='e.g. Web Application, API Security...' value={form.type} onChange={(e) => set('type', e.target.value)} />
             </div>
 
             <div>
@@ -250,7 +236,7 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
     const [form, setForm] = useState({
         name: project?.name ?? '',
         type: project?.type ?? '',
-        status: project?.status ?? 'Active',
+        status: project?.status ?? 'planning',
         description: project?.description ?? '',
     })
 
@@ -259,7 +245,7 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
         if (project) setForm({
             name: project.name ?? '',
             type: project.type ?? '',
-            status: project.status ?? 'Active',
+            status: project.status ?? 'planning',
             description: project.description ?? '',
         })
     }, [project])
@@ -290,10 +276,10 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
                 <div>
                     <Label isDark={isDark}>Status</Label>
                     <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                        <option className={optClass} value="Active">Active</option>
-                        <option className={optClass} value="Paused">Paused</option>
-                        <option className={optClass} value="Upcoming">Upcoming</option>
-                        <option className={optClass} value="Completed">Completed</option>
+                        <option className={optClass} value="active">Active</option>
+                        <option className={optClass} value="paused">Paused</option>
+                        <option className={optClass} value="planning">Upcoming</option>
+                        <option className={optClass} value="completed">Completed</option>
                     </Select>
                 </div>
             </div>
@@ -405,13 +391,14 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMemb
 {/* DELETE PROJECT MODAL */}
 type DeleteProjectModalProps = BaseModalProps & {
     projectName: string
-    onConfirm: () => void
+    onConfirm: () => Promise<void>
 }
 
 export function DeleteProjectModal({ isOpen, isDark, onClose, projectName, onConfirm }: DeleteProjectModalProps) {
-    const handleConfirm = () => {
-        onConfirm()
-        onClose()
+    const [loading, setLoading] = useState(false)
+    const handleConfirm = async () => {
+        setLoading(true)
+        try { await onConfirm() } finally { setLoading(false) }
     }
 
     return (
@@ -433,8 +420,8 @@ export function DeleteProjectModal({ isOpen, isDark, onClose, projectName, onCon
                 isDark={isDark}
                 onClose={onClose}
                 onConfirm={handleConfirm}
-                confirmLabel="Delete Project"
-                confirmClass="bg-red-500 text-white hover:bg-red-600"
+                confirmLabel={loading ? 'Deleting...' : 'Delete Project'}
+                confirmClass={`bg-red-500 text-white hover:bg-red-600 ${loading ? 'opacity-60 pointer-events-none' : ''}`}
             />
         </PopUpBase>
     )
@@ -539,16 +526,17 @@ export function EditWorklistModal({ isOpen, isDark, onClose, worklist, onSubmit 
 }
 
 
-{/* DELETE WORKLIST MODAL */} 
+{/* DELETE WORKLIST MODAL */}
 type DeleteWorklistModalProps = BaseModalProps & {
     worklistName: string
-    onConfirm: () => void
+    onConfirm: () => Promise<void>
 }
 
 export function DeleteWorklistModal({ isOpen, isDark, onClose, worklistName, onConfirm }: DeleteWorklistModalProps) {
-    const handleConfirm = () => {
-        onConfirm()
-        onClose()
+    const [loading, setLoading] = useState(false)
+    const handleConfirm = async () => {
+        setLoading(true)
+        try { await onConfirm() } finally { setLoading(false) }
     }
 
     return (
@@ -569,8 +557,8 @@ export function DeleteWorklistModal({ isOpen, isDark, onClose, worklistName, onC
                 isDark={isDark}
                 onClose={onClose}
                 onConfirm={handleConfirm}
-                confirmLabel="Delete Worklist"
-                confirmClass="bg-red-500 text-white hover:bg-red-600"
+                confirmLabel={loading ? 'Deleting...' : 'Delete Worklist'}
+                confirmClass={`bg-red-500 text-white hover:bg-red-600 ${loading ? 'opacity-60 pointer-events-none' : ''}`}
             />
         </PopUpBase>
     )
