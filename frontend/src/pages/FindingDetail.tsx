@@ -175,6 +175,42 @@ function FindingDetail () {
     const setPocField = (id: string, patch: Partial<PoC>) =>
         setPocs(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p))
 
+    const handleEvidenceUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.length) return
+        try {
+            for (const file of Array.from(e.target.files)) {
+                const formData = new FormData()
+                formData.append('file', file)
+                await api.post(`/projects/${projectId}/findings/${findingId}/evidence`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                })
+            }
+            // Reload evidence
+            const evRes = await api.get(`/projects/${projectId}/findings/${findingId}/evidence`)
+            const evidences = evRes.data.data || []
+            setPocs(evidences.map((ev: any) => ({
+                id: ev.id,
+                type: ev.mime_type?.startsWith('image/') ? 'screenshot' : 'request',
+                caption: ev.file_name,
+                content: `${api.defaults.baseURL}/projects/${projectId}/findings/${findingId}/evidence/${ev.id}/download`
+            })))
+        } catch (err) {
+            console.error('Failed to upload evidence', err)
+            alert('Failed to upload evidence.')
+        }
+    }
+
+    const handleEvidenceDelete = async (id: string) => {
+        try {
+            await api.delete(`/projects/${projectId}/findings/${findingId}/evidence/${id}`)
+            setPocs(prev => prev.filter(p => p.id !== id))
+            setOpenModal(null)
+        } catch (err) {
+            console.error('Failed to delete evidence', err)
+            alert('Failed to delete evidence.')
+        }
+    }
+
     const handleSave = async () => {
         if (!editData) return
         try {
@@ -390,12 +426,10 @@ function FindingDetail () {
                     <div className='flex items-center justify-between mb-3'>
                         <p className={`text-sm lg:text-md font-medium ${theme.textMuted}`}>Screenshots</p>
                         {isEditing && !isDev && (
-                            <button
-                                onClick={() => setPocs(prev => [...prev, { id: Date.now().toString(), type: 'screenshot', caption: `Screenshot ${prev.filter(p => p.type === 'screenshot').length + 1}`, content: '' }])}
-                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border ${theme.buttonOutline}`}
-                            >
-                                <Plus size={12} /> Add
-                            </button>
+                            <label className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border cursor-pointer ${theme.buttonOutline}`}>
+                                <Plus size={12} /> Upload
+                                <input type="file" multiple className="hidden" onChange={handleEvidenceUpload} />
+                            </label>
                         )}
                     </div>
                     <div className='flex flex-wrap gap-3'>
@@ -419,12 +453,10 @@ function FindingDetail () {
                     <div className='flex items-center justify-between mb-3'>
                         <p className={`text-sm lg:text-md font-medium ${theme.textMuted}`}>Requests &amp; Responses</p>
                         {isEditing && !isDev && (
-                            <button
-                                onClick={() => setPocs(prev => [...prev, { id: Date.now().toString(), type: 'request', caption: 'New request', content: '' }])}
-                                className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border ${theme.buttonOutline}`}
-                            >
-                                <Plus size={12} /> Add
-                            </button>
+                            <label className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border cursor-pointer ${theme.buttonOutline}`}>
+                                <Plus size={12} /> Upload
+                                <input type="file" multiple className="hidden" onChange={handleEvidenceUpload} />
+                            </label>
                         )}
                     </div>
                     <div className='flex flex-col gap-3'>
@@ -595,7 +627,7 @@ function FindingDetail () {
                                 {/* Delete PoC (edit mode only) */}
                                 {canEditPoc && (
                                     <button
-                                        onClick={() => { setPocs(prev => prev.filter(p => p.id !== poc.id)); setOpenModal(null) }}
+                                        onClick={() => handleEvidenceDelete(poc.id)}
                                         className={`${btnBase} ${theme.buttonDanger} mt-2`}
                                     >
                                         <Trash2 className={iconSize} /> Remove

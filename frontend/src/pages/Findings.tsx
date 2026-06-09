@@ -316,7 +316,7 @@ function Findings () {
                 members={[]}
                 onSubmit={async (data) => {
                     try {
-                        await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
+                        const createRes = await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
                             title: data.vulnName,
                             status: 'open',
                             severity: data.cvssScore >= 9.0 ? 'critical' : data.cvssScore >= 7.0 ? 'high' : data.cvssScore >= 4.0 ? 'medium' : 'low',
@@ -324,9 +324,21 @@ function Findings () {
                             cvss_vector: data.cvssVector,
                             impact: data.impactedSystem,
                             description: data.executiveSummary,
-                            reproduction_steps: data.str,
+                            reproduction_steps: data.str + (data.pocText ? `\n\nProof of Concept:\n${data.pocText}` : ''),
                             remediation: data.remediation
                         })
+                        const newFindingId = createRes.data.data.id
+
+                        if (data.pocFiles && data.pocFiles.length > 0) {
+                            for (const file of data.pocFiles) {
+                                const formData = new FormData()
+                                formData.append('file', file)
+                                await api.post(`/projects/${projectId}/findings/${newFindingId}/evidence`, formData, {
+                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                })
+                            }
+                        }
+
                         const res = await api.get(`/projects/${projectId}/worklists/${worklistId}/findings`)
                         const mapped = (res.data.data || []).map((f: any) => ({
                             id: f.id,
