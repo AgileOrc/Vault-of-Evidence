@@ -485,7 +485,7 @@ function MetricSection({
                   key={option.value}
                   type='button'
                   onClick={() => onSelect(metric.key, option.value)}
-                  className={`min-w-[110px] rounded-full border px-5 py-2 text-sm font-semibold font-montserrat transition-all ${
+                  className={`min-w-27.5 rounded-full border px-5 py-2 text-sm font-semibold font-montserrat transition-all ${
                     selectedMetrics[metric.key] === option.value
                       ? 'border-transparent bg-[#1767AA] text-white shadow-[0_4px_10px_rgba(23,103,170,0.25)]'
                       : 'border-[#B9DDF7] text-[#1767AA] hover:bg-[#DFF5FB]'

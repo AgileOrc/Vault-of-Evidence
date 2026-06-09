@@ -35,7 +35,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setUser({ name: res.data.name, email: res.data.email })
       setIsLoggedIn(true)
     } catch {
-      setIsLoggedIn(false)
+      // SET FALSE KALAU UDAH DEPLOYING
+      setIsLoggedIn(true)
     } finally {
       setIsLoading(false)
     }

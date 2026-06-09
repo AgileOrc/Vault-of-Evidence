@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react'
-import {
-    Users,
-    FileText,
-    Bug,
-    Search, 
-    ChevronDown,
-    Trash2,
-    FilePlusCorner,
-    Pencil
-} from 'lucide-react'
+import { Users, FileText, Bug, Search, Trash2, FilePlusCorner, Pencil } from 'lucide-react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
+import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
+import { getPageTheme } from '../utils/theme'
 
 type ProjectData = {
     id: string
@@ -21,7 +14,7 @@ type ProjectData = {
     worklists: number
     findings: number
     status: string
-    describtion: string
+    description: string
 }
 
 type WorklistData = {
@@ -32,13 +25,14 @@ type WorklistData = {
     status: string
 }
 
+const btnBase = 'flex items-center gap-2 px-2 md:px-2.5 xl:px-4 py-2 xl:py-2.5 rounded-md md:rounded-lg border font-semibold text-xs xl:text-sm font-montserrat'
+const iconSize = 'w-3 h-3 md:w-4 md:h-4'
+
 function Worklist () {
-    const { isDark } = useOutletContext<LayoutContext>()
+    const { isDark, isCollapsed } = useOutletContext<LayoutContext>()
     const [loading, setLoading] = useState(true)
-    
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
-    
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklists, setWorklists] = useState<WorklistData[]>([])
     const { projectId } = useParams()
@@ -54,117 +48,53 @@ function Worklist () {
                 setProject({
                     id: projectId || '1',
                     name: 'mycompany.com (Dummy)',
-                    describtion: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.',
+                    description: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.',
                     type: 'Web Application',
                     members: 5,
                     worklists: 5,
                     findings: 10,
-                    status: 'Active'
+                    status: 'active'
                 })
-                
                 setWorklists([
-                    {
-                        id: '1',
-                        name: 'Login Page (Dummy)',
-                        code: 'WSTG-ATHN, WSTG-SESS',
-                        findings: 3,
-                        status: 'In Progress'
-                    },
-                    {
-                        id: '2',
-                        name: 'User Profile (Dummy)',
-                        code: 'WSTG-ATHZ',
-                        findings: 1,
-                        status: 'In Progress'
-                    },
-                    {
-                        id: '3',
-                        name: 'Search Feature (Dummy)',
-                        code: 'WSTG-INPV',
-                        findings: 2,
-                        status: 'In Progress'
-                    },
-                    {
-                        id: '4',
-                        name: 'Register Page (Dummy)',
-                        code: 'WSTG-IDNT',
-                        findings: 4,
-                        status: 'Completed'
-                    },
-                    {
-                        id: '5',
-                        name: 'Forgot Password (Dummy)',
-                        code: 'WSTG-ATHN',
-                        findings: 0,
-                        status: 'Not Started'
-                    },
+                    { id: '1', name: 'Login Page',      code: 'WSTG-ATHN, WSTG-SESS', findings: 3, status: 'in progress' },
+                    { id: '2', name: 'User Profile',    code: 'WSTG-ATHZ',             findings: 1, status: 'in progress' },
+                    { id: '3', name: 'Search Feature',  code: 'WSTG-INPV',             findings: 2, status: 'in progress' },
+                    { id: '4', name: 'Register Page',   code: 'WSTG-IDNT',             findings: 4, status: 'completed'   },
+                    { id: '5', name: 'Forgot Password', code: 'WSTG-ATHN',             findings: 0, status: 'not started' },
                 ])
-                
                 setLoading(false)
             })
     }, [projectId])
 
     const filteredWorklists = worklists.filter((worklist) => {
         const matchSearch = worklist.name.toLowerCase().includes(searchTerm.toLowerCase())
-
         const matchStatus = statusFilter === 'all' || worklist.status.toLowerCase() === statusFilter.toLowerCase()
-
         return matchSearch && matchStatus
     })
 
-    const theme = isDark
-        ? {
-            cardBase: 'bg-gradient-to-br from-[#294B63] via-[#173B56] to-[#0B2E46] border border-[#2BA7D6]/40 text-[#F5F5F5] shadow-[0_8px_30px_rgba(0,0,0,0.35)]',
-            projectName: 'text-[#FFFFFF]',
-            projectDetails: 'text-[#41B0EC]',
-            buttonManage: 'text-[#41B0EC] hover:text-[#FFFFFF] hover:bg-[#0EB8DF]',
-            buttonDelete: 'text-[#EC2828] hover:text-[#FFFFFF] hover:bg-[#EC2828]',
-            buttonEditProject: 'bg-[#41B0EC] text-[#FFFFFF] hover:bg-[#27D6FF] hover:text-[#FFFFFF]',
-            buttonAddWorklist: 'bg-[#41B0EC] text-[#FFFFFF] hover:bg-[#27D6FF] hover:text-[#FFFFFF]',
-            buttonDeleteWorklist: 'text-[#41B0EC] border border-[#41B0EC] hover:text-[#FFFFFF] hover:bg-[#27D6FF]'
-        }
-        : {
-            cardBase: 'bg-linear-to-br from-[#F5F5F5] to-[#27D6FF]/20 border border-[#27D6FF]/40 text-[#002C49] shadow-md',
-            projectName: 'text-[#002C49]',
-            projectDetails: 'text-[#0E65AD]',
-            buttonManage: 'bg-[#FFFFFF] text-[#1767AA] hover:text-[#FFFFFF] hover:bg-[#41B0EC]',
-            buttonDelete: 'bg-[#FFFFFF] text-[#EC2828] hover:text-[#FFFFFF] hover:bg-[#EC2828]',
-            buttonEditProject: 'bg-[#1767AA] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-[#FFFFFF]',
-            buttonAddWorklist: 'bg-[#1767AA] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-[#FFFFFF]',
-            buttonDeleteWorklist: 'text-[#1767AA] border border-[#1767AA] hover:text-[#FFFFFF] hover:bg-[#41B0EC]'
-        }
+    const theme = getPageTheme(isDark)
+
     const badgeClass = (status: string) => {
         if (isDark) {
-            if (status === 'In Progress')
-                return 'bg-[#27D6FF] text-[#136AB2]'
-
-            if (status === 'Completed')
-                return 'bg-[#136AB2] text-[#F5F5F5]'
-
+            if (status === 'in progress') return 'bg-[#27D6FF] text-[#136AB2]'
+            if (status === 'completed')   return 'bg-[#136AB2] text-[#F5F5F5]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
-        
-        if (status === 'In Progress') return 'bg-[#1767AA] text-[#27D6FF]'
-        if (status === 'Completed') return 'bg-[#00375C] text-[#22BBDE]'
+        if (status === 'in progress') return 'bg-[#1767AA] text-[#27D6FF]'
+        if (status === 'completed')   return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
-    const projectStatus = (status: string) => {
+
+    const projectStatusClass = (status: string) => {
         if (isDark) {
-            if (status === 'Active')
-                return 'bg-[#17E58F] text-[#005B35]'
-
-            if (status === 'Paused')
-                return 'bg-[#E6DF14] text-[#5B4100]'
-
-            if (status === 'Upcoming')
-                return 'bg-[#C017DE] text-[#40005B]'
-
+            if (status === 'active')   return 'bg-[#17E58F] text-[#005B35]'
+            if (status === 'paused')   return 'bg-[#E6DF14] text-[#5B4100]'
+            if (status === 'planning') return 'bg-[#C017DE] text-[#40005B]'
             return 'bg-[#22BBDE] text-[#00375C]'
         }
-        
-        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
+        if (status === 'active')   return 'bg-[#005B35] text-[#17E58F] font-semibold'
+        if (status === 'paused')   return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        if (status === 'planning') return 'bg-[#40005B] text-[#D633FF] font-semibold'
         return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     }
 
@@ -172,151 +102,139 @@ function Worklist () {
         return <div className='text-center p-10 font-montserrat'>Loading Worklists...</div>
     }
 
-
     return (
-        <div className='space-y-1'>
-            <h1 className={`text-2xl xl:text-3xl font-semibold font-montserrat ${theme.projectName}`}>Project</h1>
-            
-            <div className='flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6'>
-                <div className='space-y-2 flex-1'>
-                    <div className='flex items-center gap-6 min-w-0'>
-                        <h2 className={`min-w-0 truncate text-2xl xl:text-3xl font-semibold font-montserrat ${theme.projectName}`}> {project?.name} </h2>
-                    
-                        <span className={`shrink-0 px-6 py-2 rounded-full font-semibold font-montserrat ${projectStatus(project?.status || '')}`}>Active</span>
+        <div className='space-y-4 md:space-y-6'>
+            {/* Project Header */}
+            <div className='space-y-2'>
+                {/* Row 1: Label */}
+                <p className={`text-xl md:text-2xl xl:text-3xl font-semibold font-montserrat ${theme.text}`}>Project</p>
+
+                {/* Row 2: 2 columns */}
+                <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-4'>
+
+                    {/* Col 1: Title, description (xl only), info */}
+                    <div className='space-y-2 md:flex-4 lg:flex-3 min-w-0'>
+                        <div className='flex items-center gap-4 min-w-0'>
+                            <h1 className={`min-w-0 truncate text-2xl md:text-3xl xl:text-4xl font-semibold font-montserrat ${theme.text}`}>{project?.name}</h1>
+                            <span className={`shrink-0 px-4 py-1 rounded-full text-sm font-semibold font-montserrat ${projectStatusClass(project?.status || '')}`}>
+                                {(project?.status ?? '').charAt(0).toUpperCase() + (project?.status ?? '').slice(1)}
+                            </span>
+                        </div>
+
+                        <p className={`text-sm md:text-base font-montserrat ${theme.text}`}>{project?.description}</p>
+
+                        <div className={`flex flex-wrap items-center gap-2 lg:gap-6 text-sm md:text-base font-medium font-montserrat ${theme.textMuted}`}>
+                            <div className='flex items-center gap-2'><Users size={18} /> {project?.members} members</div>
+                            <div className='flex items-center gap-2'><FileText size={18} /> {project?.worklists} worklists</div>
+                            <div className='flex items-center gap-2'><Bug size={18} /> {project?.findings} findings</div>
+                        </div>
                     </div>
 
-                    <p className={`max-w-4xl text-base xl:text-lg opacity-80 font-montserrat ${theme.projectName}`}>{project?.describtion}</p>
-                
-                    <div className={`flex flex-wrap items-center gap-8 text-base xl:text-lg font-medium font-montserrat ${theme.projectDetails}`}>
-                        <div className='flex items-center gap-2'>
-                            <Users size={20} /> {project?.members} members
-                        </div>
+                    {/* Col 2: Buttons */}
+                    <div className='flex-2 gap-2 shrink-0 items-start md:items-end justify-end'>
+                        <div className={`flex flex-col gap-2 items-start md:items-end justify-end ${isCollapsed ? 'flex-col xl:flex-row' : 'flex-col'}`}>
+                            
+                            {/* Edit + Manage */}
+                            <div className={`flex gap-2 md:items-end ${isCollapsed ? 'flex-row md:flex-col lg:flex-row ' : 'flex-row md:flex-col xl:flex-row'}`}>
+                                <button className={`${btnBase} ${theme.buttonPrimary}`}>
+                                    <Pencil className={iconSize} /> Edit Project
+                                </button>
+                                <button className={`${btnBase} ${theme.buttonOutline}`}>
+                                    <Users className={iconSize} /> Manage Members
+                                </button>
+                            </div>
 
-                        <div className='flex items-center gap-2'>
-                            <FileText size={20} /> {project?.worklists} worklists
-                        </div>
+                            {/* Delete */}
+                            <button className={`${btnBase} ${theme.buttonDanger} w-fit`}>
+                                <Trash2 className={iconSize} /> Delete Project
+                            </button>
 
-                        <div className='flex items-center gap-2'>
-                            <Bug size={20} /> {project?.findings} findings
                         </div>
                     </div>
-                </div>
-                
-                <div className='flex flex-wrap gap-4 shrink-0'>
-                    <button className={`flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold font-montserrat ${theme.buttonEditProject}`}>
-                        <Pencil size={18} /> Edit Project
-                    </button>
-
-                    <button className={`flex items-center gap-2 px-3 py-3 rounded-xl border font-semibold font-montserrat ${theme.buttonManage}`}>
-                        <Users size={18} /> Manage Members
-                    </button>
-                        
-                    <button className={`xl:w-auto 2xl:w-auto flex items-center gap-2 px-4 py-3 rounded-xl border font-semibold font-montserrat ${theme.buttonDelete}`}>
-                        <Trash2 size={18} /> Delete Project
-                    </button>
                 </div>
             </div>
 
             {/* Search & Status Filter */}
-            <div className='mt-2 flex flex-col lg:flex-row gap-4'>
-                <div className='relative flex-1'>
-                    <Search
-                        size={18}
-                        className='absolute left-3 top-1/2 -translate-y-1/2 text-[#0F65AD]'
-                    />
-
+            <div className='flex flex-col lg:flex-row gap-4'>
+                <div className={`flex gap-2 flex-1 rounded-lg md:rounded-xl px-3 md:px-4 py-2 lg:py-1 xl:py-3 border ${
+                    isDark ? 'bg-gradient-to-br from-white/15 to-[#C2C2C2]/8 border-white/40' : 'bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border-[#27D6FF]/40'
+                }`}>
+                    <Search size={18} className={`shrink-0 ${isDark ? 'text-white' : 'text-[#0F65AD]'}`} />
                     <input
                         type='text'
-                        placeholder='Search Worklists...'
+                        placeholder='Search worklist ...'
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className={`w-full rounded-lg md:rounded-xl pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base border font-Montserrat focus:outline-none focus:ring-2 ${
-                            isDark ? 'bg-[#1767AA]/20 border-[#2BA7D6] text-white focus:ring-[#2BA7D6]' : 'bg-[#27D6FF]/10 border-[#1767AA] text-[#0F65AD] focus:ring-[#20A6DA]'}
-                        `}
+                        className={`w-full bg-transparent text-sm md:text-base font-montserrat focus:outline-none ${
+                            isDark ? 'text-white placeholder:text-white/50' : 'text-[#002C49] placeholder:text-[#002C49]/40'
+                        }`}
                     />
                 </div>
-
-                <div className='relative w-full md:w-56 lg:w-48'>
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className={`appearance-none w-full rounded-lg md:rounded-xl px-3 md:px-4 py-2.5 md:py-3 pr-10 text-sm md:text-base border font-montserrat focus:outline-none focus:ring-2 ${
-                            isDark ? 'bg-[#1767AA]/20 border-[#2BA7D6] text-white focus:ring-[#2BA7D6]' : 'bg-[#27D6FF]/10 border-[#1767AA] text-[#0F65AD] focus:ring-[#20A6DA]'}
-                        `}
-                    >
-                        <option value='all' className={`font-montserrat ${ 
-                            isDark ? 'bg-[#0B2E46] text-white' : 'bg-[#27D6FF]/20 text-[#002C49]'}`}
-                        >All Status</option>
-
-                        <option value='in progress' className={`font-montserrat ${ 
-                            isDark ? 'bg-[#0B2E46] text-white' : 'bg-[#27D6FF]/20 text-[#002C49]'}`}
-                        >In Progress</option>
-
-                        <option value='not started' className={`font-montserrat ${ 
-                            isDark ? 'bg-[#0B2E46] text-white' : 'bg-[#27D6FF]/20 text-[#002C49]'}`}
-                        >Not Started</option>
-
-                        <option value='completed' className={`font-montserrat ${ 
-                            isDark ? 'bg-[#0B2E46] text-white' : 'bg-[#27D6FF]/20 text-[#002C49]'}`}
-                        >Completed</option>
-                    </select>
-
-                    <ChevronDown
-                        size={18}
-                        className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none'
-                    />
+                <div className='flex gap-4 max-w-screen md:w-fit lg:w-auto'>
+                    <div className='flex-1 min-w-0'>
+                        <CustomSelect
+                            value={statusFilter}
+                            onChange={setStatusFilter}
+                            options={[
+                                { value: 'all',         label: 'All Status'  },
+                                { value: 'in progress', label: 'In Progress' },
+                                { value: 'not started', label: 'Not Started' },
+                                { value: 'completed',   label: 'Completed'   },
+                            ]}
+                            isDark={isDark}
+                        />
+                    </div>
+                    <button className={`${btnBase} justify-center border-transparent ${theme.buttonPrimary}`}>
+                        <FilePlusCorner className={`w-4 h-4 lg:w-5 lg:h-5`} /> Add Worklist
+                    </button>
+                            
                 </div>
-
-                <button className={`flex items-center rounded-lg md:rounded-xl px-3 md:px-2 xl:px-4 py-1 gap-2 text-xs md:text-sm xl:text-lg font-medium font-montserrat ${theme.buttonAddWorklist}`}>
-                    <FilePlusCorner size={20} /> Add Worklist
-                </button>
+                
             </div>
 
             {/* Worklist List */}
-            <div className='mt-8 grid gap-4'>
+            <div className='grid gap-6 md:gap-4 font-montserrat'>
                 {filteredWorklists.length > 0 ? (
-                    filteredWorklists.map((project) => (
+                    filteredWorklists.map((worklist) => (
                         <Link
-                            key={project.id}
-                            to={`/projects/${project.id}/worklists/${project.id}/findings`}
-                            className={`block rounded-xl md:rounded-2xl p-4 md:p-6 transition hover:scale-[1.01] ${theme.cardBase}`}
+                            key={worklist.id}
+                            to={`/projects/${projectId}/worklists/${worklist.id}/findings`}
+                            className={`block rounded-xl md:rounded-2xl px-5 py-4 md:px-6 md:py-5 transition hover:scale-[1.01] ${theme.cardBase}`}
                         >
-                            <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-3'>
-                                <div>
-                                    <h3 className={`text-lg md:text-xl xl:text-2xl font-semibold font-montserrat ${theme.projectName}`}> {project.name} </h3>
-
-                                    <p className={`mt-2 text-lg md:text-lg xl:text-xl font-medium font-montserrat ${theme.projectDetails}`}> {project.code} </p>
+                            <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-4'>
+                                {/* Worklist Title & Code */}
+                                <div className='flex flex-col min-w-0'>
+                                    <h3 className={`text-xl md:text-xl xl:text-[1.3rem] font-semibold ${theme.text}`}>{worklist.name}</h3>
+                                    <p className={`mt-0.5 text-sm md:text-base font-medium ${theme.textMuted}`}>{worklist.code}</p>
                                 </div>
-
-                                <div className='mt-3 flex flex-wrap items-center gap-3 md:gap-5 xl:gap-6 text-xs md:text-sm xl:text-base'>
-                                    <div className={`flex items-center gap-2 text-lg md:text-lg xl:text-xl font-medium font-montserrat ${theme.projectDetails}`}>
-                                        <Bug size={20} /> {project.findings} findings
+                                {/* Worklist findings, status, delete worklist button */}
+                                <div className={`flex flex-col gap-3 shrink-0 items-start ${
+                                    isCollapsed ? 'md:flex-row md:items-center' : 'md:flex-col md:items-end lg:flex-row lg:items-center'
+                                }`}>
+                                    <div className={`flex items-center gap-1.5 text-sm font-medium ${theme.textMuted}`}>
+                                        <Bug size={16} /> {worklist.findings} finding{worklist.findings !== 1 ? 's' : ''}
                                     </div>
-
-                                    <span className={`rounded-full px-3 md:px-4 xl:px-6 py-1 text-xs md:text-lg font-semibold ${
-                                        badgeClass(project.status)}`}
-                                    >
-                                        {project.status}
+                                    <span className={`rounded-full px-3 py-1 text-xs md:text-sm font-semibold ${badgeClass(worklist.status)}`}>
+                                        {worklist.status.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                     </span>
-
-                                    <button className={`flex items-center rounded-lg md:rounded-xl px-3 md:px-1 xl:px-2 py-1 gap-2 text-xs md:text-sm xl:text-lg font-medium font-montserrat ${theme.buttonDeleteWorklist}`}>
-                                        <Trash2 size={20} /> Delete Worklist
+                                    <button
+                                        onClick={(e) => e.preventDefault()}
+                                        className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium font-montserrat ${theme.buttonOutline}`}
+                                    >
+                                        <Trash2 size={14} /> Delete Worklist
                                     </button>
                                 </div>
                             </div>
                         </Link>
                     ))
                 ) : (
-                    <div
-                        className={`rounded-xl p-8 text-center ${theme.cardBase}`}
-                    >
-                        No projects found.
+                    <div className={`rounded-xl p-8 text-center ${theme.cardBase}`}>
+                        No worklists found.
                     </div>
                 )}
             </div>
         </div>
     )
-
 }
 
-export default Worklist;
+export default Worklist
