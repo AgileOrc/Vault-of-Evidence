@@ -17,12 +17,12 @@ import { getPageTheme } from '../utils/theme'
 type ProjectData = {
     id: string
     name: string
-    type?: string 
-    members?: number
-    worklists?: number
-    findings?: number
+    type: string
+    members?: { id: string }[]
+    worklists: number
+    findings?: { id: string }[]
     status: string
-    description?: string
+    description: string
 }
 
 function Projects () {
@@ -34,12 +34,10 @@ function Projects () {
 
     const [projects, setProjects] = useState<ProjectData[]>([])
 
-   
     useEffect(() => {
         api.get('/projects')
             .then((res) => {
-                // Mengambil array data dari struktur pagination backend
-                setProjects(res.data.data || []) 
+                setProjects(res.data.data || [])
                 setLoading(false)
             })
             .catch(() => {
@@ -81,12 +79,11 @@ function Projects () {
     }, [])
 
     const filteredProjects = projects.filter((project) => {
-        // [BUG FIX]: Tambahkan fallback string kosong (|| '') agar tidak crash jika nama/status null
         const matchesSearch =
-            (project.name || '').toLowerCase().includes(searchTerm.toLowerCase())
+            project.name.toLowerCase().includes(searchTerm.toLowerCase())
 
         const matchesStatus =
-            statusFilter === 'all' || (project.status || 'planning').toLowerCase() === statusFilter.toLowerCase()
+            statusFilter === 'all' || project.status.toLowerCase() === statusFilter.toLowerCase()
 
         return matchesSearch && matchesStatus
     })
@@ -95,11 +92,23 @@ function Projects () {
     const theme = getPageTheme(isDark)
 
     const badgeClass = (status: string) => {
-        // [BUG FIX]: Tambahkan fallback 'planning' agar toLowerCase() tidak crash
-        const cleanStatus = (status || 'planning').toLowerCase()
-        if (cleanStatus === 'active') return isDark ? 'bg-[#17E58F] text-[#005B35]' : 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (cleanStatus === 'paused') return isDark ? 'bg-[#E6DF14] text-[#5B4100]' : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        return isDark ? 'bg-[#22BBDE] text-[#00375C]' : 'bg-[#00375C] text-[#22BBDE] font-semibold'
+        if (isDark) {
+            if (status === 'Active')
+                return 'bg-[#17E58F] text-[#005B35]'
+
+            if (status === 'Paused')
+                return 'bg-[#E6DF14] text-[#5B4100]'
+
+            if (status === 'Upcoming')
+                return 'bg-[#C017DE] text-[#40005B]'
+
+            return 'bg-[#22BBDE] text-[#00375C]'
+        }
+        
+        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
+        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
+        return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     }
 
     if (loading) {

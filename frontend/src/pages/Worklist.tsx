@@ -208,7 +208,9 @@ function Worklist () {
                                     <p className={`mt-0.5 text-sm md:text-base font-medium ${theme.textMuted}`}>{worklist.code}</p>
                                 </div>
                                 {/* Worklist findings, status, delete worklist button */}
-                                <div className='flex flex-col md:flex-row items-start md:items-center gap-3 shrink-0'>
+                                <div className={`flex flex-col gap-3 shrink-0 items-start ${
+                                    isCollapsed ? 'md:flex-row md:items-center' : 'md:flex-col md:items-end lg:flex-row lg:items-center'
+                                }`}>
                                     <div className={`flex items-center gap-1.5 text-sm font-medium ${theme.textMuted}`}>
                                         <Bug size={16} /> {worklist.findings} finding{worklist.findings !== 1 ? 's' : ''}
                                     </div>
