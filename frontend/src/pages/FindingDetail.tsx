@@ -129,10 +129,11 @@ function FindingDetail () {
 
     // ── helpers
     const severityClass = (sev: string) => {
-        if (sev === 'Critical') return isDark ? 'bg-[#EC2828] text-[#5B0000]'  : 'bg-[#5B0000] text-[#EC2828] font-semibold'
-        if (sev === 'High')     return isDark ? 'bg-[#E67219] text-[#5B3000]'  : 'bg-[#5B3100] text-[#E67219] font-semibold'
-        if (sev === 'Medium')   return isDark ? 'bg-[#E6DF14] text-[#5B4100]'  : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        return                         isDark ? 'bg-[#17E58F] text-[#005B35]'  : 'bg-[#005B35] text-[#17E58F] font-semibold'
+        const s = sev.toLowerCase()
+        if (s === 'critical') return isDark ? 'bg-[#EC2828] text-[#5B0000]'  : 'bg-[#5B0000] text-[#EC2828] font-semibold'
+        if (s === 'high')     return isDark ? 'bg-[#E67219] text-[#5B3000]'  : 'bg-[#5B3100] text-[#E67219] font-semibold'
+        if (s === 'medium')   return isDark ? 'bg-[#E6DF14] text-[#5B4100]'  : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        return                       isDark ? 'bg-[#17E58F] text-[#005B35]'  : 'bg-[#005B35] text-[#17E58F] font-semibold'
     }
 
     const statusBadgeClass = (s: string) => {
@@ -255,7 +256,7 @@ function FindingDetail () {
                     {/* badges + meta */}
                     <div className='flex flex-wrap items-center gap-2'>
                         <span className={`rounded-full px-3 py-1 text-xs md:text-sm font-semibold ${severityClass(currentFinding.severity)}`}>
-                            {currentFinding.severity}
+                            {currentFinding.severity.charAt(0).toUpperCase() + currentFinding.severity.slice(1)}
                         </span>
                         <span className={`rounded-full px-3 py-1 text-xs md:text-sm font-semibold ${statusBadgeClass(currentFinding.status)}`}>
                             {capitalize(currentFinding.status)}

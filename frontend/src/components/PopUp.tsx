@@ -682,6 +682,7 @@ type FindingFormData = {
     vulnName: string
     executiveSummary: string
     vulnType: string
+    wstgCode: string
     impactedSystem: string
     cvssScore: number
     cvssVector: string
@@ -699,7 +700,7 @@ type AddFindingModalProps = BaseModalProps & {
 
 export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: AddFindingModalProps) {
     const [form, setForm] = useState<FindingFormData>({
-        vulnName: '', executiveSummary: '', vulnType: '', impactedSystem: '',
+        vulnName: '', executiveSummary: '', vulnType: '', wstgCode: '', impactedSystem: '',
         cvssScore: 0, cvssVector: '', str: '', remediation: '',
         pocText: '', pocFiles: [], contributorName: '',
     })
@@ -735,6 +736,11 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
                     <div>
                         <Label isDark={isDark}>Vulnerability Type <span className="text-red-400">*</span></Label>
                         <Input isDark={isDark} placeholder='e.g. Broken Authentication, XSS, IDOR...' value={form.vulnType} onChange={(e) => set('vulnType', e.target.value)} />
+                    </div>
+
+                    <div>
+                        <Label isDark={isDark}>WSTG Code</Label>
+                        <Input isDark={isDark} placeholder='e.g. WSTG-ATHN-01' value={form.wstgCode} onChange={(e) => set('wstgCode', e.target.value)} />
                     </div>
 
                     <div>

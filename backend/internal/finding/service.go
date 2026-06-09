@@ -37,6 +37,8 @@ func (s *service) Create(projectID string, req *domain.CreateFindingRequest) (*d
 		Severity:          req.Severity,
 		CVSSScore:         req.CVSSScore,
 		CVSSVector:        req.CVSSVector,
+		WSTGCode:          req.WSTGCode,
+		Contributor:       req.Contributor,
 		AffectedEndpoints: req.AffectedEndpoints,
 		ReproductionSteps: req.ReproductionSteps,
 		Impact:            req.Impact,

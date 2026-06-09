@@ -26,7 +26,7 @@ func projectIDParam(c *gin.Context) string {
 }
 
 func (h *Handler) GetByProject(c *gin.Context) {
-	worklists, err := h.service.GetByProject(c.Param("project_id"))
+	worklists, err := h.service.GetByProject(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch worklists"})
 		return
@@ -40,7 +40,7 @@ func (h *Handler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	w, err := h.service.Create(c.Param("project_id"), &req)
+	w, err := h.service.Create(c.Param("id"), &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create worklist"})
 		return
