@@ -32,7 +32,8 @@ function Projects () {
 
     const [projects, setProjects] = useState<ProjectData[]>([])
 
-    //ini jujur aku blm tau bener apa engganya, tolong di koreksi ges kalo salah
+    //ini jujur aku blm tau bener apa engganya, tolong di koreksi ges kalo salah ~putri
+
     useEffect(() => {
         api.get('/projects/lists')
             .then((res) => {
@@ -90,18 +91,18 @@ function Projects () {
 
     const theme = isDark
         ? {
-            cardBase: 'bg-gradient-to-br from-[#294B63] via-[#173B56] to-[#0B2E46] border border-[#2BA7D6]/40 text-[#F5F5F5] shadow-[0_8px_30px_rgba(0,0,0,0.35)]',
+            cardBase: 'bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
             greetings: 'text-[#FFFFFF]',
             titles: 'text-[#FFFFFF]',
             info: 'text-[#41B0EC]',
-            buttonNewProject: 'bg-[#41B0EC] text-[#FFFFFF] hover:bg-[#0EB8DF] hover:text-white',
+            buttonNewProject: 'bg-linear-to-br from-[#0EB8DF] to-[#138FC5] text-white hover:bg-white hover:bg-none hover:text-[#138FC5] hover:border-2 hover:border-[#0EB8DF]',
         }
         : {
-            cardBase: 'bg-linear-to-br from-[#F5F5F5] to-[#27D6FF]/20 border border-[#27D6FF]/40 text-[#002C49] shadow-md',
+            cardBase: 'bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
             greetings: 'text-[#002C49]',
             titles: 'text-[#002C49]',
             info: 'text-[#0E65AD]',
-            buttonNewProject: 'bg-[#1767AA] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-white',
+            buttonNewProject: 'bg-[#1767AA] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-white hover:border hover:border-white',
         }
 
     const badgeClass = (status: string) => {
@@ -138,7 +139,7 @@ function Projects () {
                 
                 <Link
                     to={`/projects/new`} 
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2 md:px-4 md:py-2 xl:px-5 xl:py-3 text-sm md:text-base font-semibold font-montserrat ${theme.buttonNewProject}`}>
+                    className={`flex items-center gap-1 xl:gap-2 rounded-md md:rounded-lg px-3 xl:px-4 py-1.5 xl:py-2 text-sm md:text-md xl:text-lg font-semibold font-montserrat ${theme.buttonNewProject}`}>
                     <Plus className='h-4 w-4' /> New Project
                 </Link>
             </header>
