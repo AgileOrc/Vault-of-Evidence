@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"gorm.io/gorm"
 	"vault-of-evidence/backend/internal/domain"
@@ -16,9 +15,11 @@ type Repository interface {
 	UpdatePasswordHash(userID, hash string) error
 	EmailExists(email string) bool
 	UsernameExists(username string) bool
+
+	// Metode Baru untuk Mengelola Token Reset Password di DB
 	CreateResetToken(token *domain.PasswordResetToken) error
-	FindResetToken(tokenHash string) (*domain.PasswordResetToken, error)
-	MarkResetTokenUsed(id string) error
+	FindResetTokenByHash(hash string) (*domain.PasswordResetToken, error)
+	UpdateResetToken(token *domain.PasswordResetToken) error
 }
 
 type repository struct{ db *gorm.DB }
@@ -57,8 +58,7 @@ func (r *repository) FindByID(id string) (*domain.User, error) {
 }
 
 func (r *repository) UpdatePasswordHash(userID, hash string) error {
-	return r.db.Model(&domain.User{}).Where("id = ?", userID).
-		Update("password_hash", hash).Error
+	return r.db.Model(&domain.User{}).Where("id = ?", userID).Update("password_hash", hash).Error
 }
 
 func (r *repository) EmailExists(email string) bool {
@@ -77,21 +77,15 @@ func (r *repository) CreateResetToken(token *domain.PasswordResetToken) error {
 	return r.db.Create(token).Error
 }
 
-func (r *repository) FindResetToken(tokenHash string) (*domain.PasswordResetToken, error) {
+func (r *repository) FindResetTokenByHash(hash string) (*domain.PasswordResetToken, error) {
 	var token domain.PasswordResetToken
-	err := r.db.Preload("User").
-		Where("token_hash = ? AND used = ? AND expires_at > ?", tokenHash, false, time.Now().UTC()).
-		First(&token).Error
+	err := r.db.Preload("User").Where("token_hash = ? AND used = ?", hash, false).First(&token).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
-	if err != nil {
-		return nil, err
-	}
-	return &token, nil
+	return &token, err
 }
 
-func (r *repository) MarkResetTokenUsed(id string) error {
-	return r.db.Model(&domain.PasswordResetToken{}).Where("id = ?", id).
-		Update("used", true).Error
+func (r *repository) UpdateResetToken(token *domain.PasswordResetToken) error {
+	return r.db.Save(token).Error
 }

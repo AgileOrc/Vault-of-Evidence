@@ -24,8 +24,9 @@ type FindingData = {
     id: string
     title: string
     severity: string
-    project: string
-    worklist: string
+    project?: string
+    worklist?: string
+    status?: string
 }
 
 type DashboardSummary = {
@@ -35,24 +36,6 @@ type DashboardSummary = {
     recentProjects: ProjectData[]
     recentFindings: FindingData[]
 }
-
-// @ts-ignore: Keeping dummy data for fallback
-const dummyProjects = [
-    { id: '1', name: 'mycompany.com', description: 'Web Application', status: 'Active' },
-    { id: '2', name: 'api.startup.io', description: 'API Security', status: 'Active' },
-    { id: '3', name: 'staging.app.io', description: 'Web Application', status: 'Paused' },
-    { id: '4', name: 'newclient.com', description: 'Web Application', status: 'Upcoming' },
-    { id: '5', name: 'corp.enterprise.com', description: 'Internal Network', status: 'Completed' },
-]
-
-// @ts-ignore: Keeping dummy data for fallback
-const dummyFindings = [
-    { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
-    { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
-    { id: '3', title: 'Broken Authentication on /forgot-password', project: 'mycompany.com', worklist: 'Forgot Password', severity: 'High' },
-    { id: '4', title: 'Sensitive Data Exposure on /api/v1/users', project: 'staging.app.io', worklist: 'User Profile', severity: 'Medium' },
-    { id: '5', title: 'Missing Secure Flag on session cookie', project: 'corp.enterprise.com', worklist: 'Login Page', severity: 'Low' },
-]
 
 function StatCard({ title, value, subtitle, icon: Icon, theme, iconClass }: {
     title: string | React.ReactNode
@@ -78,12 +61,9 @@ function Dashboard () {
     const { isDark } = useOutletContext<LayoutContext>()
     const { user } = useUser()
 
-    // @ts-ignore: Loading state might be used later or for UI transitions
     const [loading, setLoading] = useState(true)
-
     const [data, setData] = useState<DashboardSummary | null>(null)
 
-    
     useEffect(() => {
         api.get('/projects/dashboard/summary')
             .then((res) => {
@@ -97,100 +77,59 @@ function Dashboard () {
 
     const theme = isDark
         ? {
-            cardBase:
-                'rounded-3xl xl:rounded-4xl bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
-
-            greetings:
-                'text-[#FFFFFF]',
-
-            titles:
-                'text-[#FFFFFF]',
-
-            cardText:
-                'text-[#FFFFFF]',
-
-            description:
-                'text-[#41B0EC]',
-
-            viewAllBUtton:
-                'text-[#41B0EC] hover:text-[#BDEEFF] transition-colors',
-
-            buttonNewProject:
-                'bg-linear-to-br from-[#0EB8DF] to-[#138FC5] text-white hover:bg-white hover:bg-none hover:text-[#138FC5] hover:border-2 hover:border-[#0EB8DF]',
-
-            divider:
-                'divide-[#27D6FF]/50',
-
-            icon:
-                'bg-[#0B2E46] text-[#41B0EC]',
-
-            statNumber:
-                'text-[#41B0EC]',
-
-            statIcon:
-                'text-[#F5F5F5]'
+            cardBase: 'rounded-3xl xl:rounded-4xl bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+            greetings: 'text-[#FFFFFF]',
+            titles: 'text-[#FFFFFF]',
+            cardText: 'text-[#FFFFFF]',
+            description: 'text-[#41B0EC]',
+            viewAllBUtton: 'text-[#41B0EC] hover:text-[#BDEEFF] transition-colors',
+            buttonNewProject: 'bg-linear-to-br from-[#0EB8DF] to-[#138FC5] text-white hover:bg-white hover:bg-none hover:text-[#138FC5] hover:border-2 hover:border-[#0EB8DF]',
+            divider: 'divide-[#27D6FF]/50',
+            icon: 'bg-[#0B2E46] text-[#41B0EC]',
+            statNumber: 'text-[#41B0EC]',
+            statIcon: 'text-[#F5F5F5]'
         }
         : {
-            cardBase:
-                'rounded-3xl xl:rounded-4xl bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
-
-            greetings:
-                'text-[#002C49]',
-
-            titles:
-                'text-[#002C49]',
-
-            cardText:
-                'text-[#0F65AD]',
-
-            description:
-                'text-[#0E65AD]',
-
-            viewAllBUtton:
-                'text-[#0E65AD] hover:text-[#3b99e6] transition-colors',
-
-            buttonNewProject:
-                'bg-[#1767AA] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-white hover:border hover:border-white',
-
-            divider:
-                'divide-[#1767AA]/30',
-
-            icon:
-                'bg-[#20A6DA] text-[#F5F5F5]',
-
-            statNumber:
-                'text-[#002C49]',
-            statIcon:
-                'text-[#0E65AD]'
+            cardBase: 'rounded-3xl xl:rounded-4xl bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 text-[#002C49] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+            greetings: 'text-[#002C49]',
+            titles: 'text-[#002C49]',
+            cardText: 'text-[#0F65AD]',
+            description: 'text-[#0E65AD]',
+            viewAllBUtton: 'text-[#0E65AD] hover:text-[#3b99e6] transition-colors',
+            buttonNewProject: 'bg-[#1767AA] text-[#FFFFFF] hover:bg-[#41B0EC] hover:text-white hover:border hover:border-white',
+            divider: 'divide-[#1767AA]/30',
+            icon: 'bg-[#20A6DA] text-[#F5F5F5]',
+            statNumber: 'text-[#002C49]',
+            statIcon: 'text-[#0E65AD]'
         }
 
     const badgeClass = (status: string) => {
+        const cleanStatus = (status || 'planning').toLowerCase()
         if (isDark) {
-            if (status === 'Active')
-                return 'bg-[#17E58F] text-[#005B35]'
-
-            if (status === 'Paused')
-                return 'bg-[#E6DF14] text-[#5B4100]'
-
-            if (status === 'Upcoming')
-                return 'bg-[#C017DE] text-[#40005B]'
-
+            if (cleanStatus === 'active') return 'bg-[#17E58F] text-[#005B35]'
+            if (cleanStatus === 'paused') return 'bg-[#E6DF14] text-[#5B4100]'
+            if (cleanStatus === 'upcoming') return 'bg-[#C017DE] text-[#40005B]'
             return 'bg-[#22BBDE] text-[#00375C]'
         }
         
-        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
+        if (cleanStatus === 'active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
+        if (cleanStatus === 'paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        if (cleanStatus === 'upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
         return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     }
 
     const severityClass = (severity: string) => {
-        if (severity === 'Critical') return isDark ? 'bg-[#EC2828] text-[#5B0000]' : 'bg-[#5B0000] text-[#EC2828] font-semibold'
-        if (severity === 'High') return isDark ? 'bg-[#E67219] text-[#5B3000]' : 'bg-[#5B3100] text-[#E67219] font-semibold'
-        if (severity === 'Medium') return isDark ? 'bg-[#E6DF14] text-[#5B4100]' : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
+        const cleanSeverity = (severity || 'low').toLowerCase()
+        if (cleanSeverity === 'critical') return isDark ? 'bg-[#EC2828] text-[#5B0000]' : 'bg-[#5B0000] text-[#EC2828] font-semibold'
+        if (cleanSeverity === 'high') return isDark ? 'bg-[#E67219] text-[#5B3000]' : 'bg-[#5B3100] text-[#E67219] font-semibold'
+        if (cleanSeverity === 'medium') return isDark ? 'bg-[#E6DF14] text-[#5B4100]' : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
         return isDark ? 'bg-[#17E58F] text-[#005B35]' : 'bg-[#005B35] text-[#17E58F] font-semibold'
     }
     
+    if (loading) {
+        return <div className="text-center p-10 font-montserrat">Loading secure workspace...</div>
+    }
+
     return (
         <div className='space-y-8 md:space-y-12 xl:space-y-6'>
             <header className='flex flex-wrap gap-6 items-start justify-between'>
@@ -203,12 +142,12 @@ function Dashboard () {
                 </Link>
             </header>
             
-            {/* Statistik Atas */}
+            {/* Statistik Atas: Data Asli dari Backend */}
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4'>
-                <StatCard title='Active projects' value={4} subtitle={`of ${data?.totalProjects || 0} total`} icon={Folder} iconClass={theme.statIcon} theme={theme} />
-                <StatCard title='Active worklists' value={5} subtitle='Ongoing' icon={ClipboardList} iconClass={theme.statIcon} theme={theme} />
-                <StatCard title='Waiting response' value={7} subtitle='Unresolved' icon={Timer} iconClass={theme.statIcon} theme={theme} />
-                <StatCard title= {<>Unresolved <br /> critical & high</>} value={2} subtitle='Needs attention' icon={AlertTriangle} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title='Active projects' value={data?.activeProjects || 0} subtitle={`of ${data?.totalProjects || 0} total`} icon={Folder} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title='Active worklists' value={0} subtitle='Ongoing' icon={ClipboardList} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title='Waiting response' value={0} subtitle='Unresolved' icon={Timer} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title={<>Unresolved <br /> critical & high</>} value={data?.criticalHighCount || 0} subtitle='Needs attention' icon={AlertTriangle} iconClass={theme.statIcon} theme={theme} />
             </div>
 
             {/* Project Overview Card & Recent Activity*/}
@@ -225,33 +164,22 @@ function Dashboard () {
                         {data?.recentProjects && data.recentProjects.length > 0 ? (
                             data.recentProjects.map((project) => (
                                 <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
-                                    <div>
+                                    <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                         <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
                                         <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
                                     <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
-                                        {project.status}
+                                        {project.status || 'Planning'}
                                     </span>
                                 </div>
                             ))
                         ) : (
-                            <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">You haven't joined any projects yet.</p>
+                            <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold mt-4">You haven't joined any projects yet.</p>
                         )}
-                        {/* {dummyProjects.map((project) => (
-                            <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
-                                <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
-                                    <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
-                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description}</p>
-                                </div>
-                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
-                                    {project.status}
-                                </span>
-                            </div>
-                        ))} */}
                     </div>
                 </div>
 
-                {/* Recent Activity (Tetap dummy karena tidak ada tabel log aktivitas di DB saat ini) */}
+                {/* Recent Activity (Statik Sementara) */}
                 <div className={`px-8 py-8 lg:px-8 min-w-1/3 ${theme.cardBase}`}>
                     <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
                         <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Recent Activity</h2>
@@ -287,27 +215,18 @@ function Dashboard () {
                             <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                     <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
-                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{finding.project} - {finding.worklist}</p>
+                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>
+                                        {finding.project || 'General'} - {finding.worklist || finding.status || 'Open'}
+                                    </p>
                                 </div>
-                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${severityClass(finding.severity)}`}>
-                                    {finding.severity}
+                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold capitalize ${severityClass(finding.severity)}`}>
+                                    {finding.severity || 'Low'}
                                 </span>
                             </div>
                         ))
                     ) : (
-                        <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">No vulnerabilities reported yet.</p>
+                        <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold mt-4">No vulnerabilities reported yet.</p>
                     )}
-                    {/* {dummyFindings.map((finding) => (
-                        <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
-                            <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
-                                <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
-                                <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{finding.project} - {finding.worklist}</p>
-                            </div>
-                            <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${severityClass(finding.severity)}`}>
-                                {finding.severity}
-                            </span>
-                        </div>
-                    ))} */}
                 </div>
             </div>
         </div>

@@ -111,7 +111,7 @@ function Sidebar ({
           )}
         </button>
 
-        {/* ================= MODIFIKASI BAGIAN USER DI SINI ================= */}
+        
         <NavLink
           to='/profile'
           className={({ isActive }) => 
