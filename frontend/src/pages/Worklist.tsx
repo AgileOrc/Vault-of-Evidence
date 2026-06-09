@@ -269,7 +269,18 @@ function Worklist () {
                 project={project}
                 onSubmit={async (data) => {
                     try {
-                        await api.put(`/projects/${projectId}`, data)
+                        const statusMap: Record<string, string> = {
+                            'Active': 'active',
+                            'Paused': 'planning', // Backend doesn't have paused
+                            'Upcoming': 'planning',
+                            'Completed': 'completed'
+                        }
+                        const payload = {
+                            name: data.name,
+                            description: data.description,
+                            status: statusMap[data.status ?? 'Active'] || 'active'
+                        }
+                        await api.put(`/projects/${projectId}`, payload)
                         const res = await api.get(`/projects/${projectId}`)
                         setProject({ ...project, ...res.data.data })
                     } catch (err) { console.error('Failed to edit project', err) }

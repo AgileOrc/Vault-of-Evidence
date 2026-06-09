@@ -284,7 +284,12 @@ function Findings () {
                 worklist={worklist}
                 onSubmit={async (data) => {
                     try {
-                        await api.put(`/projects/${projectId}/worklists/${worklistId}`, data)
+                        const payload = {
+                            name: data.name,
+                            code: data.code,
+                            status: data.status?.toLowerCase() || 'not started'
+                        }
+                        await api.put(`/projects/${projectId}/worklists/${worklistId}`, payload)
                         const res = await api.get(`/projects/${projectId}/worklists/${worklistId}`)
                         setWorklist(res.data.data)
                     } catch (err) { console.error('Failed to edit worklist', err) }
