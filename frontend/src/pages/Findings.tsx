@@ -46,6 +46,7 @@ function Findings () {
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklist, setWorklist] = useState<WorklistData | null>(null)
     const [findings, setFindings] = useState<FindingData[]>([])
+    const [members, setMembers] = useState<{ id: string; name: string }[]>([])
     const { projectId, worklistId } = useParams()
 
     useEffect(() => {
@@ -55,18 +56,30 @@ function Findings () {
             api.get(`/projects/${projectId}/worklists/${worklistId}/findings`)
         ])
         .then(([projectRes, worklistRes, findingsRes]) => {
-            setProject(projectRes.data.data)
+            const proj = projectRes.data.data
+            setProject(proj)
             setWorklist(worklistRes.data.data)
+
+            // Map project members untuk dropdown contributor (hanya PM dan Pentester)
+            const rawMembers = proj?.members || []
+            setMembers(
+                rawMembers
+                    .filter((m: any) => m.role === 'pm' || m.role === 'pentester')
+                    .map((m: any) => ({
+                        id: m.user_id,
+                        name: m.user?.name || m.user?.username || m.user_id
+                    }))
+            )
             
             const rawFindings = findingsRes.data.data || [];
             const mappedFindings = rawFindings.map((f: any) => ({
                 id: f.id,
                 name: f.title || 'Untitled',
-                code: '-', // Backend doesn't have finding code yet
+                code: f.wstg_code || '-',
                 status: f.status || 'open',
                 confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString() : '-',
                 severity: f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : 'Low',
-                member: '-' // Backend doesn't have assignee yet
+                member: f.contributor || '-'
             }))
             
             setFindings(mappedFindings)
@@ -313,17 +326,18 @@ function Findings () {
                 isOpen={showAddFinding}
                 isDark={isDark}
                 onClose={() => setShowAddFinding(false)}
-                members={[]}
+                members={members}
                 onSubmit={async (data) => {
                     try {
                         await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
                             title: data.vulnName,
-                            status: 'open',
-                            severity: data.cvssScore >= 9.0 ? 'Critical' : data.cvssScore >= 7.0 ? 'High' : data.cvssScore >= 4.0 ? 'Medium' : 'Low',
+                            severity: data.cvssScore >= 9.0 ? 'critical' : data.cvssScore >= 7.0 ? 'high' : data.cvssScore >= 4.0 ? 'medium' : 'low',
                             cvss_score: data.cvssScore,
                             cvss_vector: data.cvssVector,
+                            wstg_code: data.wstgCode,
+                            contributor: data.contributorName,
                             impact: data.impactedSystem,
-                            description: data.executiveSummary,
+                            description: data.executiveSummary || '-',
                             reproduction_steps: data.str,
                             remediation: data.remediation
                         })
@@ -331,11 +345,11 @@ function Findings () {
                         const mapped = (res.data.data || []).map((f: any) => ({
                             id: f.id,
                             name: f.title || 'Untitled',
-                            code: '-',
+                            code: f.wstg_code || '-',
                             status: f.status || 'open',
                             confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString() : '-',
                             severity: f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : 'Low',
-                            member: '-'
+                            member: f.contributor || '-'
                         }))
                         setFindings(mapped)
                     } catch (err) { console.error('Failed to add finding', err) }

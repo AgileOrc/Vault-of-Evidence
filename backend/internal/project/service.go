@@ -40,6 +40,18 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 	if err := s.repo.Create(p); err != nil {
 		return nil, fmt.Errorf("project.service: create: %w", err)
 	}
+
+	// Tambahkan creator sebagai PM otomatis
+	member := &domain.ProjectMember{
+		ProjectID:  p.ID,
+		UserID:     createdBy,
+		Role:       domain.RolePM,
+		AssignedBy: createdBy,
+	}
+	if err := s.repo.AddMember(member); err != nil {
+		fmt.Printf("warning: failed to add creator as PM for project %s: %v\n", p.ID, err)
+	}
+
 	return p, nil
 }
 

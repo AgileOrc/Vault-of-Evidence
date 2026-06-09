@@ -38,12 +38,26 @@ func RequireProjectRole(db *gorm.DB, paramName string, allowed ...domain.Project
 		var member domain.ProjectMember
 		if err := db.Where("project_id = ? AND user_id = ?", projectID, userID).First(&member).Error; err != nil {
 			if err == gorm.ErrRecordNotFound {
-				// Ditolak karena tidak terdaftar di proyek ini
-				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "you do not have access to this project"})
+				// Fallback: cek apakah user adalah creator project → treat as PM
+				var project domain.Project
+				if dbErr := db.Select("id, created_by_id").Where("id = ?", projectID).First(&project).Error; dbErr == nil && project.CreatedByID == userID {
+					// Auto-tambahkan ke project_members supaya konsisten ke depannya
+					newMember := domain.ProjectMember{
+						ProjectID:  projectID,
+						UserID:     userID,
+						Role:       domain.RolePM,
+						AssignedBy: userID,
+					}
+					db.Create(&newMember)
+					member = newMember
+				} else {
+					c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "you do not have access to this project"})
+					return
+				}
+			} else {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error while verifying permissions"})
 				return
 			}
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "database error while verifying permissions"})
-			return
 		}
 
 		// 4. Cek apakah jabatannya sesuai dengan yang diizinkan untuk fitur ini
