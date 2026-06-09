@@ -36,6 +36,7 @@ type DashboardSummary = {
     recentFindings: FindingData[]
 }
 
+// @ts-ignore: Keeping dummy data for fallback
 const dummyProjects = [
     { id: '1', name: 'mycompany.com', description: 'Web Application', status: 'Active' },
     { id: '2', name: 'api.startup.io', description: 'API Security', status: 'Active' },
@@ -44,6 +45,7 @@ const dummyProjects = [
     { id: '5', name: 'corp.enterprise.com', description: 'Internal Network', status: 'Completed' },
 ]
 
+// @ts-ignore: Keeping dummy data for fallback
 const dummyFindings = [
     { id: '1', title: 'SQL Injection on /api/v1/auth/login', project: 'mycompany.com', worklist: 'Login Page', severity: 'Critical' },
     { id: '2', title: 'Reflected XSS on /search?q=', project: 'api.startup.io', worklist: 'Search Feature', severity: 'Medium' },
@@ -76,6 +78,7 @@ function Dashboard () {
     const { isDark } = useOutletContext<LayoutContext>()
     const { user } = useUser()
 
+    // @ts-ignore: Loading state might be used later or for UI transitions
     const [loading, setLoading] = useState(true)
 
     const [data, setData] = useState<DashboardSummary | null>(null)
@@ -219,7 +222,7 @@ function Dashboard () {
                         </Link>
                     </div>
                     <div className={`divide-y ${theme.divider}`}>
-                        {/* {data?.recentProjects && data.recentProjects.length > 0 ? (
+                        {data?.recentProjects && data.recentProjects.length > 0 ? (
                             data.recentProjects.map((project) => (
                                 <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                     <div>
@@ -233,8 +236,8 @@ function Dashboard () {
                             ))
                         ) : (
                             <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">You haven't joined any projects yet.</p>
-                        )} */}
-                        {dummyProjects.map((project) => (
+                        )}
+                        {/* {dummyProjects.map((project) => (
                             <div key={project.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                     <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
@@ -244,7 +247,7 @@ function Dashboard () {
                                     {project.status}
                                 </span>
                             </div>
-                        ))}
+                        ))} */}
                     </div>
                 </div>
 
@@ -279,7 +282,7 @@ function Dashboard () {
                     </Link>
                 </div>
                 <div className={`divide-y ${theme.divider}`}>
-                    {/* {data?.recentFindings && data.recentFindings.length > 0 ? (
+                    {data?.recentFindings && data.recentFindings.length > 0 ? (
                         data.recentFindings.map((finding) => (
                             <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
@@ -293,8 +296,8 @@ function Dashboard () {
                         ))
                     ) : (
                         <p className="rounded-full text-center py-4 text-[0.65rem] md:text-xs opacity-60 font-montserrat font-semibold">No vulnerabilities reported yet.</p>
-                    )} */}
-                    {dummyFindings.map((finding) => (
+                    )}
+                    {/* {dummyFindings.map((finding) => (
                         <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                             <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                 <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
@@ -304,7 +307,7 @@ function Dashboard () {
                                 {finding.severity}
                             </span>
                         </div>
-                    ))}
+                    ))} */}
                 </div>
             </div>
         </div>
