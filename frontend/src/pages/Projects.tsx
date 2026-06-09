@@ -52,7 +52,7 @@ function Projects () {
                     members: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }, { id: '5' }],
                     worklists: 6,
                     findings: Array.from({ length: 23 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'Active',
+                    status: 'active',
                     description: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.'
                 },
                 {
@@ -72,7 +72,7 @@ function Projects () {
                     members: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }],
                     worklists: 7,
                     findings: Array.from({ length: 15 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'Completed',
+                    status: 'completed',
                     description: '-'
                 }
             ])

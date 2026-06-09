@@ -851,6 +851,7 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
         vulnName: finding?.vulnName ?? '',
         executiveSummary: finding?.executiveSummary ?? '',
         vulnType: finding?.vulnType ?? '',
+        wstgCode: finding?.wstgCode ?? '',
         impactedSystem: finding?.impactedSystem ?? '',
         cvssScore: finding?.cvssScore ?? 0,
         cvssVector: finding?.cvssVector ?? '',
