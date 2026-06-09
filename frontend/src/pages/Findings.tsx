@@ -223,27 +223,12 @@ function Findings () {
                                     value={statusFilter}
                                     onChange={setStatusFilter}
                                     options={[
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 8c06e8d (fix: resolve major routing bugs, permission roles, and findings status enums)
                                         { value: 'all',       label: 'All Status' },
                                         { value: 'open',      label: 'Open'       },
                                         { value: 'confirmed', label: 'Confirmed'  },
                                         { value: 'fixing',    label: 'Fixing'     },
                                         { value: 'fixed',     label: 'Fixed'      },
                                         { value: 'closed',    label: 'Closed'     },
-<<<<<<< HEAD
-=======
-                                        { value: 'all',             label: 'All Status'      },
-                                        { value: 'open',            label: 'Open'            },
-                                        { value: 'confirmed',       label: 'Confirmed'       },
-                                        { value: 'fixing',          label: 'Fixing'          },
-                                        { value: 'fixed',           label: 'Fixed'           },
-                                        { value: 'closed_on_notes', label: 'Closed on Notes' },
->>>>>>> 629f6ae (feat: fix project status alignment, PoC file upload, delete flows, date format, CVSS input, and add closed-on-notes inline textarea)
-=======
->>>>>>> 8c06e8d (fix: resolve major routing bugs, permission roles, and findings status enums)
                                     ]}
                                     isDark={isDark}
                                 />
@@ -346,7 +331,7 @@ function Findings () {
                     try {
                         const createRes = await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
                             title: data.vulnName,
-
+                            status: 'open',
                             severity: data.cvssScore >= 9.0 ? 'critical' : data.cvssScore >= 7.0 ? 'high' : data.cvssScore >= 4.0 ? 'medium' : 'low',
                             cvss_score: data.cvssScore,
                             cvss_vector: data.cvssVector,

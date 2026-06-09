@@ -85,10 +85,10 @@ func (s *service) Update(projectID, id string, req *domain.UpdateFindingRequest,
 		
 		// Cek syarat Notes: Hanya boleh diisi jika statusnya (yang baru atau lama) adalah "closed"
 		if req.Notes != "" {
-			if f.Status == domain.FindingStatusClosedOnNotes {
+			if f.Status == domain.FindingStatusClosed {
 				f.Notes = req.Notes
 			} else {
-				return nil, errors.New("developer is only allowed to write notes when the status is 'closed_on_notes'")
+				return nil, errors.New("developer is only allowed to write notes when the status is 'closed'")
 			}
 		}
 

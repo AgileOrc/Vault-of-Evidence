@@ -35,7 +35,7 @@ type Finding struct {
 	Status            FindingStatus `gorm:"type:varchar(20);not null;default:'open'"       json:"status"`
 	Notes             string        `gorm:"type:text"                                      json:"notes"`
 	CVSSScore         float64       `gorm:"type:decimal(4,1);default:0.0"                  json:"cvss_score"`
-	CVSSVector        string        `gorm:"type:varchar(255)"                              json:"cvss_vector"`
+	CVSSVector        string        `gorm:"type:varchar(100)"                              json:"cvss_vector"`
 	WSTGCode          string        `gorm:"type:varchar(100)"                              json:"wstg_code"`
 	Contributor       string        `gorm:"type:varchar(255)"                              json:"contributor"`
 	AffectedEndpoints string        `gorm:"type:text"                                      json:"affected_endpoints"`
@@ -49,10 +49,10 @@ type Finding struct {
 type CreateFindingRequest struct {
 	WorklistID        *uuid.UUID `json:"worklist_id,omitempty"`
 	Title             string     `json:"title"              binding:"required,min=3,max=255"`
-	Description       string     `json:"description"`
+	Description       string     `json:"description"        binding:"required,min=10"`
 	Severity          Severity   `json:"severity"           binding:"required,oneof=critical high medium low informational"`
 	CVSSScore         float64    `json:"cvss_score"         binding:"min=0,max=10"`
-	CVSSVector        string     `json:"cvss_vector"`
+	CVSSVector        string     `json:"cvss_vector"        binding:"omitempty,max=100"`
 	WSTGCode          string     `json:"wstg_code"`
 	Contributor       string     `json:"contributor"`
 	AffectedEndpoints string     `json:"affected_endpoints"`
@@ -63,12 +63,12 @@ type CreateFindingRequest struct {
 
 type UpdateFindingRequest struct {
 	Title             string        `json:"title"              binding:"omitempty,min=3,max=255"`
-	Description       string        `json:"description"        binding:"omitempty"`
+	Description       string        `json:"description"        binding:"omitempty,min=10"`
 	Severity          Severity      `json:"severity"           binding:"omitempty,oneof=critical high medium low informational"`
 	Status            FindingStatus `json:"status"             binding:"omitempty,oneof=open confirmed fixing fixed closed"`
 	Notes             string        `json:"notes"              binding:"omitempty"`
 	CVSSScore         float64       `json:"cvss_score"         binding:"omitempty,min=0,max=10"`
-	CVSSVector        string        `json:"cvss_vector"`
+	CVSSVector        string        `json:"cvss_vector"        binding:"omitempty,max=100"`
 	WSTGCode          string        `json:"wstg_code"`
 	AffectedEndpoints string        `json:"affected_endpoints"`
 	ReproductionSteps string        `json:"reproduction_steps"`
