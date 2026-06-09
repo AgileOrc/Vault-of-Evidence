@@ -116,29 +116,8 @@ function FindingDetail () {
             
             setUserRole(meRes.data.data?.projectRole ?? 'pm')
             setLoading(false)
-        }).catch(() => {
-            // fallback dummy
-            setProject({ id: projectId || '1', name: 'mycompany.com' })
-            setWorklist({ id: worklistId || '1', name: 'Login Page', status: 'in progress' })
-            setFinding({
-                id: findingId || '1',
-                name: 'SQL Injection on /api/v1/auth/login',
-                code: 'WSTG-ATHN-04',
-                status: 'confirmed',
-                severity: 'Critical',
-                confirmDate: '2 May 2026',
-                member: 'Bob',
-                cvssScore: 9.8,
-                cvssVector: 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H',
-                impactedSystem: '/api/v1/auth/login',
-                executiveSummary: 'A SQL Injection vulnerability was identified in the login endpoint that allows an unauthenticated attacker to bypass authentication and gain unauthorized access to the application, potentially exposing all user data stored in the database.',
-                stepsToReproduce: "1. Navigate to https://mycompany.com/login\n2. Enter payload ' OR '1'='1 in the username field\n3. Enter any password\n4. Submit the form to achieve authentication bypass\n5. Escalate privileges to database accounts.",
-                remediationStrategy: 'Use parameterized queries or prepared statements for all database interactions. Implement strict server-side input validation and sanitization. Apply the principle of least privilege to database accounts.',
-            })
-            setPocs([
-                { id: '1', type: 'screenshot', caption: 'Screenshot 1', content: '' },
-                { id: '4', type: 'request', caption: 'Authentication bypass request', content: "POST /api/v1/auth/login HTTP/1.1\nHost: mycompany.com\nContent-Type: application/json\n\n{\n  \"username\": \"' OR '1'='1\",\n  \"password\": \"anything\"\n}" },
-            ])
+        }).catch((err) => {
+            console.error('Failed to load finding details:', err)
             setLoading(false)
         })
     }, [projectId, worklistId, findingId])

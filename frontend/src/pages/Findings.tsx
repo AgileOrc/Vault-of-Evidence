@@ -66,21 +66,8 @@ function Findings () {
             setFindings(mappedFindings)
             setLoading(false)
         })
-        .catch(() => {
-            setProject({ id: projectId || '1', name: 'mycompany.com' })
-            setWorklist({
-                id: worklistId || '1',
-                name: 'Login Page',
-                code: 'WSTG-ATHN, WSTG-SESS',
-                status: 'in progress'
-            })
-            setFindings([
-                { id: '1', name: 'SQL Injection on /api/v1/auth/login',            code: 'WSTG-ATHN-01', status: 'confirmed',       confirmDate: '2 May 2026', severity: 'Critical', member: 'Bob'   },
-                { id: '2', name: 'Weak Lock Out Mechanism on /api/v1/auth/login',   code: 'WSTG-ATHN-03', status: 'open',            confirmDate: '3 May 2026', severity: 'High',     member: 'Carol' },
-                { id: '3', name: 'Weak Lock Out Mechanism on /api/v1/auth/login',   code: 'WSTG-ATHN-03', status: 'fixing',          confirmDate: '5 May 2026', severity: 'Medium',   member: 'Bob'   },
-                { id: '4', name: 'Missing Secure and HttpOnly Flag on Session Cookie', code: 'WSTG-SESS-02', status: 'fixed',         confirmDate: '7 May 2026', severity: 'Medium',   member: 'Carol' },
-                { id: '5', name: 'Credentials Transported over Unencrypted Channel', code: 'WSTG-ATHN-01', status: 'closed on notes', confirmDate: '8 May 2026', severity: 'Low',     member: 'Bob'   },
-            ])
+        .catch((err) => {
+            console.error('Failed to load findings:', err)
             setLoading(false)
         })
     }, [worklistId, projectId])
