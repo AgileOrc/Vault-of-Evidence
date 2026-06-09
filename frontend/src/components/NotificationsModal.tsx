@@ -65,7 +65,7 @@ const DUMMY_NOTIFICATIONS: Notification[] = [
 ]
 
 function NotificationsModal ({ isOpen, isDark, onClose }: NotificationsModalProps) {
-  const [notifications, setNotifications] = useState<Notification[]>(DUMMY_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   const markAllRead = () =>
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))

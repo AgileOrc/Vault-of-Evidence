@@ -44,39 +44,7 @@ function Projects () {
                 setLoading(false)
             })
             .catch(() => {
-                setProjects([
-                {
-                    id: '1',
-                    name: 'mycompany.com (Dummy)',
-                    type: 'Web Application',
-                    members: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }, { id: '5' }],
-                    worklists: 6,
-                    findings: Array.from({ length: 23 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'active',
-                    description: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.'
-                },
-                {
-                    id: '2',
-                    name: 'api.startup.io (Dummy)',
-                    type: 'API Security',
-                    members: [{ id: '1' }, { id: '2' }, { id: '3' }],
-                    worklists: 4,
-                    findings: Array.from({ length: 11 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'planning',
-                    description: '-'
-                },
-                {
-                    id: '3',
-                    name: 'staging.app.io (Dummy)',
-                    type: 'Web Application',
-                    members: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }],
-                    worklists: 7,
-                    findings: Array.from({ length: 15 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'completed',
-                    description: '-'
-                }
-            ])
-                
+                setProjects([])
                 setLoading(false)
             })
     }, [])
