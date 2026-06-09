@@ -7,6 +7,7 @@ import NotificationsModal from './NotificationsModal'
 
 export type LayoutContext = {
   isDark: boolean
+  isCollapsed: boolean
 }
 
 function AppLayout () {
@@ -43,7 +44,7 @@ function AppLayout () {
         </button>
 
         <main className='px-18 md:px-16 xl:px-18 pb-12 pt-20 md:pt-18 xl:pt-20'>
-          <Outlet context={{ isDark }} />
+          <Outlet context={{ isDark, isCollapsed }} />
         </main>
       </div>
 

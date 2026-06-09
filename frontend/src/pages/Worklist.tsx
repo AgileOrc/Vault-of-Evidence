@@ -25,8 +25,11 @@ type WorklistData = {
     status: string
 }
 
+const btnBase = 'flex items-center gap-2 px-2 md:px-2.5 xl:px-4 py-2 xl:py-2.5 rounded-md md:rounded-lg border font-semibold text-xs xl:text-sm font-montserrat'
+const iconSize = 'w-3 h-3 md:w-4 md:h-4'
+
 function Worklist () {
-    const { isDark } = useOutletContext<LayoutContext>()
+    const { isDark, isCollapsed } = useOutletContext<LayoutContext>()
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
@@ -102,15 +105,15 @@ function Worklist () {
     return (
         <div className='space-y-4 md:space-y-6'>
             {/* Project Header */}
-            <div className='space-y-3'>
+            <div className='space-y-2'>
                 {/* Row 1: Label */}
-                <p className={`text-sm md:text-base font-medium font-montserrat ${theme.textMuted}`}>Project</p>
+                <p className={`text-xl md:text-2xl xl:text-3xl font-semibold font-montserrat ${theme.text}`}>Project</p>
 
                 {/* Row 2: 2 columns */}
                 <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-4'>
 
                     {/* Col 1: Title, description (xl only), info */}
-                    <div className='space-y-2 flex-1 min-w-0'>
+                    <div className='space-y-2 md:flex-4 lg:flex-3 min-w-0'>
                         <div className='flex items-center gap-4 min-w-0'>
                             <h1 className={`min-w-0 truncate text-2xl md:text-3xl xl:text-4xl font-semibold font-montserrat ${theme.text}`}>{project?.name}</h1>
                             <span className={`shrink-0 px-4 py-1 rounded-full text-sm font-semibold font-montserrat ${projectStatusClass(project?.status || '')}`}>
@@ -118,36 +121,42 @@ function Worklist () {
                             </span>
                         </div>
 
-                        <p className={`max-w-2xl text-sm md:text-base opacity-80 font-montserrat ${theme.text}`}>{project?.description}</p>
+                        <p className={`text-sm md:text-base font-montserrat ${theme.text}`}>{project?.description}</p>
 
-                        <div className={`flex flex-wrap items-center gap-6 text-sm md:text-base font-medium font-montserrat ${theme.textMuted}`}>
+                        <div className={`flex flex-wrap items-center gap-2 lg:gap-6 text-sm md:text-base font-medium font-montserrat ${theme.textMuted}`}>
                             <div className='flex items-center gap-2'><Users size={18} /> {project?.members} members</div>
                             <div className='flex items-center gap-2'><FileText size={18} /> {project?.worklists} worklists</div>
                             <div className='flex items-center gap-2'><Bug size={18} /> {project?.findings} findings</div>
                         </div>
                     </div>
 
-                    {/* Col 2: Buttons — row 1: Edit + Manage, row 2: Delete */}
-                    <div className='flex flex-col gap-2 shrink-0 items-start md:items-end'>
-                        <div className='flex gap-2'>
-                            <button className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border font-semibold text-sm font-montserrat ${theme.buttonPrimary}`}>
-                                <Pencil size={16} /> Edit Project
-                            </button>
-                            <button className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border font-semibold text-sm font-montserrat ${theme.buttonOutline}`}>
-                                <Users size={16} /> Manage Members
-                            </button>
-                        </div>
-                        <button className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border font-semibold text-sm font-montserrat ${theme.buttonDanger}`}>
-                            <Trash2 size={16} /> Delete Project
-                        </button>
-                    </div>
+                    {/* Col 2: Buttons */}
+                    <div className='flex-2 gap-2 shrink-0 items-start md:items-end justify-end'>
+                        <div className={`flex flex-col gap-2 items-start md:items-end justify-end ${isCollapsed ? 'flex-col xl:flex-row' : 'flex-col'}`}>
+                            
+                            {/* Edit + Manage */}
+                            <div className={`flex gap-2 md:items-end ${isCollapsed ? 'flex-row md:flex-col lg:flex-row ' : 'flex-row md:flex-col xl:flex-row'}`}>
+                                <button className={`${btnBase} ${theme.buttonPrimary}`}>
+                                    <Pencil className={iconSize} /> Edit Project
+                                </button>
+                                <button className={`${btnBase} ${theme.buttonOutline}`}>
+                                    <Users className={iconSize} /> Manage Members
+                                </button>
+                            </div>
 
+                            {/* Delete */}
+                            <button className={`${btnBase} ${theme.buttonDanger} w-fit`}>
+                                <Trash2 className={iconSize} /> Delete Project
+                            </button>
+
+                        </div>
+                    </div>
                 </div>
             </div>
 
             {/* Search & Status Filter */}
-            <div className='flex flex-col lg:flex-row items-stretch gap-4'>
-                <div className={`flex items-center gap-2 flex-1 rounded-lg md:rounded-xl px-3 md:px-4 py-2.5 md:py-3 border ${
+            <div className='flex flex-col lg:flex-row gap-4'>
+                <div className={`flex gap-2 flex-1 rounded-lg md:rounded-xl px-3 md:px-4 py-2 lg:py-1 xl:py-3 border ${
                     isDark ? 'bg-gradient-to-br from-white/15 to-[#C2C2C2]/8 border-white/40' : 'bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border-[#27D6FF]/40'
                 }`}>
                     <Search size={18} className={`shrink-0 ${isDark ? 'text-white' : 'text-[#0F65AD]'}`} />
@@ -161,24 +170,30 @@ function Worklist () {
                         }`}
                     />
                 </div>
-                <CustomSelect
-                    value={statusFilter}
-                    onChange={setStatusFilter}
-                    options={[
-                        { value: 'all',         label: 'All Status'  },
-                        { value: 'in progress', label: 'In Progress' },
-                        { value: 'not started', label: 'Not Started' },
-                        { value: 'completed',   label: 'Completed'   },
-                    ]}
-                    isDark={isDark}
-                />
-                <button className={`flex items-center justify-center gap-2 rounded-lg md:rounded-xl px-4 py-2.5 text-sm md:text-base font-semibold font-montserrat ${theme.buttonPrimary}`}>
-                    <FilePlusCorner size={18} /> Add Worklist
-                </button>
+                <div className='flex gap-4 max-w-screen md:w-fit lg:w-auto'>
+                    <div className='flex-1 min-w-0'>
+                        <CustomSelect
+                            value={statusFilter}
+                            onChange={setStatusFilter}
+                            options={[
+                                { value: 'all',         label: 'All Status'  },
+                                { value: 'in progress', label: 'In Progress' },
+                                { value: 'not started', label: 'Not Started' },
+                                { value: 'completed',   label: 'Completed'   },
+                            ]}
+                            isDark={isDark}
+                        />
+                    </div>
+                    <button className={`${btnBase} justify-center border-transparent ${theme.buttonPrimary}`}>
+                        <FilePlusCorner className={`w-4 h-4 lg:w-5 lg:h-5`} /> Add Worklist
+                    </button>
+                            
+                </div>
+                
             </div>
 
             {/* Worklist List */}
-            <div className='grid gap-4 font-montserrat'>
+            <div className='grid gap-6 md:gap-4 font-montserrat'>
                 {filteredWorklists.length > 0 ? (
                     filteredWorklists.map((worklist) => (
                         <Link
@@ -186,12 +201,14 @@ function Worklist () {
                             to={`/projects/${projectId}/worklists/${worklist.id}/findings`}
                             className={`block rounded-xl md:rounded-2xl px-5 py-4 md:px-6 md:py-5 transition hover:scale-[1.01] ${theme.cardBase}`}
                         >
-                            <div className='flex items-center justify-between gap-4'>
-                                <div className='min-w-0'>
-                                    <h3 className={`text-base md:text-lg xl:text-xl font-semibold ${theme.text}`}>{worklist.name}</h3>
+                            <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-4'>
+                                {/* Worklist Title & Code */}
+                                <div className='flex flex-col min-w-0'>
+                                    <h3 className={`text-xl md:text-xl xl:text-[1.3rem] font-semibold ${theme.text}`}>{worklist.name}</h3>
                                     <p className={`mt-0.5 text-sm md:text-base font-medium ${theme.textMuted}`}>{worklist.code}</p>
                                 </div>
-                                <div className='flex items-center gap-3 shrink-0'>
+                                {/* Worklist findings, status, delete worklist button */}
+                                <div className='flex flex-col md:flex-row items-start md:items-center gap-3 shrink-0'>
                                     <div className={`flex items-center gap-1.5 text-sm font-medium ${theme.textMuted}`}>
                                         <Bug size={16} /> {worklist.findings} finding{worklist.findings !== 1 ? 's' : ''}
                                     </div>
