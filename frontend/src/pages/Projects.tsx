@@ -157,8 +157,8 @@ function Projects () {
                         placeholder='Search Projects...'
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className={`w-full rounded-lg md:rounded-xl pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base border font-Montserrat focus:outline-none focus:ring-2 ${
-                            isDark ? 'bg-[#173B56] border-[#2BA7D6]/40 text-white focus:ring-[#2BA7D6]' : 'bg-white border-[#1767AA]/30 text-[#002C49] focus:ring-[#20A6DA]'}
+                        className={`w-full rounded-lg md:rounded-xl pl-9 md:pl-10 pr-3 md:pr-4 py-2.5 md:py-3 text-sm md:text-base border font-montserrat focus:outline-none focus:ring-2 ${
+                            isDark ? 'bg-gradient-to-br from-white/15 to-[#C2C2C2]/8 border border-white/40 text-white' : 'bg-linear-to-br from-[#27D6FF]/5 to-[#1767AA]/5 border border-[#27D6FF]/40 text-[#002C49]'}
                         `}
                     />
                 </div>

@@ -95,7 +95,7 @@ function Dashboard () {
     const theme = isDark
         ? {
             cardBase:
-                'rounded-3xl xl:rounded-4xl bg-gradient-to-br from-[#F5F5F5]/15 to-[#C2C2C2]/8 border border-[#F5F5F5]/40 text-[#F5F5F5] shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
+                'rounded-3xl xl:rounded-4xl bg-gradient-to-br from-white/15 to-[#C2C2C2]/8 border border-white/40 text-white shadow-[2px_2px_10px_2px_rgba(0,44,73,0.05)]',
 
             greetings:
                 'text-[#FFFFFF]',
