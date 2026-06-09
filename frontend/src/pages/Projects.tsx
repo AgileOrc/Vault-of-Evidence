@@ -11,16 +11,16 @@ import { Link, useOutletContext } from 'react-router-dom'
 import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
-import { getPageTheme } from '../utils/theme'
+import { getPageTheme, projectStatusBadge, projectStatusLabel } from '../utils/theme'
 import { NewProjectModal } from '../components/PopUp'
 
 
 type ProjectData = {
     id: string
     name: string
-    type: string
+    type?: string
     members?: { id: string }[]
-    worklists: number
+    worklists?: { id: string }[]
     findings?: { id: string }[]
     status: string
     description: string
@@ -52,7 +52,7 @@ function Projects () {
                     members: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }, { id: '5' }],
                     worklists: 6,
                     findings: Array.from({ length: 23 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'Active',
+                    status: 'active',
                     description: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.'
                 },
                 {
@@ -62,7 +62,7 @@ function Projects () {
                     members: [{ id: '1' }, { id: '2' }, { id: '3' }],
                     worklists: 4,
                     findings: Array.from({ length: 11 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'Paused',
+                    status: 'planning',
                     description: '-'
                 },
                 {
@@ -72,7 +72,7 @@ function Projects () {
                     members: [{ id: '1' }, { id: '2' }, { id: '3' }, { id: '4' }],
                     worklists: 7,
                     findings: Array.from({ length: 15 }, (_, i) => ({ id: String(i + 1) })),
-                    status: 'Completed',
+                    status: 'completed',
                     description: '-'
                 }
             ])
@@ -94,25 +94,6 @@ function Projects () {
 
     const theme = getPageTheme(isDark)
 
-    const badgeClass = (status: string) => {
-        if (isDark) {
-            if (status === 'Active')
-                return 'bg-[#17E58F] text-[#005B35]'
-
-            if (status === 'Paused')
-                return 'bg-[#E6DF14] text-[#5B4100]'
-
-            if (status === 'Upcoming')
-                return 'bg-[#C017DE] text-[#40005B]'
-
-            return 'bg-[#22BBDE] text-[#00375C]'
-        }
-        
-        if (status === 'Active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (status === 'Paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        if (status === 'Upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
-        return 'bg-[#00375C] text-[#22BBDE] font-semibold'
-    }
 
     if (loading) {
         return <div className="text-center p-10 font-montserrat">Loading penetration testing engagements...</div>
@@ -155,10 +136,11 @@ function Projects () {
                     value={statusFilter}
                     onChange={setStatusFilter}
                     options={[
-                        { value: 'all', label: 'All Status' },
-                        { value: 'active', label: 'Active' },
-                        { value: 'paused', label: 'Paused' },
-                        { value: 'completed', label: 'Completed' },
+                        { value: 'all',       label: 'All Status' },
+                        { value: 'active',    label: 'Active'     },
+                        { value: 'paused',    label: 'Paused'     },
+                        { value: 'planning',  label: 'Upcoming'   },
+                        { value: 'completed', label: 'Completed'  },
                     ]}
                     isDark={isDark}
                     className='xl:w-42'
@@ -181,8 +163,8 @@ function Projects () {
                                     <h3 className={`text-lg md:text-xl xl:text-2xl font-semibold ${theme.text}`}>
                                         {project.name}
                                     </h3>
-                                    <span className={`shrink-0 rounded-full px-3 xl:px-5 py-1 text-xs md:text-xs font-semibold ${badgeClass(project.status)}`}>
-                                        {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                                    <span className={`shrink-0 rounded-full px-3 xl:px-5 py-1 text-xs md:text-xs font-semibold ${projectStatusBadge(project.status, isDark)}`}>
+                                        {projectStatusLabel(project.status)}
                                     </span>
                                 </div>
 
@@ -198,7 +180,7 @@ function Projects () {
                                     </div>
                                     <div className={`flex items-center gap-1 ${theme.textMuted}`}>
                                         <FileText size={16} />
-                                        <span>{project.worklists} worklists</span>
+                                        <span>{project.worklists?.length ?? 0} worklists</span>
                                     </div>
                                     <div className={`flex items-center gap-1 ${theme.textMuted}`}>
                                         <Bug size={16} />

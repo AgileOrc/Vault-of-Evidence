@@ -31,6 +31,7 @@ func NewService(repo Repository) Service { return &service{repo: repo} }
 func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) (*domain.Project, error) {
 	p := &domain.Project{
 		Name:        req.Name,
+		Type:        req.Type,
 		Description: req.Description,
 		Status:      domain.StatusPlanning,
 		StartDate:   req.StartDate,
@@ -40,6 +41,18 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 	if err := s.repo.Create(p); err != nil {
 		return nil, fmt.Errorf("project.service: create: %w", err)
 	}
+
+	// Tambahkan creator sebagai PM otomatis
+	member := &domain.ProjectMember{
+		ProjectID:  p.ID,
+		UserID:     createdBy,
+		Role:       domain.RolePM,
+		AssignedBy: createdBy,
+	}
+	if err := s.repo.AddMember(member); err != nil {
+		fmt.Printf("warning: failed to add creator as PM for project %s: %v\n", p.ID, err)
+	}
+
 	return p, nil
 }
 
@@ -66,6 +79,9 @@ func (s *service) Update(id string, req *domain.UpdateProjectRequest) (*domain.P
 
 	if req.Name != "" {
 		p.Name = req.Name
+	}
+	if req.Type != "" {
+		p.Type = req.Type
 	}
 	if req.Description != "" {
 		p.Description = req.Description

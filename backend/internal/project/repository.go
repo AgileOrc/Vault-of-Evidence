@@ -40,7 +40,8 @@ func (r *repository) FindAll(params pagination.Params) ([]domain.Project, int64,
 		return nil, 0, err
 	}
 
-	err := r.db.Order("created_at DESC").
+	err := r.db.Preload("Members").Preload("Worklists").Preload("Findings").
+		Order("created_at DESC").
 		Limit(params.Limit).
 		Offset(params.Offset).
 		Find(&projects).Error
