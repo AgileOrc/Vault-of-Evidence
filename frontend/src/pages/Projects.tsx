@@ -20,6 +20,7 @@ type ProjectData = {
     worklists?: number  // Dibuat opsional
     findings?: number   // Dibuat opsional
     status: string
+    description?: string // Typo 'describtion' diperbaiki jadi description (dibuat opsional)
 }
 
 function Projects () {
@@ -31,7 +32,7 @@ function Projects () {
 
     const [projects, setProjects] = useState<ProjectData[]>([])
 
-    // Koneksi ke backend sudah BENAR
+    // Koneksi ke backend sudah BENAR dan TIDAK DOBEL
     useEffect(() => {
         api.get('/projects')
             .then((res) => {
@@ -144,7 +145,7 @@ function Projects () {
                     filteredProjects.map((project) => (
                         <Link
                             key={project.id}
-                            to={`/projects/${project.id}`}
+                            to={`/projects/${project.id}`} // URL Diperbaiki mengarah ke halaman Project Details
                             className={`block rounded-xl md:rounded-2xl p-4 md:p-6 transition hover:scale-[1.01] ${theme.cardBase}`}
                         >
                             <div className='flex flex-col md:flex-row md:items-start md:justify-between gap-3'>
@@ -155,7 +156,7 @@ function Projects () {
                                         <div className={`flex items-center gap-1 ${theme.info}`}>
                                             <Globe size={16} />
                                             {/* [BUG FIX]: Tambahkan fallback 'General Project' jika type kosong */}
-                                            <span>{project.type || 'General Project'}</span>
+                                            <span>{project.type || project.description || 'General Project'}</span>
                                         </div>
 
                                         <div className={`flex items-center gap-1 ${theme.info}`}>

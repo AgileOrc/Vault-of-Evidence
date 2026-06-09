@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { User } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
 import type { LayoutContext } from '../components/AppLayout'

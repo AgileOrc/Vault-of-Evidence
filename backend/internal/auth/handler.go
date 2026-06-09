@@ -24,12 +24,14 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup, authMw gin.HandlerFunc) {
 	rg.POST("/signup", h.Signup)
 	rg.POST("/login", h.Login)
 	rg.POST("/logout", h.Logout)
-	rg.POST("/change-password", authMw, h.ChangePassword)
-	rg.GET("/me", authMw, h.GetMe)
-
-	// Registrasi Endpoint Baru Sesuai Hit Axios Frontend Lupa Password
+	
+	// Reset password (public - tidak butuh login)
 	rg.POST("/resetPassword", h.ForgotPassword)
 	rg.POST("/createNewPassword", h.ResetPassword)
+
+	// Butuh login
+	rg.POST("/change-password", authMw, h.ChangePassword)
+	rg.GET("/me", authMw, h.GetMe)
 }
 
 func (h *Handler) Signup(c *gin.Context) {

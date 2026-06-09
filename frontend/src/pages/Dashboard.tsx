@@ -24,7 +24,9 @@ type FindingData = {
     id: string
     title: string
     severity: string
-    status: string
+    project?: string
+    worklist?: string
+    status?: string
 }
 
 type DashboardSummary = {
@@ -102,7 +104,7 @@ function Dashboard () {
         }
 
     const badgeClass = (status: string) => {
-        const cleanStatus = status ? status.toLowerCase() : ''
+        const cleanStatus = (status || 'planning').toLowerCase()
         if (isDark) {
             if (cleanStatus === 'active') return 'bg-[#17E58F] text-[#005B35]'
             if (cleanStatus === 'paused') return 'bg-[#E6DF14] text-[#5B4100]'
@@ -117,7 +119,7 @@ function Dashboard () {
     }
 
     const severityClass = (severity: string) => {
-        const cleanSeverity = severity ? severity.toLowerCase() : ''
+        const cleanSeverity = (severity || 'low').toLowerCase()
         if (cleanSeverity === 'critical') return isDark ? 'bg-[#EC2828] text-[#5B0000]' : 'bg-[#5B0000] text-[#EC2828] font-semibold'
         if (cleanSeverity === 'high') return isDark ? 'bg-[#E67219] text-[#5B3000]' : 'bg-[#5B3100] text-[#E67219] font-semibold'
         if (cleanSeverity === 'medium') return isDark ? 'bg-[#E6DF14] text-[#5B4100]' : 'bg-[#5B4100] text-[#E6DF14] font-semibold'
@@ -140,12 +142,12 @@ function Dashboard () {
                 </Link>
             </header>
             
-            {/* Statistik Atas */}
+            {/* Statistik Atas: Data Asli dari Backend */}
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4'>
                 <StatCard title='Active projects' value={data?.activeProjects || 0} subtitle={`of ${data?.totalProjects || 0} total`} icon={Folder} iconClass={theme.statIcon} theme={theme} />
                 <StatCard title='Active worklists' value={0} subtitle='Ongoing' icon={ClipboardList} iconClass={theme.statIcon} theme={theme} />
                 <StatCard title='Waiting response' value={0} subtitle='Unresolved' icon={Timer} iconClass={theme.statIcon} theme={theme} />
-                <StatCard title= {<>Unresolved <br /> critical & high</>} value={data?.criticalHighCount || 0} subtitle='Needs attention' icon={AlertTriangle} iconClass={theme.statIcon} theme={theme} />
+                <StatCard title={<>Unresolved <br /> critical & high</>} value={data?.criticalHighCount || 0} subtitle='Needs attention' icon={AlertTriangle} iconClass={theme.statIcon} theme={theme} />
             </div>
 
             {/* Project Overview Card & Recent Activity*/}
@@ -166,8 +168,8 @@ function Dashboard () {
                                         <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
                                         <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
-                                    <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
-                                        {project.status}
+                                    <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
+                                        {project.status || 'Planning'}
                                     </span>
                                 </div>
                             ))
@@ -177,7 +179,7 @@ function Dashboard () {
                     </div>
                 </div>
 
-                {/* Recent Activity (Statik Sementara karena belum ada tabel log di DB) */}
+                {/* Recent Activity (Statik Sementara) */}
                 <div className={`px-8 py-8 lg:px-8 min-w-1/3 ${theme.cardBase}`}>
                     <div className='flex flex-col gap-2 md:flex-row items-start md:items-center justify-between'>
                         <h2 className={`text-lg md:text-xl xl:text-2xl font-montserrat font-semibold md:py-2 xl:py-3 ${theme.titles}`}>Recent Activity</h2>
@@ -213,10 +215,12 @@ function Dashboard () {
                             <div key={finding.id} className='flex flex-col md:flex-row items-start md:items-center justify-between py-3'>
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                     <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
-                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>Status: {finding.status}</p>
+                                    <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>
+                                        {finding.project || 'General'} - {finding.worklist || finding.status || 'Open'}
+                                    </p>
                                 </div>
-                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold ${severityClass(finding.severity)}`}>
-                                    {finding.severity}
+                                <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold capitalize ${severityClass(finding.severity)}`}>
+                                    {finding.severity || 'Low'}
                                 </span>
                             </div>
                         ))
