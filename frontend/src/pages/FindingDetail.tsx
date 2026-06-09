@@ -83,14 +83,41 @@ function FindingDetail () {
             api.get(`/projects/${projectId}`),
             api.get(`/projects/${projectId}/worklists/${worklistId}`),
             api.get(`/projects/${projectId}/findings/${findingId}`),
+            api.get(`/projects/${projectId}/findings/${findingId}/evidence`),
             api.get('/auth/me'),
-        ]).then(([projRes, wlRes, fRes, meRes]) => {
+        ]).then(([projRes, wlRes, fRes, evRes, meRes]) => {
             setProject(projRes.data.data)
             setWorklist(wlRes.data.data)
-            setFinding(fRes.data.data)
+            
+            const raw = fRes.data.data
+            setFinding({
+                id: raw.id,
+                name: raw.title,
+                code: '—', // Backend does not have code for finding natively yet
+                status: raw.status,
+                severity: raw.severity,
+                confirmDate: new Date(raw.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
+                member: 'Pentester',
+                cvssScore: raw.cvss_score,
+                cvssVector: raw.cvss_vector || '',
+                impactedSystem: raw.impact || '',
+                executiveSummary: raw.description || '',
+                stepsToReproduce: raw.reproduction_steps || '',
+                remediationStrategy: raw.remediation || '',
+            })
+            
+            const evidences = evRes.data.data || []
+            setPocs(evidences.map((ev: any) => ({
+                id: ev.id,
+                type: ev.mime_type?.startsWith('image/') ? 'screenshot' : 'request',
+                caption: ev.file_name,
+                content: `${api.defaults.baseURL}/projects/${projectId}/findings/${findingId}/evidence/${ev.id}/download`
+            })))
+            
             setUserRole(meRes.data.data?.projectRole ?? 'pm')
             setLoading(false)
         }).catch(() => {
+            // fallback dummy
             setProject({ id: projectId || '1', name: 'mycompany.com' })
             setWorklist({ id: worklistId || '1', name: 'Login Page', status: 'in progress' })
             setFinding({
@@ -110,10 +137,7 @@ function FindingDetail () {
             })
             setPocs([
                 { id: '1', type: 'screenshot', caption: 'Screenshot 1', content: '' },
-                { id: '2', type: 'screenshot', caption: 'Screenshot 2', content: '' },
-                { id: '3', type: 'screenshot', caption: 'Screenshot 3', content: '' },
                 { id: '4', type: 'request', caption: 'Authentication bypass request', content: "POST /api/v1/auth/login HTTP/1.1\nHost: mycompany.com\nContent-Type: application/json\n\n{\n  \"username\": \"' OR '1'='1\",\n  \"password\": \"anything\"\n}" },
-                { id: '5', type: 'request', caption: 'Server response', content: 'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n  "token": "eyJhbGc...",\n  "user": { "id": 1, "role": "admin" }\n}' },
             ])
             setLoading(false)
         })
@@ -172,6 +196,28 @@ function FindingDetail () {
     const setPocField = (id: string, patch: Partial<PoC>) =>
         setPocs(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p))
 
+    const handleSave = async () => {
+        if (!editData) return
+        try {
+            await api.put(`/projects/${projectId}/findings/${findingId}`, {
+                title: editData.name,
+                status: editData.status,
+                severity: editData.severity,
+                cvss_score: editData.cvssScore,
+                cvss_vector: editData.cvssVector,
+                impact: editData.impactedSystem,
+                description: editData.executiveSummary,
+                reproduction_steps: editData.stepsToReproduce,
+                remediation: editData.remediationStrategy
+            })
+            setFinding(editData)
+            setIsEditing(false)
+        } catch (error) {
+            console.error('Failed to update finding', error)
+            alert('Failed to update finding details.')
+        }
+    }
+
     if (loading) {
         return <div className='text-center p-10 font-montserrat'>Loading Finding...</div>
     }
@@ -215,7 +261,7 @@ function FindingDetail () {
                         {isEditing ? (
                             <>
                                 <button
-                                    onClick={() => { setFinding(editData); setIsEditing(false) }}
+                                    onClick={handleSave}
                                     className={`${btnBase} border-transparent ${theme.buttonPrimary}`}
                                 >
                                     Save
