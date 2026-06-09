@@ -429,7 +429,7 @@ function FindingDetail () {
                     {openModal === 'cvss' && (
                         <div className='space-y-4'>
                             <div>
-                                <label className={`block text-xs font-semibold mb-1 ${theme.textMuted}`}>CVSS Score (0–10)</label>
+                                <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>CVSS Score (0–10)</label>
                                 {isEditing && !isDev ? (
                                     <input type='number' min={0} max={10} step={0.1}
                                         value={editData?.cvssScore ?? ''}
@@ -437,11 +437,11 @@ function FindingDetail () {
                                         className={inputClass(isDark)}
                                     />
                                 ) : (
-                                    <p className={`text-6xl font-bold ${theme.text}`}>{currentFinding.cvssScore ?? '—'}</p>
+                                    <p className={`text-5xl md:text-6xl font-bold ${theme.text}`}>{currentFinding.cvssScore ?? '—'}</p>
                                 )}
                             </div>
                             <div>
-                                <label className={`block text-xs font-semibold mb-1 ${theme.textMuted}`}>CVSS Vector</label>
+                                <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>CVSS Vector</label>
                                 {isEditing && !isDev ? (
                                     <input type='text' maxLength={100}
                                         value={editData?.cvssVector ?? ''}
@@ -449,7 +449,7 @@ function FindingDetail () {
                                         className={monoClass(isDark)}
                                     />
                                 ) : (
-                                    <p className={`font-mono text-xs break-all ${theme.text}`}>{currentFinding.cvssVector || '—'}</p>
+                                    <p className={`font-mono text-sm lg:text-base font-medium break-all ${theme.text}`}>{currentFinding.cvssVector || '—'}</p>
                                 )}
                             </div>
                         </div>
@@ -458,7 +458,7 @@ function FindingDetail () {
                     {/* Impacted System */}
                     {openModal === 'impactedSystem' && (
                         <div>
-                            <label className={`block text-xs font-semibold mb-1 ${theme.textMuted}`}>Impacted System</label>
+                            <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>Impacted System</label>
                             {isEditing && !isDev ? (
                                 <input type='text' maxLength={200}
                                     value={editData?.impactedSystem ?? ''}
@@ -466,7 +466,7 @@ function FindingDetail () {
                                     className={inputClass(isDark)}
                                 />
                             ) : (
-                                <p className={`text-base font-semibold ${theme.text}`}>{currentFinding.impactedSystem || '—'}</p>
+                                <p className={`text-lg lg:text-xl font-semibold ${theme.text}`}>{currentFinding.impactedSystem || '—'}</p>
                             )}
                         </div>
                     )}
@@ -474,7 +474,7 @@ function FindingDetail () {
                     {/* Executive Summary */}
                     {openModal === 'executiveSummary' && (
                         <div>
-                            <label className={`block text-xs font-semibold mb-1 ${theme.textMuted}`}>Executive Summary</label>
+                            <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>Executive Summary</label>
                             {isEditing && !isDev ? (
                                 <textarea maxLength={2000} rows={8}
                                     value={editData?.executiveSummary ?? ''}
@@ -482,7 +482,7 @@ function FindingDetail () {
                                     className={textareaClass(isDark)}
                                 />
                             ) : (
-                                <p className={`text-sm leading-relaxed ${theme.text}`}>{currentFinding.executiveSummary || '—'}</p>
+                                <p className={`text-sm lg:text-base font-medium leading-relaxed ${theme.text}`}>{currentFinding.executiveSummary || '—'}</p>
                             )}
                         </div>
                     )}
@@ -490,7 +490,7 @@ function FindingDetail () {
                     {/* Steps to Reproduce */}
                     {openModal === 'steps' && (
                         <div>
-                            <label className={`block text-xs font-semibold mb-1 ${theme.textMuted}`}>Steps to Reproduce</label>
+                            <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>Steps to Reproduce</label>
                             {isEditing && !isDev ? (
                                 <textarea maxLength={3000} rows={10}
                                     value={editData?.stepsToReproduce ?? ''}
@@ -498,7 +498,7 @@ function FindingDetail () {
                                     className={textareaClass(isDark)}
                                 />
                             ) : (
-                                <p className={`text-sm leading-relaxed whitespace-pre-line ${theme.text}`}>{currentFinding.stepsToReproduce || '—'}</p>
+                                <p className={`text-sm lg:text-base font-medium leading-relaxed whitespace-pre-line ${theme.text}`}>{currentFinding.stepsToReproduce || '—'}</p>
                             )}
                         </div>
                     )}
@@ -506,7 +506,7 @@ function FindingDetail () {
                     {/* Remediation */}
                     {openModal === 'remediation' && (
                         <div>
-                            <label className={`block text-xs font-semibold mb-1 ${theme.textMuted}`}>Remediation Strategy</label>
+                            <label className={`block text-xs font-semibold mb-1 ${isDark ? 'text-white/60' : theme.textMuted}`}>Remediation Strategy</label>
                             {isEditing && !isDev ? (
                                 <textarea maxLength={3000} rows={8}
                                     value={editData?.remediationStrategy ?? ''}
@@ -514,7 +514,7 @@ function FindingDetail () {
                                     className={textareaClass(isDark)}
                                 />
                             ) : (
-                                <p className={`text-sm leading-relaxed ${theme.text}`}>{currentFinding.remediationStrategy || '—'}</p>
+                                <p className={`text-sm lg:text-base font-medium leading-relaxed ${theme.text}`}>{currentFinding.remediationStrategy || '—'}</p>
                             )}
                         </div>
                     )}
