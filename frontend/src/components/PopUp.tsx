@@ -331,21 +331,27 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMemb
             {/* Add member */}
             <div>
                 <Label isDark={isDark}>Add Member</Label>
-                <div className="flex gap-2">
-                    <Input isDark={isDark} placeholder="team@company.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <Select isDark={isDark} value={role} onChange={(e) => setRole(e.target.value)}>
-                        <option className={optClass} value="Project Manager">Project Manager</option>
-                        <option className={optClass} value="Pentester Member">Pentester Member</option>
-                        <option className={optClass} value="Developer">Developer</option>
-                    </Select>
-                    <button
-                        onClick={handleAdd}
-                        className={`shrink-0 flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-semibold font-montserrat transition ${
-                            isDark ? 'bg-[#41B0EC] text-white hover:bg-[#27D6FF]' : 'bg-[#1767AA] text-white hover:bg-[#41B0EC]'
-                        }`}
-                    >
-                        <Plus size={16} />
-                    </button>
+                <div className="flex flex-col md:flex-row gap-2">
+                    <div className="flex-1 min-w-0">
+                        <Input isDark={isDark} placeholder="Input email here..." value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div className='flex gap-2'>
+                        <div className="w-48 shrink-0">
+                        <Select isDark={isDark} value={role} onChange={(e) => setRole(e.target.value)}>
+                            <option className={optClass} value="Project Manager">Project Manager</option>
+                            <option className={optClass} value="Pentester Member">Pentester Member</option>
+                            <option className={optClass} value="Developer">Developer</option>
+                        </Select>
+                        </div>
+                        <button
+                            onClick={handleAdd}
+                            className={`shrink-0 flex items-center px-3 py-2 rounded-xl text-sm font-semibold font-montserrat transition ${
+                                isDark ? 'bg-[#41B0EC] text-white hover:bg-[#27D6FF]' : 'bg-[#1767AA] text-white hover:bg-[#41B0EC]'
+                            }`}
+                        >
+                            <Plus size={16} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
