@@ -12,9 +12,9 @@ var ErrNotFound = errors.New("worklist not found")
 type Service interface {
 	Create(projectID string, req *domain.CreateWorklistRequest) (*domain.Worklist, error)
 	GetByProject(projectID string) ([]domain.Worklist, error)
-	GetByID(id string) (*domain.Worklist, error)
-	Update(id string, req *domain.UpdateWorklistRequest) (*domain.Worklist, error)
-	Delete(id string) error
+	GetByID(projectID, id string) (*domain.Worklist, error)
+	Update(projectID, id string, req *domain.UpdateWorklistRequest) (*domain.Worklist, error)
+	Delete(projectID, id string) error
 }
 
 type service struct{ repo Repository }
@@ -43,16 +43,16 @@ func (s *service) GetByProject(projectID string) ([]domain.Worklist, error) {
 	return s.repo.FindByProjectID(projectID)
 }
 
-func (s *service) GetByID(id string) (*domain.Worklist, error) {
+func (s *service) GetByID(projectID, id string) (*domain.Worklist, error) {
 	w, err := s.repo.FindByID(id)
 	if err != nil { return nil, err }
-	if w == nil { return nil, ErrNotFound }
+	if w == nil || w.ProjectID.String() != projectID { return nil, ErrNotFound }
 	return w, nil
 }
 
-func (s *service) Update(id string, req *domain.UpdateWorklistRequest) (*domain.Worklist, error) {
+func (s *service) Update(projectID, id string, req *domain.UpdateWorklistRequest) (*domain.Worklist, error) {
 	w, err := s.repo.FindByID(id)
-	if err != nil || w == nil { return nil, ErrNotFound }
+	if err != nil || w == nil || w.ProjectID.String() != projectID { return nil, ErrNotFound }
 
 	if req.Name != "" { w.Name = req.Name }
 	if req.Code != "" { w.Code = req.Code }
@@ -65,8 +65,8 @@ func (s *service) Update(id string, req *domain.UpdateWorklistRequest) (*domain.
 	return w, nil
 }
 
-func (s *service) Delete(id string) error {
+func (s *service) Delete(projectID, id string) error {
 	w, err := s.repo.FindByID(id)
-	if err != nil || w == nil { return ErrNotFound }
+	if err != nil || w == nil || w.ProjectID.String() != projectID { return ErrNotFound }
 	return s.repo.Delete(id)
 }
