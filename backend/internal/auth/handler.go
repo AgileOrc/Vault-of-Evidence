@@ -24,7 +24,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup, authMw gin.HandlerFunc) {
 	rg.POST("/signup", h.Signup)
 	rg.POST("/login", h.Login)
 	rg.POST("/logout", h.Logout)
-	
+
 	// Reset password (public - tidak butuh login)
 	rg.POST("/resetPassword", h.ForgotPassword)
 	rg.POST("/createNewPassword", h.ResetPassword)
@@ -70,10 +70,13 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	if err := h.jwtManager.SetAuthCookie(c.Writer, user.ID, user.Username); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to set session"})
+	token, err := h.jwtManager.GenerateToken(user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create session"})
 		return
 	}
+
+	h.jwtManager.SetAuthCookie(c.Writer, token)
 
 	c.JSON(http.StatusOK, gin.H{"message": "login successful", "user": user.ToResponse()})
 }

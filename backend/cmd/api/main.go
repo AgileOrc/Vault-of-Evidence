@@ -19,7 +19,7 @@ import (
 	"vault-of-evidence/backend/internal/middleware"
 	jwtpkg "vault-of-evidence/backend/internal/pkg/jwt"
 	"vault-of-evidence/backend/internal/project"
-	"vault-of-evidence/backend/internal/worklist" // 1. IMPORT MODUL BARU DI SINI
+	"vault-of-evidence/backend/internal/worklist"
 )
 
 func main() {
@@ -51,7 +51,6 @@ func main() {
 	projectSvc := project.NewService(projectRepo)
 	projectHandler := project.NewHandler(projectSvc)
 
-	// 2. INISIALISASI WORKLIST
 	worklistRepo := worklist.NewRepository(db)
 	worklistSvc := worklist.NewService(worklistRepo)
 	worklistHandler := worklist.NewHandler(worklistSvc)
@@ -81,10 +80,12 @@ func main() {
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Max-Age", "86400")
+
 		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
+
 		c.Next()
 	})
 
@@ -96,19 +97,24 @@ func main() {
 
 	api := router.Group("/api/v1")
 
-	// 1. Auth Routes
 	authRoutes := api.Group("/auth")
-	authRoutes.Use(authLimiter.Middleware())
-	authHandler.RegisterRoutes(authRoutes, authMw)
+	{
+		authRoutes.POST("/signup", authLimiter.Middleware(), authHandler.Signup)
+		authRoutes.POST("/login", authLimiter.Middleware(), authHandler.Login)
+		authRoutes.POST("/resetPassword", authLimiter.Middleware(), authHandler.ForgotPassword)
+		authRoutes.POST("/createNewPassword", authLimiter.Middleware(), authHandler.ResetPassword)
 
-	// 2. Project Routes Group
+		authRoutes.POST("/logout", authHandler.Logout)
+		authRoutes.POST("/change-password", authMw, authHandler.ChangePassword)
+		authRoutes.GET("/me", authMw, authHandler.GetMe)
+	}
+
 	projectRoutes := api.Group("/projects")
 	projectRoutes.Use(authMw)
 	{
 		projectRoutes.GET("", projectHandler.GetAll)
 		projectRoutes.POST("", projectHandler.Create)
 
-		// 3. DAFTARKAN DASHBOARD API (Wajib di atas rute /:id agar tidak dibaca sebagai ID proyek)
 		projectRoutes.GET("/dashboard/summary", projectHandler.GetDashboardSummary)
 
 		singleProject := projectRoutes.Group("/:id")
@@ -116,28 +122,33 @@ func main() {
 			singleProject.GET("",
 				middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 				projectHandler.GetByID)
+
 			singleProject.PUT("",
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.Update)
+
 			singleProject.DELETE("",
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.Delete)
 
-			// 4. DAFTARKAN WORKLIST ROUTES DI DALAM GROUP PROJECT
 			worklistRoutes := singleProject.Group("/worklists")
 			{
 				worklistRoutes.GET("",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 					worklistHandler.GetByProject)
+
 				worklistRoutes.GET("/:worklist_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 					worklistHandler.GetByID)
+
 				worklistRoutes.POST("",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					worklistHandler.Create)
+
 				worklistRoutes.PUT("/:worklist_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					worklistHandler.Update)
+
 				worklistRoutes.DELETE("/:worklist_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					worklistHandler.Delete)
@@ -148,15 +159,19 @@ func main() {
 				findingRoutes.GET("",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 					findingHandler.GetByProject)
+
 				findingRoutes.GET("/:finding_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 					findingHandler.GetByID)
+
 				findingRoutes.POST("",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					findingHandler.Create)
+
 				findingRoutes.PUT("/:finding_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester, domain.RoleDev),
 					findingHandler.Update)
+
 				findingRoutes.DELETE("/:finding_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					findingHandler.Delete)
@@ -166,12 +181,15 @@ func main() {
 					evidenceRoutes.GET("",
 						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 						evidenceHandler.GetByFinding)
+
 					evidenceRoutes.GET("/:evidence_id/download",
 						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
 						evidenceHandler.Download)
+
 					evidenceRoutes.POST("",
 						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
 						evidenceHandler.Upload)
+
 					evidenceRoutes.DELETE("/:evidence_id",
 						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
 						evidenceHandler.Delete)
@@ -182,6 +200,7 @@ func main() {
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
 	log.Printf("[SERVER] Listening on %s (mode: %s)", addr, cfg.GinMode)
+
 	if err := router.Run(addr); err != nil {
 		log.Fatalf("[FATAL] Server: %v", err)
 	}
