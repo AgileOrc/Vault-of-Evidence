@@ -101,7 +101,7 @@ function Sidebar ({
           </div>
 
           {!isCollapsed && (
-            <div className={`relative flex h-4.5 w-7 xl:h-6.5 xl:w-10 items-center rounded-full border-2 border-[#DCF3F8] ${
+            <div className={`relative flex h-4.5 w-7 md:h-5 md:w-7 xl:h-7 xl:w-10 items-center rounded-full border-2 border-[#DCF3F8] ${
               isDark ? 'bg-transparent' : 'bg-[#1767AA]'
             }`}>
               <span className={`absolute h-3.5 w-3.5 xl:h-5 xl:w-5 rounded-full bg-[#DCF3F8] transition-all ${
