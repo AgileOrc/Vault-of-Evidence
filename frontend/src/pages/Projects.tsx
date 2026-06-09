@@ -222,7 +222,15 @@ function Projects () {
                 isOpen={showNewProject}
                 isDark={isDark}
                 onClose={() => setShowNewProject(false)}
-                onSubmit={(data) => console.log('new project', data)}
+                onSubmit={async (data) => {
+                    try {
+                        await api.post('/projects', data)
+                        const res = await api.get('/projects')
+                        setProjects(res.data.data || [])
+                    } catch (err) {
+                        console.error('Failed to create project', err)
+                    }
+                }}
             />
             
         </div>
