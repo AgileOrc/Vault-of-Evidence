@@ -5,6 +5,7 @@ import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
 import { getPageTheme } from '../utils/theme'
+import { EditWorklistModal, DeleteWorklistModal, AddFindingModal } from '../components/PopUp'
 
 type ProjectData = {
     id: string
@@ -37,6 +38,11 @@ function Findings () {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [severityFilter, setSeverityFilter] = useState('all')
+
+    const [showEditWorklist, setShowEditWorklist] = useState(false)
+    const [showAddFinding, setShowAddFinding] = useState(false)
+    const [showDeleteWorklist, setShowDeleteWorklist] = useState(false)
+
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklist, setWorklist] = useState<WorklistData | null>(null)
     const [findings, setFindings] = useState<FindingData[]>([])
@@ -159,10 +165,14 @@ function Findings () {
 
                     {/* Right: Edit + Delete always 1 row */}
                     <div className='flex gap-2 md:gap-3 shrink-0'>
-                        <button className={`${btnBase} border-transparent ${theme.buttonPrimary}`}>
+                        <button 
+                            onClick={() => setShowEditWorklist(true)}
+                            className={`${btnBase} border-transparent ${theme.buttonPrimary}`}>
                             <Pencil className={iconSize} /> Edit Worklist
                         </button>
-                        <button className={`${btnBase} ${theme.buttonDanger}`}>
+                        <button 
+                            onClick={() => setShowDeleteWorklist(true)}
+                            className={`${btnBase} ${theme.buttonDanger}`}>
                             <Trash2 className={iconSize} /> Delete Worklist
                         </button>
                     </div>
@@ -224,7 +234,9 @@ function Findings () {
                                 />
                             </div>
                         </div>
-                        <button className={`${btnBase} shrink-0 border-transparent w-fit ${theme.buttonPrimary}`}>
+                        <button 
+                            onClick={() => setShowAddFinding(true)}
+                            className={`${btnBase} shrink-0 border-transparent w-fit ${theme.buttonPrimary}`}>
                             <FilePlusCorner className={iconSize} /> Add Finding
                         </button>
                     </div>
@@ -277,6 +289,30 @@ function Findings () {
                     </div>
                 )}
             </div>
+            
+            <EditWorklistModal
+                isOpen={showEditWorklist}
+                isDark={isDark}
+                onClose={() => setShowEditWorklist(false)}
+                worklist={worklist}
+                onSubmit={(data) => console.log('edit worklist', data)}
+            />
+
+            <DeleteWorklistModal
+                isOpen={showDeleteWorklist}
+                isDark={isDark}
+                onClose={() => setShowDeleteWorklist(false)}
+                worklistName={worklist?.name ?? ''}
+                onConfirm={() => console.log('delete worklist')}
+            />
+
+            <AddFindingModal
+                isOpen={showAddFinding}
+                isDark={isDark}
+                onClose={() => setShowAddFinding(false)}
+                members={[]}
+                onSubmit={(data) => console.log('add finding', data)}
+            />
 
         </div>
     )

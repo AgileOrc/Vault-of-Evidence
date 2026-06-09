@@ -12,6 +12,7 @@ import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
 import { getPageTheme } from '../utils/theme'
+import { NewProjectModal } from '../components/PopUp'
 
 
 type ProjectData = {
@@ -31,6 +32,8 @@ function Projects () {
 
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
+
+    const [showNewProject, setShowNewProject] = useState(false)
 
     const [projects, setProjects] = useState<ProjectData[]>([])
 
@@ -123,11 +126,11 @@ function Projects () {
                     <p className={`text-sm md:text-base xl:text-lg font-montserrat ${theme.text}`}>All penetration testing engagements.</p>
                 </div>
                 
-                <Link
-                    to={`/projects/new`} 
+                <button
+                    onClick={() => setShowNewProject(true)}
                     className={`flex items-center gap-1 xl:gap-2 rounded-md md:rounded-lg px-3 xl:px-4 py-1.5 xl:py-2 text-sm md:text-md xl:text-lg font-semibold font-montserrat ${theme.buttonPrimary}`}>
                     <Plus className='h-4 w-4' /> New Project
-                </Link>
+                </button>
             </header>
 
             {/* Search & Status Filter */}
@@ -214,6 +217,14 @@ function Projects () {
                     </div>
                 )}
             </div>
+            
+            <NewProjectModal
+                isOpen={showNewProject}
+                isDark={isDark}
+                onClose={() => setShowNewProject(false)}
+                onSubmit={(data) => console.log('new project', data)}
+            />
+            
         </div>
     )
 }
