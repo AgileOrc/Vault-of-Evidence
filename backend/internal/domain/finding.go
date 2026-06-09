@@ -42,6 +42,7 @@ type Finding struct {
 	UpdatedAt         time.Time     `json:"updated_at"`
 }
 type CreateFindingRequest struct {
+	WorklistID        *uuid.UUID `json:"worklist_id,omitempty"`
 	Title             string   `json:"title"              binding:"required,min=3,max=255"`
 	Description       string   `json:"description"        binding:"required,min=10"`
 	Severity          Severity `json:"severity"           binding:"required,oneof=critical high medium low informational"`

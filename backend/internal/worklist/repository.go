@@ -29,7 +29,7 @@ func (r *repository) Create(w *domain.Worklist) error {
 
 func (r *repository) FindByProjectID(projectID string) ([]domain.Worklist, error) {
 	var worklists []domain.Worklist
-	if err := r.db.Where("project_id = ?", projectID).Order("created_at DESC").Find(&worklists).Error; err != nil {
+	if err := r.db.Preload("Findings").Where("project_id = ?", projectID).Order("created_at DESC").Find(&worklists).Error; err != nil {
 		return nil, err
 	}
 	return worklists, nil

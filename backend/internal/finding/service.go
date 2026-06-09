@@ -14,6 +14,7 @@ var ErrNotFound = errors.New("finding not found")
 type Service interface {
 	Create(projectID string, req *domain.CreateFindingRequest) (*domain.Finding, error)
 	GetByProject(projectID string, params pagination.Params) ([]domain.Finding, int64, error)
+	GetByWorklist(worklistID string, params pagination.Params) ([]domain.Finding, int64, error)
 	GetByID(id string) (*domain.Finding, error)
 	
 	
@@ -33,6 +34,7 @@ func (s *service) Create(projectID string, req *domain.CreateFindingRequest) (*d
 	}
 	f := &domain.Finding{
 		ProjectID:         pid,
+		WorklistID:        req.WorklistID,
 		Title:             req.Title,
 		Description:       req.Description,
 		Severity:          req.Severity,
@@ -50,6 +52,10 @@ func (s *service) Create(projectID string, req *domain.CreateFindingRequest) (*d
 
 func (s *service) GetByProject(projectID string, params pagination.Params) ([]domain.Finding, int64, error) {
 	return s.repo.FindByProjectID(projectID, params)
+}
+
+func (s *service) GetByWorklist(worklistID string, params pagination.Params) ([]domain.Finding, int64, error) {
+	return s.repo.FindByWorklistID(worklistID, params)
 }
 
 func (s *service) GetByID(id string) (*domain.Finding, error) {
