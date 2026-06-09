@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { User, Calendar, X, Pencil, Trash2, Plus, Upload, Loader2 } from 'lucide-react'
+import { User, Calendar, X, Pencil, Trash2, Plus, Upload, Loader2, FileDown } from 'lucide-react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
 import { getPageTheme } from '../utils/theme'
+import jsPDF from 'jspdf'
 
 type ProjectData  = { id: string; name: string }
 type WorklistData = { id: string; name: string; status: string }
@@ -114,6 +115,7 @@ function FindingDetail () {
     const [pocError,          setPocError]          = useState<string | null>(null)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [deletingFinding,   setDeletingFinding]   = useState(false)
+    const [generatingPdf,     setGeneratingPdf]     = useState(false)
 
     // ref untuk hidden file input screenshot
     const screenshotInputRef  = useRef<HTMLInputElement>(null)
@@ -407,6 +409,216 @@ function FindingDetail () {
         } catch (error) {
             console.error('Failed to update finding', error)
             alert('Failed to update finding details.')
+        }
+    }
+
+    // ── PDF generation ───────────────────────────────────────────────────────
+    const blobUrlToBase64 = (blobUrl: string): Promise<string> =>
+        fetch(blobUrl)
+            .then(r => r.blob())
+            .then(blob => new Promise<string>((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onloadend = () => resolve(reader.result as string)
+                reader.onerror   = reject
+                reader.readAsDataURL(blob)
+            }))
+
+    const handleDownloadPDF = async () => {
+        if (!finding) return
+        setGeneratingPdf(true)
+        try {
+            const f   = finding
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+            const pageW   = doc.internal.pageSize.getWidth()
+            const pageH   = doc.internal.pageSize.getHeight()
+            const margin  = 18
+            const col     = pageW - margin * 2
+            let y = margin
+
+            // ── helpers ──────────────────────────────────────────────────────
+            const checkPage = (needed = 10) => {
+                if (y + needed > pageH - margin) { doc.addPage(); y = margin }
+            }
+
+            const addHeading = (text: string, size = 11) => {
+                checkPage(10)
+                doc.setFontSize(size)
+                doc.setFont('helvetica', 'bold')
+                doc.setTextColor(0, 44, 73)
+                doc.text(text, margin, y)
+                y += size * 0.45 + 3
+            }
+
+            const addBody = (text: string, size = 9) => {
+                doc.setFontSize(size)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor(60, 60, 60)
+                const lines = doc.splitTextToSize(text || '—', col)
+                lines.forEach((line: string) => {
+                    checkPage(size * 0.45 + 2)
+                    doc.text(line, margin, y)
+                    y += size * 0.45 + 1.5
+                })
+                y += 2
+            }
+
+            const addKV = (key: string, value: string) => {
+                checkPage(8)
+                doc.setFontSize(9)
+                doc.setFont('helvetica', 'bold')
+                doc.setTextColor(80, 80, 80)
+                doc.text(`${key}:`, margin, y)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor(30, 30, 30)
+                const lines = doc.splitTextToSize(value || '—', col - 35)
+                doc.text(lines[0], margin + 35, y)
+                y += 5.5
+                if (lines.length > 1) {
+                    lines.slice(1).forEach((l: string) => {
+                        checkPage(5)
+                        doc.text(l, margin + 35, y)
+                        y += 5
+                    })
+                }
+            }
+
+            const addDivider = () => {
+                checkPage(6)
+                doc.setDrawColor(200, 200, 200)
+                doc.line(margin, y, pageW - margin, y)
+                y += 5
+            }
+
+            const addSectionTitle = (title: string) => {
+                checkPage(14)
+                y += 3
+                doc.setFillColor(0, 44, 73)
+                doc.roundedRect(margin, y - 4, col, 8, 1, 1, 'F')
+                doc.setFontSize(10)
+                doc.setFont('helvetica', 'bold')
+                doc.setTextColor(255, 255, 255)
+                doc.text(title, margin + 3, y + 0.5)
+                doc.setTextColor(0, 0, 0)
+                y += 9
+            }
+
+            // ── Cover / Header ────────────────────────────────────────────────
+            doc.setFillColor(0, 44, 73)
+            doc.rect(0, 0, pageW, 28, 'F')
+            doc.setFontSize(16)
+            doc.setFont('helvetica', 'bold')
+            doc.setTextColor(255, 255, 255)
+            doc.text('Finding Report', margin, 14)
+            doc.setFontSize(9)
+            doc.setFont('helvetica', 'normal')
+            doc.text(`${project?.name ?? ''} › ${worklist?.name ?? ''}`, margin, 21)
+            doc.text(`Generated: ${new Date().toLocaleDateString('id-ID', { dateStyle: 'long' })}`, pageW - margin, 21, { align: 'right' })
+            y = 36
+
+            // ── Finding Identity ──────────────────────────────────────────────
+            addHeading(f.name, 14)
+            y += 1
+            addKV('Code',       f.code)
+            addKV('Status',     f.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))
+            addKV('Severity',   f.severity.charAt(0).toUpperCase() + f.severity.slice(1))
+            addKV('Date',       f.confirmDate)
+            addKV('Contributor',f.member)
+            addDivider()
+
+            // ── CVSS ──────────────────────────────────────────────────────────
+            addSectionTitle('CVSS Score')
+            addKV('Score',  f.cvssScore !== null ? String(f.cvssScore) : '—')
+            addKV('Vector', f.cvssVector || '—')
+
+            // ── Impacted System ───────────────────────────────────────────────
+            addSectionTitle('Impacted System')
+            addBody(f.impactedSystem)
+
+            // ── WSTG Code ────────────────────────────────────────────────────
+            addSectionTitle('WSTG Code')
+            addBody(f.wstgCode)
+
+            // ── Executive Summary ─────────────────────────────────────────────
+            addSectionTitle('Executive Summary')
+            addBody(f.executiveSummary)
+
+            // ── Steps to Reproduce ────────────────────────────────────────────
+            addSectionTitle('Steps to Reproduce')
+            addBody(f.stepsToReproduce)
+
+            // ── Remediation Strategy ──────────────────────────────────────────
+            addSectionTitle('Remediation Strategy')
+            addBody(f.remediationStrategy)
+
+            // ── Notes (only if closed_on_notes) ──────────────────────────────
+            if (f.status === 'closed_on_notes') {
+                addSectionTitle('Notes')
+                addBody(f.notes)
+            }
+
+            // ── Proof of Concept – Screenshots ───────────────────────────────
+            const screenshots = pocs.filter(p => p.type === 'screenshot')
+            if (screenshots.length > 0) {
+                addSectionTitle('Proof of Concept – Screenshots')
+                for (const poc of screenshots) {
+                    try {
+                        const b64 = await blobUrlToBase64(poc.content)
+                        // tentukan dimensi agar pas di halaman
+                        const imgW = col
+                        const imgH = 70
+                        checkPage(imgH + 10)
+                        addBody(poc.caption)
+                        y += 1
+                        doc.addImage(b64, 'JPEG', margin, y, imgW, imgH, undefined, 'FAST')
+                        y += imgH + 5
+                    } catch { /* skip gambar yang gagal */ }
+                }
+            }
+
+            // ── Proof of Concept – Requests ───────────────────────────────────
+            const requests = pocs.filter(p => p.type === 'request')
+            if (requests.length > 0) {
+                addSectionTitle('Proof of Concept – Requests & Responses')
+                for (const poc of requests) {
+                    checkPage(10)
+                    doc.setFontSize(9)
+                    doc.setFont('helvetica', 'bold')
+                    doc.setTextColor(0, 44, 73)
+                    doc.text(poc.caption, margin, y)
+                    y += 5
+                    doc.setFont('courier', 'normal')
+                    doc.setFontSize(8)
+                    doc.setTextColor(40, 40, 40)
+                    const lines = doc.splitTextToSize(poc.content || '(empty)', col)
+                    lines.forEach((line: string) => {
+                        checkPage(4.5)
+                        doc.text(line, margin, y)
+                        y += 4.5
+                    })
+                    y += 4
+                }
+            }
+
+            // ── Footer pada setiap halaman ────────────────────────────────────
+            const totalPages = (doc.internal as any).getNumberOfPages()
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i)
+                doc.setFontSize(7.5)
+                doc.setFont('helvetica', 'normal')
+                doc.setTextColor(150, 150, 150)
+                doc.text(
+                    `${project?.name ?? ''} – ${f.name} | Page ${i} of ${totalPages}`,
+                    pageW / 2, pageH - 8, { align: 'center' }
+                )
+            }
+
+            const safeName = f.name.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 60)
+            doc.save(`${safeName}_finding_report.pdf`)
+        } catch (err) {
+            console.error('PDF generation failed', err)
+            alert('Gagal membuat PDF.')
+        } finally {
+            setGeneratingPdf(false)
         }
     }
 
@@ -748,6 +960,24 @@ function FindingDetail () {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* ── Download PDF (floating bottom-right) ─────────────────────────── */}
+            <div className='flex justify-end pt-2 pb-4'>
+                <button
+                    onClick={handleDownloadPDF}
+                    disabled={generatingPdf}
+                    className={`flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm font-montserrat shadow-lg transition hover:scale-[1.03] disabled:opacity-60 disabled:cursor-not-allowed ${
+                        isDark
+                            ? 'bg-[#27D6FF] text-[#002C49] hover:bg-[#1ab8e0]'
+                            : 'bg-[#1767AA] text-white hover:bg-[#0f4f88]'
+                    }`}
+                >
+                    {generatingPdf
+                        ? <><Loader2 size={16} className='animate-spin' /> Generating PDF…</>
+                        : <><FileDown size={16} /> Download PDF</>
+                    }
+                </button>
             </div>
 
             {/* ── Delete Finding Confirm ────────────────────────────────────────── */}
