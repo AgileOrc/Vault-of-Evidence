@@ -111,20 +111,32 @@ function Sidebar ({
           )}
         </button>
 
+        {/* ================= MODIFIKASI BAGIAN USER DI SINI ================= */}
         <NavLink
           to='/profile'
-          className={`flex items-center px-1 py-2 xl:px-1.5 gap-2 rounded-lg hover:bg-[#20A6DA] transition ${
-              isCollapsed ? 'justify-center' : ''
-          }`}
-      >
-          <div className='flex items-center justify-center p-1 xl:p-1.5 rounded-full bg-[#20A6DA]'>
-              <User className='h-3.5 w-3.5 xl:h-6 xl:w-6' />
-          </div>
-          {!isCollapsed && (
-              <div>
-                  <p className='text-xs xl:text-[1.15rem] font-semibold'>{user.name}</p>
-                  <p className='text-[0.5rem] xl:text-xs opacity-80'>{user.email}</p>
+          className={({ isActive }) => 
+            `flex items-center px-2 py-2.5 xl:px-3 xl:py-3 gap-2 rounded-md xl:rounded-lg transition ${
+              isCollapsed ? 'justify-center' : 'w-full'
+            } ${isActive ? navItemActive : 'text-white hover:bg-[#F5F5F5]/30'}`
+          }
+        >
+          {({ isActive }) => (
+            <>
+              {/* Warna lingkaran icon ikut berubah: Biru terang jika idle, Biru gelap bawaan jika aktif */}
+              <div className={`flex items-center justify-center p-1 xl:p-1.5 rounded-full transition-colors ${
+                isActive ? 'bg-[#1767AA] text-white' : 'bg-[#20A6DA] text-white'
+              }`}>
+                <User className='h-3.5 w-3.5 xl:h-5 xl:w-5' />
               </div>
+              {!isCollapsed && (
+                <div className='overflow-hidden truncate'>
+                  <p className='text-xs xl:text-[1.1rem] font-semibold truncate'>{user.name}</p>
+                  <p className={`text-[0.5rem] xl:text-xs truncate ${isActive ? 'text-[#1767AA]/80' : 'opacity-80'}`}>
+                    {user.email}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </NavLink>
       </div>
