@@ -13,5 +13,5 @@ export const getPageTheme = (isDark: boolean) => isDark
         textMuted:     'text-[#0E65AD]',
         buttonPrimary: 'bg-[#1767AA] text-white hover:bg-[#41B0EC] hover:text-white',
         buttonDanger:  'text-[#EC2828] hover:text-white hover:bg-[#EC2828]',
-        buttonOutline: 'text-[#1767AA] border border-[#1767AA] hover:text-white hover:bg-[#41B0EC]',
+        buttonOutline: 'text-[#1767AA] border border-[#1767AA] hover:text-white hover:bg-[#1767AA]',
     }

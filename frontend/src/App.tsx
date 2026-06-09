@@ -12,6 +12,7 @@ import CreateNewPassword from './pages/CreateNewPassword'
 import NewProject from './pages/NewProject'
 import Worklist from './pages/Worklist'
 import Findings from './pages/Findings'
+import FindingDetail from './pages/FindingDetail'
 import Profile from './pages/UserProfile'
 import CVSSCalculator from './pages/CVSSCalculator'
 
@@ -47,6 +48,7 @@ function App () {
         <Route path="/Projects/New" element={<NewProject />} />
         <Route path="/projects/:projectId/worklists" element={<Worklist />} />
         <Route path='/projects/:projectId/worklists/:worklistId/findings' element={<Findings />} />
+        <Route path='/projects/:projectId/worklists/:worklistId/findings/:findingId' element={<FindingDetail />} />
         <Route path='/cvss' element={<CVSSCalculator />} />
         <Route path='/Profile' element={<Profile />} /> 
       </Route>
