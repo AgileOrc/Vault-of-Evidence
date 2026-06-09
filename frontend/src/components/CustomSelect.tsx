@@ -3,11 +3,12 @@ import { ChevronDown } from 'lucide-react'
 
 export type SelectOption = { value: string; label: string }
 
-function CustomSelect({ value, onChange, options, isDark }: {
+function CustomSelect({ value, onChange, options, isDark, className }: {
     value: string
     onChange: (val: string) => void
     options: SelectOption[]
     isDark: boolean
+    className?: string
 }) {
     const [isOpen, setIsOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
@@ -25,7 +26,7 @@ function CustomSelect({ value, onChange, options, isDark }: {
     const selectedLabel = options.find(o => o.value === value)?.label ?? options[0].label
 
     return (
-        <div ref={ref} className='relative shrink-0 w-full md:w-36 lg:w-48'>
+        <div ref={ref} className={`relative shrink-0 ${className ?? 'w-full'}`}>
             {/* Trigger Button */}
             <button
                 type='button'

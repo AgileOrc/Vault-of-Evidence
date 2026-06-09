@@ -158,6 +158,7 @@ function Projects () {
                         { value: 'completed', label: 'Completed' },
                     ]}
                     isDark={isDark}
+                    className='xl:w-42'
                 />
             </div>
 
