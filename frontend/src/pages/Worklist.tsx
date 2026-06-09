@@ -74,26 +74,10 @@ function Worklist () {
             setWorklists(mappedWorklists)
             setLoading(false)
         })
-        .catch(() => {
-                setProject({
-                    id: projectId || '1',
-                    name: 'mycompany.com (Dummy)',
-                    description: 'Web application penetration testing for mycompany.com e-commerce platform. Covers authentication, authorization, session management, and business logic testing.',
-                    type: 'Web Application',
-                    members: 5,
-                    worklists: 5,
-                    findings: 10,
-                    status: 'active'
-                })
-                setWorklists([
-                    { id: '1', name: 'Login Page',      code: 'WSTG-ATHN, WSTG-SESS', findings: 3, status: 'in progress' },
-                    { id: '2', name: 'User Profile',    code: 'WSTG-ATHZ',             findings: 1, status: 'in progress' },
-                    { id: '3', name: 'Search Feature',  code: 'WSTG-INPV',             findings: 2, status: 'in progress' },
-                    { id: '4', name: 'Register Page',   code: 'WSTG-IDNT',             findings: 4, status: 'completed'   },
-                    { id: '5', name: 'Forgot Password', code: 'WSTG-ATHN',             findings: 0, status: 'not started' },
-                ])
-                setLoading(false)
-            })
+        .catch((err) => {
+            console.error('Failed to load worklists:', err)
+            setLoading(false)
+        })
     }, [projectId])
 
     const filteredWorklists = worklists.filter((worklist) => {
