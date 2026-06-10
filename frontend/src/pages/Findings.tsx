@@ -338,7 +338,7 @@ function Findings () {
                             wstg_code: data.wstgCode,
                             contributor: data.contributorName,
                             impact: data.impactedSystem,
-                            description: data.executiveSummary || '-',
+                            description: data.executiveSummary || 'No description provided.',
                             reproduction_steps: data.str + (data.pocText ? `\n\nProof of Concept:\n${data.pocText}` : ''),
                             remediation: data.remediation
                         })
@@ -348,7 +348,7 @@ function Findings () {
                             for (const file of data.pocFiles) {
                                 const formData = new FormData()
                                 formData.append('file', file)
-                                await api.post(`/projects/${projectId}/findings/${newFindingId}/evidence`, formData, {
+                                await api.post(`/projects/${projectId}/worklists/${worklistId}/findings/${newFindingId}/evidence`, formData, {
                                     headers: { 'Content-Type': 'multipart/form-data' }
                                 })
                             }

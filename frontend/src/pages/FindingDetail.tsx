@@ -890,16 +890,6 @@ function FindingDetail () {
                 <div>
                     <div className='flex items-center justify-between mb-3'>
                         <p className={`text-sm lg:text-md font-medium ${theme.textMuted}`}>Screenshots</p>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        {isEditing && !isDev && (
-                            <label className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border cursor-pointer ${theme.buttonOutline}`}>
-                                <Plus size={12} /> Upload
-                                <input type="file" multiple className="hidden" onChange={handleEvidenceUpload} />
-                            </label>
-=======
-=======
->>>>>>> 028d8bb (feat: implement evidence upload and delete logic for findings)
                         {canEditPoc && (
                             <button
                                 disabled={uploadingPoc}
@@ -911,17 +901,6 @@ function FindingDetail () {
                             >
                                 {uploadingPoc ? <Loader2 size={12} className='animate-spin' /> : <Plus size={12} />} Add
                             </button>
-<<<<<<< HEAD
->>>>>>> 629f6ae (feat: fix project status alignment, PoC file upload, delete flows, date format, CVSS input, and add closed-on-notes inline textarea)
-=======
-=======
-                        {isEditing && !isDev && (
-                            <label className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border cursor-pointer ${theme.buttonOutline}`}>
-                                <Plus size={12} /> Upload
-                                <input type="file" multiple className="hidden" onChange={handleEvidenceUpload} />
-                            </label>
->>>>>>> 651ab8f (feat: implement evidence upload and delete logic for findings)
->>>>>>> 028d8bb (feat: implement evidence upload and delete logic for findings)
                         )}
                     </div>
                     <div className='flex flex-wrap gap-3'>
@@ -947,16 +926,6 @@ function FindingDetail () {
                 <div>
                     <div className='flex items-center justify-between mb-3'>
                         <p className={`text-sm lg:text-md font-medium ${theme.textMuted}`}>Requests &amp; Responses</p>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        {isEditing && !isDev && (
-                            <label className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border cursor-pointer ${theme.buttonOutline}`}>
-                                <Plus size={12} /> Upload
-                                <input type="file" multiple className="hidden" onChange={handleEvidenceUpload} />
-                            </label>
-=======
-=======
->>>>>>> 028d8bb (feat: implement evidence upload and delete logic for findings)
                         {canEditPoc && (
                             <button
                                 onClick={() => {
@@ -969,17 +938,6 @@ function FindingDetail () {
                             >
                                 <Plus size={12} /> Add
                             </button>
-<<<<<<< HEAD
->>>>>>> 629f6ae (feat: fix project status alignment, PoC file upload, delete flows, date format, CVSS input, and add closed-on-notes inline textarea)
-=======
-=======
-                        {isEditing && !isDev && (
-                            <label className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md border cursor-pointer ${theme.buttonOutline}`}>
-                                <Plus size={12} /> Upload
-                                <input type="file" multiple className="hidden" onChange={handleEvidenceUpload} />
-                            </label>
->>>>>>> 651ab8f (feat: implement evidence upload and delete logic for findings)
->>>>>>> 028d8bb (feat: implement evidence upload and delete logic for findings)
                         )}
                     </div>
                     <div className='flex flex-col gap-3'>
@@ -1283,17 +1241,6 @@ function FindingDetail () {
                                 )}
 
                                 {canEditPoc && (
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                    <button
-                                        onClick={() => handleEvidenceDelete(poc.id)}
-                                        className={`${btnBase} ${theme.buttonDanger} mt-2`}
-                                    >
-                                        <Trash2 className={iconSize} /> Remove
-                                    </button>
-=======
-=======
->>>>>>> 028d8bb (feat: implement evidence upload and delete logic for findings)
                                     <div className='flex gap-2 flex-wrap'>
                                         {/* Simpan ke server */}
                                         <button
@@ -1319,18 +1266,6 @@ function FindingDetail () {
                                             <Trash2 size={14} /> Hapus
                                         </button>
                                     </div>
-<<<<<<< HEAD
->>>>>>> 629f6ae (feat: fix project status alignment, PoC file upload, delete flows, date format, CVSS input, and add closed-on-notes inline textarea)
-=======
-=======
-                                    <button
-                                        onClick={() => handleEvidenceDelete(poc.id)}
-                                        className={`${btnBase} ${theme.buttonDanger} mt-2`}
-                                    >
-                                        <Trash2 className={iconSize} /> Remove
-                                    </button>
->>>>>>> 651ab8f (feat: implement evidence upload and delete logic for findings)
->>>>>>> 028d8bb (feat: implement evidence upload and delete logic for findings)
                                 )}
                             </div>
                         )

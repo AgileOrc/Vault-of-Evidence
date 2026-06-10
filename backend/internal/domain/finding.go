@@ -42,14 +42,14 @@ type Finding struct {
 	ReproductionSteps string        `gorm:"type:text"                                      json:"reproduction_steps"`
 	Impact            string        `gorm:"type:text"                                      json:"impact"`
 	Remediation       string        `gorm:"type:text"                                      json:"remediation"`
-	Evidence          []Evidence    `gorm:"foreignKey:FindingID"                           json:"evidence,omitempty"`
+	Evidence          []Evidence    `gorm:"foreignKey:FindingID;constraint:OnDelete:CASCADE;" json:"evidence,omitempty"`
 	CreatedAt         time.Time     `json:"created_at"`
 	UpdatedAt         time.Time     `json:"updated_at"`
 }
 type CreateFindingRequest struct {
 	WorklistID        *uuid.UUID `json:"worklist_id,omitempty"`
 	Title             string     `json:"title"              binding:"required,min=3,max=255"`
-	Description       string     `json:"description"        binding:"required,min=10"`
+	Description       string     `json:"description"        binding:"required"`
 	Severity          Severity   `json:"severity"           binding:"required,oneof=critical high medium low informational"`
 	CVSSScore         float64    `json:"cvss_score"         binding:"min=0,max=10"`
 	CVSSVector        string     `json:"cvss_vector"        binding:"omitempty,max=100"`
@@ -63,7 +63,7 @@ type CreateFindingRequest struct {
 
 type UpdateFindingRequest struct {
 	Title             string        `json:"title"              binding:"omitempty,min=3,max=255"`
-	Description       string        `json:"description"        binding:"omitempty,min=10"`
+	Description       string        `json:"description"        binding:"omitempty"`
 	Severity          Severity      `json:"severity"           binding:"omitempty,oneof=critical high medium low informational"`
 	Status            FindingStatus `json:"status"             binding:"omitempty,oneof=open confirmed fixing fixed closed"`
 	Notes             string        `json:"notes"              binding:"omitempty"`
