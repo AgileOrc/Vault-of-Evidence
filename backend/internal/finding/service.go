@@ -15,12 +15,9 @@ type Service interface {
 	Create(projectID string, req *domain.CreateFindingRequest) (*domain.Finding, error)
 	GetByProject(projectID string, params pagination.Params) ([]domain.Finding, int64, error)
 	GetByWorklist(worklistID string, params pagination.Params) ([]domain.Finding, int64, error)
-	GetByID(id string) (*domain.Finding, error)
-	
-	
-	Update(id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error)
-	
-	Delete(id string) error
+	GetByID(projectID, id string) (*domain.Finding, error)
+	Update(projectID, id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error)
+	Delete(projectID, id string) error
 }
 
 type service struct{ repo Repository }
@@ -39,6 +36,9 @@ func (s *service) Create(projectID string, req *domain.CreateFindingRequest) (*d
 		Description:       req.Description,
 		Severity:          req.Severity,
 		CVSSScore:         req.CVSSScore,
+		CVSSVector:        req.CVSSVector,
+		WSTGCode:          req.WSTGCode,
+		Contributor:       req.Contributor,
 		AffectedEndpoints: req.AffectedEndpoints,
 		ReproductionSteps: req.ReproductionSteps,
 		Impact:            req.Impact,
@@ -58,20 +58,20 @@ func (s *service) GetByWorklist(worklistID string, params pagination.Params) ([]
 	return s.repo.FindByWorklistID(worklistID, params)
 }
 
-func (s *service) GetByID(id string) (*domain.Finding, error) {
+func (s *service) GetByID(projectID, id string) (*domain.Finding, error) {
 	f, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
-	if f == nil {
+	if f == nil || f.ProjectID.String() != projectID {
 		return nil, ErrNotFound
 	}
 	return f, nil
 }
 
-func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error) {
+func (s *service) Update(projectID, id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error) {
 	f, err := s.repo.FindByID(id)
-	if err != nil || f == nil {
+	if err != nil || f == nil || f.ProjectID.String() != projectID {
 		return nil, ErrNotFound
 	}
 
@@ -88,7 +88,6 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 			if f.Status == domain.FindingStatusClosed {
 				f.Notes = req.Notes
 			} else {
-				// Lempar error jika Dev mencoba mengisi notes tanpa menutup bug-nya
 				return nil, errors.New("developer is only allowed to write notes when the status is 'closed'")
 			}
 		}
@@ -99,6 +98,8 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 		if req.Description != "" { f.Description = req.Description }
 		if req.Severity != "" { f.Severity = req.Severity }
 		if req.CVSSScore > 0 { f.CVSSScore = req.CVSSScore }
+		if req.CVSSVector != "" { f.CVSSVector = req.CVSSVector }
+		if req.WSTGCode != "" { f.WSTGCode = req.WSTGCode }
 		if req.AffectedEndpoints != "" { f.AffectedEndpoints = req.AffectedEndpoints }
 		if req.ReproductionSteps != "" { f.ReproductionSteps = req.ReproductionSteps }
 		if req.Impact != "" { f.Impact = req.Impact }
@@ -111,6 +112,8 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 		if req.Description != "" { f.Description = req.Description }
 		if req.Severity != "" { f.Severity = req.Severity }
 		if req.CVSSScore > 0 { f.CVSSScore = req.CVSSScore }
+		if req.CVSSVector != "" { f.CVSSVector = req.CVSSVector }
+		if req.WSTGCode != "" { f.WSTGCode = req.WSTGCode }
 		if req.AffectedEndpoints != "" { f.AffectedEndpoints = req.AffectedEndpoints }
 		if req.ReproductionSteps != "" { f.ReproductionSteps = req.ReproductionSteps }
 		if req.Impact != "" { f.Impact = req.Impact }
@@ -125,9 +128,9 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 	return f, nil
 }
 
-func (s *service) Delete(id string) error {
+func (s *service) Delete(projectID, id string) error {
 	f, err := s.repo.FindByID(id)
-	if err != nil || f == nil {
+	if err != nil || f == nil || f.ProjectID.String() != projectID {
 		return ErrNotFound
 	}
 	return s.repo.Delete(id)

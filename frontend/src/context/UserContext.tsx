@@ -36,7 +36,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       setIsLoggedIn(true)
     } catch {
       // SET FALSE KALAU UDAH DEPLOYING
-      setIsLoggedIn(true)
+      setIsLoggedIn(false)
     } finally {
       setIsLoading(false)
     }

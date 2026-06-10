@@ -28,8 +28,14 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "authentication required"})
+		return
+	}
+
 	params := pagination.ParseFromContext(c)
-	projects, total, err := h.service.GetAll(params)
+	projects, total, err := h.service.GetAll(params, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch projects"})
 		return

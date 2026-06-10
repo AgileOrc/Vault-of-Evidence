@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import {
     X,
     // Trash2,
@@ -175,18 +176,16 @@ type NewProjectModalProps = BaseModalProps & {
 }
 
 export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjectModalProps) {
-    const [form, setForm] = useState({ name: '', type: '', status: 'Active', description: '' })
+    const [form, setForm] = useState({ name: '', type: '', status: 'planning', description: '' })
 
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
     const handleSubmit = () => {
         if (!form.name.trim()) return
         onSubmit(form)
-        setForm({ name: '', type: '', status: 'Active', description: '' })
+        setForm({ name: '', type: '', status: 'planning', description: '' })
         onClose()
     }
-
-    const optClass = isDark ? 'bg-[#0B2E46] text-white' : 'bg-white text-[#002C49]'
 
     return (
         <PopUpBase isOpen={isOpen} isDark={isDark} onClose={onClose} title="New Project">
@@ -195,21 +194,9 @@ export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjec
                 <Input isDark={isDark} placeholder="e.g. mycompany.com" value={form.name} onChange={(e) => set('name', e.target.value)} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <Label isDark={isDark}>Type <span className="text-red-400">*</span></Label>
-                    <Input isDark={isDark} placeholder='e.g. Web Application, API Security...' value={form.type} onChange={(e) => set('type', e.target.value)} />
-                </div>
-
-                <div>
-                    <Label isDark={isDark}>Status</Label>
-                    <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                        <option className={optClass} value="Active">Active</option>
-                        <option className={optClass} value="Paused">Paused</option>
-                        <option className={optClass} value="Upcoming">Upcoming</option>
-                        <option className={optClass} value="Completed">Completed</option>
-                    </Select>
-                </div>
+            <div>
+                <Label isDark={isDark}>Type <span className="text-red-400">*</span></Label>
+                <Input isDark={isDark} placeholder='e.g. Web Application, API Security...' value={form.type} onChange={(e) => set('type', e.target.value)} />
             </div>
 
             <div>
@@ -250,14 +237,19 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
     const [form, setForm] = useState({
         name: project?.name ?? '',
         type: project?.type ?? '',
-        status: project?.status ?? 'Active',
+        status: project?.status ?? 'planning',
         description: project?.description ?? '',
     })
 
     // Sync when project changes
-    useState(() => {
-        if (project) setForm({ name: project.name, type: project.type, status: project.status, description: project.description })
-    })
+    useEffect(() => {
+        if (project) setForm({
+            name: project.name ?? '',
+            type: project.type ?? '',
+            status: project.status ?? 'planning',
+            description: project.description ?? '',
+        })
+    }, [project])
 
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
@@ -285,10 +277,10 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
                 <div>
                     <Label isDark={isDark}>Status</Label>
                     <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                        <option className={optClass} value="Active">Active</option>
-                        <option className={optClass} value="Paused">Paused</option>
-                        <option className={optClass} value="Upcoming">Upcoming</option>
-                        <option className={optClass} value="Completed">Completed</option>
+                        <option className={optClass} value="active">Active</option>
+                        <option className={optClass} value="paused">Paused</option>
+                        <option className={optClass} value="planning">Upcoming</option>
+                        <option className={optClass} value="completed">Completed</option>
                     </Select>
                 </div>
             </div>
@@ -400,13 +392,14 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMemb
 {/* DELETE PROJECT MODAL */}
 type DeleteProjectModalProps = BaseModalProps & {
     projectName: string
-    onConfirm: () => void
+    onConfirm: () => Promise<void>
 }
 
 export function DeleteProjectModal({ isOpen, isDark, onClose, projectName, onConfirm }: DeleteProjectModalProps) {
-    const handleConfirm = () => {
-        onConfirm()
-        onClose()
+    const [loading, setLoading] = useState(false)
+    const handleConfirm = async () => {
+        setLoading(true)
+        try { await onConfirm() } finally { setLoading(false) }
     }
 
     return (
@@ -428,8 +421,8 @@ export function DeleteProjectModal({ isOpen, isDark, onClose, projectName, onCon
                 isDark={isDark}
                 onClose={onClose}
                 onConfirm={handleConfirm}
-                confirmLabel="Delete Project"
-                confirmClass="bg-red-500 text-white hover:bg-red-600"
+                confirmLabel={loading ? 'Deleting...' : 'Delete Project'}
+                confirmClass={`bg-red-500 text-white hover:bg-red-600 ${loading ? 'opacity-60 pointer-events-none' : ''}`}
             />
         </PopUpBase>
     )
@@ -444,13 +437,13 @@ type AddWorklistModalProps = BaseModalProps & {
 }
 
 export function AddWorklistModal({ isOpen, isDark, onClose, onSubmit }: AddWorklistModalProps) {
-    const [form, setForm] = useState({ name: '', code: '', status: 'Not Started' })
+    const [form, setForm] = useState({ name: '', code: '', status: 'not started' })
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
     const handleSubmit = () => {
         if (!form.name.trim()) return
         onSubmit(form)
-        setForm({ name: '', code: '', status: 'Not Started' })
+        setForm({ name: '', code: '', status: 'not started' })
         onClose()
     }
 
@@ -472,9 +465,9 @@ export function AddWorklistModal({ isOpen, isDark, onClose, onSubmit }: AddWorkl
             <div>
                 <Label isDark={isDark}>Status</Label>
                 <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                    <option className={optClass} value="Not Started">Not Started</option>
-                    <option className={optClass} value="In Progress">In Progress</option>
-                    <option className={optClass} value="Completed">Completed</option>
+                    <option className={optClass} value="not started">Not Started</option>
+                    <option className={optClass} value="in progress">In Progress</option>
+                    <option className={optClass} value="completed">Completed</option>
                 </Select>
             </div>
 
@@ -534,16 +527,17 @@ export function EditWorklistModal({ isOpen, isDark, onClose, worklist, onSubmit 
 }
 
 
-{/* DELETE WORKLIST MODAL */} 
+{/* DELETE WORKLIST MODAL */}
 type DeleteWorklistModalProps = BaseModalProps & {
     worklistName: string
-    onConfirm: () => void
+    onConfirm: () => Promise<void>
 }
 
 export function DeleteWorklistModal({ isOpen, isDark, onClose, worklistName, onConfirm }: DeleteWorklistModalProps) {
-    const handleConfirm = () => {
-        onConfirm()
-        onClose()
+    const [loading, setLoading] = useState(false)
+    const handleConfirm = async () => {
+        setLoading(true)
+        try { await onConfirm() } finally { setLoading(false) }
     }
 
     return (
@@ -564,8 +558,8 @@ export function DeleteWorklistModal({ isOpen, isDark, onClose, worklistName, onC
                 isDark={isDark}
                 onClose={onClose}
                 onConfirm={handleConfirm}
-                confirmLabel="Delete Worklist"
-                confirmClass="bg-red-500 text-white hover:bg-red-600"
+                confirmLabel={loading ? 'Deleting...' : 'Delete Worklist'}
+                confirmClass={`bg-red-500 text-white hover:bg-red-600 ${loading ? 'opacity-60 pointer-events-none' : ''}`}
             />
         </PopUpBase>
     )
@@ -593,8 +587,14 @@ function calcCVSS(m: CvssMetrics): number {
     const get = (key: keyof CvssMetrics) =>
         CVSS_OPTIONS[key].options.find((o) => o.val === m[key])?.score ?? 0
 
-    const AV = get('AV'), AC = get('AC'), PR = get('PR'), UI = get('UI')
+    const AV = get('AV'), AC = get('AC'), UI = get('UI')
     const S = m.S === 'C', C = get('C'), I = get('I'), A = get('A')
+    
+    let PR = get('PR')
+    if (S) {
+        if (m.PR === 'L') PR = 0.68
+        if (m.PR === 'H') PR = 0.50
+    }
 
     const ISCBase = 1 - (1 - C) * (1 - I) * (1 - A)
     const ISS = S ? 7.52 * (ISCBase - 0.029) - 3.25 * Math.pow(ISCBase - 0.02, 15) : 6.42 * ISCBase
@@ -631,18 +631,45 @@ export function CvssCalculatorModal({ isOpen, isDark, onClose, onApply }: CvssCa
                 : isDark ? 'border-[#2BA7D6]/40 text-[#41B0EC] hover:bg-[#2BA7D6]/20' : 'border-[#1767AA]/30 text-[#1767AA] hover:bg-[#27D6FF]/20'
         }`
 
+    const getVal = (v: string, map: Record<string, number>) => map[v] ?? 0
+    const chartData = [
+        { metric: 'AV', full: 'Attack Vector', value: getVal(m.AV, { P: 0, L: 33, A: 66, N: 100 }) },
+        { metric: 'AC', full: 'Attack Complexity', value: getVal(m.AC, { L: 0, H: 100 }) },
+        { metric: 'PR', full: 'Privileges Required', value: getVal(m.PR, { N: 0, L: 50, H: 100 }) },
+        { metric: 'UI', full: 'User Interaction', value: getVal(m.UI, { N: 0, R: 100 }) },
+        { metric: 'S', full: 'Scope', value: getVal(m.S, { U: 0, C: 100 }) },
+        { metric: 'C', full: 'Confidentiality', value: getVal(m.C, { N: 0, L: 50, H: 100 }) },
+        { metric: 'I', full: 'Integrity', value: getVal(m.I, { N: 0, L: 50, H: 100 }) },
+        { metric: 'A', full: 'Availability', value: getVal(m.A, { N: 0, L: 50, H: 100 }) },
+    ]
+
     return (
         <PopUpBase isOpen={isOpen} isDark={isDark} onClose={onClose} title="CVSS v3.1 Calculator" maxWidth="max-w-2xl">
             {/* Score display */}
-            <div className={`flex items-center justify-between rounded-xl px-5 py-4 ${isDark ? 'bg-[#0B2E46]' : 'bg-[#F0FAFF]'}`}>
-                <div>
+            <div className={`flex flex-col sm:flex-row items-center gap-6 rounded-xl px-5 py-4 ${isDark ? 'bg-[#0B2E46]' : 'bg-[#F0FAFF]'}`}>
+                <div className="flex-1 w-full text-center sm:text-left">
                     <p className="text-xs font-semibold font-montserrat opacity-60 uppercase tracking-wider">Base Score</p>
-                    <p className={`text-4xl font-bold font-montserrat ${color}`}>{score.toFixed(1)}</p>
+                    <p className={`text-5xl font-bold font-montserrat ${color}`}>{score.toFixed(1)}</p>
                     <p className={`text-sm font-semibold font-montserrat ${color}`}>{label}</p>
+                    <div className="mt-4">
+                        <p className="text-xs opacity-60 font-montserrat mb-1">Vector String</p>
+                        <p className={`text-xs font-mono break-all max-w-xs mx-auto sm:mx-0 ${isDark ? 'text-[#41B0EC]' : 'text-[#1767AA]'}`}>{vector}</p>
+                    </div>
                 </div>
-                <div className="text-right">
-                    <p className="text-xs opacity-60 font-montserrat mb-1">Vector String</p>
-                    <p className={`text-xs font-mono break-all max-w-xs ${isDark ? 'text-[#41B0EC]' : 'text-[#1767AA]'}`}>{vector}</p>
+                <div className="w-full sm:w-64 h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                            <PolarGrid stroke={isDark ? '#2BA7D640' : '#1767AA40'} />
+                            <PolarAngleAxis dataKey="metric" tick={{ fill: isDark ? '#41B0EC' : '#1767AA', fontSize: 10, fontWeight: 600, fontFamily: 'Montserrat' }} />
+                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                            <Tooltip 
+                                contentStyle={{ backgroundColor: isDark ? '#002C49' : '#FFFFFF', borderColor: isDark ? '#41B0EC' : '#1767AA', borderRadius: '8px' }}
+                                itemStyle={{ color: isDark ? '#F5F5F5' : '#002C49', fontWeight: 600, fontFamily: 'Montserrat', fontSize: 12 }}
+                                formatter={(val, _name, props) => [`Score: ${val}%`, props.payload.full]}
+                            />
+                            <Radar name="CVSS Metric" dataKey="value" stroke={isDark ? '#41B0EC' : '#1767AA'} fill={isDark ? '#41B0EC' : '#1767AA'} fillOpacity={0.4} />
+                        </RadarChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
 
@@ -682,6 +709,7 @@ type FindingFormData = {
     vulnName: string
     executiveSummary: string
     vulnType: string
+    wstgCode: string
     impactedSystem: string
     cvssScore: number
     cvssVector: string
@@ -699,11 +727,11 @@ type AddFindingModalProps = BaseModalProps & {
 
 export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: AddFindingModalProps) {
     const [form, setForm] = useState<FindingFormData>({
-        vulnName: '', executiveSummary: '', vulnType: '', impactedSystem: '',
+        vulnName: '', executiveSummary: '', vulnType: '', wstgCode: '', impactedSystem: '',
         cvssScore: 0, cvssVector: '', str: '', remediation: '',
         pocText: '', pocFiles: [], contributorName: '',
     })
-    const [showCvss, setShowCvss] = useState(false)
+
     const fileRef = useRef<HTMLInputElement>(null)
 
     const set = (key: keyof FindingFormData, val: unknown) => setForm((p) => ({ ...p, [key]: val }))
@@ -738,6 +766,11 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
                     </div>
 
                     <div>
+                        <Label isDark={isDark}>WSTG Code</Label>
+                        <Input isDark={isDark} placeholder='e.g. WSTG-ATHN-01' value={form.wstgCode} onChange={(e) => set('wstgCode', e.target.value)} />
+                    </div>
+
+                    <div>
                         <Label isDark={isDark}>Impacted System <span className="text-red-400">*</span></Label>
                         <Input isDark={isDark} placeholder="e.g. /api/v1/login" value={form.impactedSystem} onChange={(e) => set('impactedSystem', e.target.value)} />
                     </div>
@@ -748,30 +781,37 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
                     </div>
 
                     {/* CVSS */}
-                    <div className="sm:col-span-2">
-                        <Label isDark={isDark}>CVSS Score</Label>
-                        <div className="flex gap-3 items-center">
-                            <div className={`flex-1 rounded-xl px-4 py-2.5 border text-sm font-montserrat ${
-                                isDark ? 'bg-[#1767AA]/20 border-[#2BA7D6]/50 text-white' : 'bg-[#F5F5F5] border-[#1767AA]/30 text-[#002C49]'
-                            }`}>
-                                {form.cvssScore > 0 ? (
-                                    <span>
-                                        <span className={`font-bold ${cvssColor}`}>{form.cvssScore.toFixed(1)} — {cvssLabel}</span>
-                                        <span className={`ml-2 text-xs font-mono opacity-60`}>{form.cvssVector}</span>
-                                    </span>
-                                ) : (
-                                    <span className="opacity-40">Not calculated</span>
-                                )}
-                            </div>
+                    <div>
+                        <Label isDark={isDark}>CVSS Score <span className="opacity-50 font-normal">(0–10)</span></Label>
+                        <div className="flex gap-2 items-center">
+                            <input
+                                type="number" min={0} max={10} step={0.1}
+                                value={form.cvssScore || ''}
+                                onChange={e => set('cvssScore', parseFloat(e.target.value) || 0)}
+                                placeholder="0.0"
+                                className={`w-24 rounded-xl px-3 py-2.5 border text-sm font-montserrat font-bold focus:outline-none ${
+                                    isDark ? 'bg-[#0B2E46] border-[#2BA7D6]/50 text-white placeholder:text-white/30' : 'bg-white border-[#1767AA]/30 text-[#002C49] placeholder:text-[#002C49]/30'
+                                } ${form.cvssScore > 0 ? cvssColor : ''}`}
+                            />
+                            {form.cvssScore > 0 && (
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cvssColor} ${isDark ? 'bg-white/10' : 'bg-[#002C49]/5'}`}>
+                                    {cvssLabel}
+                                </span>
+                            )}
                             <button
-                                onClick={() => setShowCvss(true)}
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
+                                onClick={() => window.open('/cvss', '_blank')}
+                                className={`ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
                                     isDark ? 'border-[#41B0EC] text-[#41B0EC] hover:bg-[#2BA7D6]/20' : 'border-[#1767AA] text-[#1767AA] hover:bg-[#27D6FF]/20'
                                 }`}
                             >
                                 <Calculator size={16} /> Calculate
                             </button>
                         </div>
+                    </div>
+
+                    <div>
+                        <Label isDark={isDark}>CVSS Vector</Label>
+                        <Input isDark={isDark} placeholder="CVSS:4.0/AV:N/AC:L/..." value={form.cvssVector} onChange={e => set('cvssVector', e.target.value)} />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -828,13 +868,6 @@ export function AddFindingModal({ isOpen, isDark, onClose, members, onSubmit }: 
                 <ModalFooter isDark={isDark} onClose={onClose} onConfirm={handleSubmit} confirmLabel="Add Finding" />
             </PopUpBase>
 
-            {/* CVSS sub-modal */}
-            <CvssCalculatorModal
-                isOpen={showCvss}
-                isDark={isDark}
-                onClose={() => setShowCvss(false)}
-                onApply={(score, vector) => { set('cvssScore', score); set('cvssVector', vector) }}
-            />
         </>
     )
 }
@@ -852,6 +885,7 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
         vulnName: finding?.vulnName ?? '',
         executiveSummary: finding?.executiveSummary ?? '',
         vulnType: finding?.vulnType ?? '',
+        wstgCode: finding?.wstgCode ?? '',
         impactedSystem: finding?.impactedSystem ?? '',
         cvssScore: finding?.cvssScore ?? 0,
         cvssVector: finding?.cvssVector ?? '',
@@ -861,7 +895,7 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
         pocFiles: finding?.pocFiles ?? [],
         contributorName: finding?.contributorName ?? '',
     })
-    const [showCvss, setShowCvss] = useState(false)
+
     const fileRef = useRef<HTMLInputElement>(null)
 
     const set = (key: keyof FindingFormData, val: unknown) => setForm((p) => ({ ...p, [key]: val }))
@@ -912,30 +946,37 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
                         <Textarea isDark={isDark} rows={3} value={form.executiveSummary} onChange={(e) => set('executiveSummary', e.target.value)} />
                     </div>
 
-                    <div className="sm:col-span-2">
-                        <Label isDark={isDark}>CVSS Score</Label>
-                        <div className="flex gap-3 items-center">
-                            <div className={`flex-1 rounded-xl px-4 py-2.5 border text-sm font-montserrat ${
-                                isDark ? 'bg-[#1767AA]/20 border-[#2BA7D6]/50 text-white' : 'bg-[#F5F5F5] border-[#1767AA]/30 text-[#002C49]'
-                            }`}>
-                                {form.cvssScore > 0 ? (
-                                    <span>
-                                        <span className={`font-bold ${cvssColor}`}>{form.cvssScore.toFixed(1)} — {cvssLabel}</span>
-                                        <span className="ml-2 text-xs font-mono opacity-60">{form.cvssVector}</span>
-                                    </span>
-                                ) : (
-                                    <span className="opacity-40">Not calculated</span>
-                                )}
-                            </div>
+                    <div>
+                        <Label isDark={isDark}>CVSS Score <span className="opacity-50 font-normal">(0–10)</span></Label>
+                        <div className="flex gap-2 items-center">
+                            <input
+                                type="number" min={0} max={10} step={0.1}
+                                value={form.cvssScore || ''}
+                                onChange={e => set('cvssScore', parseFloat(e.target.value) || 0)}
+                                placeholder="0.0"
+                                className={`w-24 rounded-xl px-3 py-2.5 border text-sm font-montserrat font-bold focus:outline-none ${
+                                    isDark ? 'bg-[#0B2E46] border-[#2BA7D6]/50 text-white placeholder:text-white/30' : 'bg-white border-[#1767AA]/30 text-[#002C49] placeholder:text-[#002C49]/30'
+                                } ${form.cvssScore > 0 ? cvssColor : ''}`}
+                            />
+                            {form.cvssScore > 0 && (
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${cvssColor} ${isDark ? 'bg-white/10' : 'bg-[#002C49]/5'}`}>
+                                    {cvssLabel}
+                                </span>
+                            )}
                             <button
-                                onClick={() => setShowCvss(true)}
-                                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
+                                onClick={() => window.open('/cvss', '_blank')}
+                                className={`ml-auto flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold font-montserrat border transition ${
                                     isDark ? 'border-[#41B0EC] text-[#41B0EC] hover:bg-[#2BA7D6]/20' : 'border-[#1767AA] text-[#1767AA] hover:bg-[#27D6FF]/20'
                                 }`}
                             >
                                 <Calculator size={16} /> Recalculate
                             </button>
                         </div>
+                    </div>
+
+                    <div>
+                        <Label isDark={isDark}>CVSS Vector</Label>
+                        <Input isDark={isDark} placeholder="CVSS:4.0/AV:N/AC:L/..." value={form.cvssVector} onChange={e => set('cvssVector', e.target.value)} />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -987,12 +1028,6 @@ export function EditFindingModal({ isOpen, isDark, onClose, finding, members, on
                 <ModalFooter isDark={isDark} onClose={onClose} onConfirm={handleSubmit} confirmLabel="Save Changes" />
             </PopUpBase>
 
-            <CvssCalculatorModal
-                isOpen={showCvss}
-                isDark={isDark}
-                onClose={() => setShowCvss(false)}
-                onApply={(score, vector) => { set('cvssScore', score); set('cvssVector', vector) }}
-            />
         </>
     )
 }

@@ -46,6 +46,7 @@ function Findings () {
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklist, setWorklist] = useState<WorklistData | null>(null)
     const [findings, setFindings] = useState<FindingData[]>([])
+    const [members, setMembers] = useState<{ id: string; name: string }[]>([])
     const { projectId, worklistId } = useParams()
 
     useEffect(() => {
@@ -55,18 +56,30 @@ function Findings () {
             api.get(`/projects/${projectId}/worklists/${worklistId}/findings`)
         ])
         .then(([projectRes, worklistRes, findingsRes]) => {
-            setProject(projectRes.data.data)
+            const proj = projectRes.data.data
+            setProject(proj)
             setWorklist(worklistRes.data.data)
+
+            // Map project members untuk dropdown contributor (hanya PM dan Pentester)
+            const rawMembers = proj?.members || []
+            setMembers(
+                rawMembers
+                    .filter((m: any) => m.role === 'pm' || m.role === 'pentester')
+                    .map((m: any) => ({
+                        id: m.user_id,
+                        name: m.user?.name || m.user?.username || m.user_id
+                    }))
+            )
             
             const rawFindings = findingsRes.data.data || [];
             const mappedFindings = rawFindings.map((f: any) => ({
                 id: f.id,
                 name: f.title || 'Untitled',
-                code: '-', // Backend doesn't have finding code yet
+                code: f.wstg_code || '-',
                 status: f.status || 'open',
-                confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString() : '-',
+                confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-',
                 severity: f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : 'Low',
-                member: '-' // Backend doesn't have assignee yet
+                member: f.contributor || '-'
             }))
             
             setFindings(mappedFindings)
@@ -92,13 +105,13 @@ function Findings () {
             if (status === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (status === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (status === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (status === 'closed on notes') return 'bg-[#27D6FF] text-[#00375C]'
+            if (status === 'closed')          return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (status === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (status === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (status === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (status === 'closed on notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (status === 'closed')          return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
@@ -210,12 +223,12 @@ function Findings () {
                                     value={statusFilter}
                                     onChange={setStatusFilter}
                                     options={[
-                                        { value: 'all',             label: 'All Status'      },
-                                        { value: 'open',            label: 'Open'            },
-                                        { value: 'confirmed',       label: 'Confirmed'       },
-                                        { value: 'fixing',          label: 'Fixing'          },
-                                        { value: 'fixed',           label: 'Fixed'           },
-                                        { value: 'closed on notes', label: 'Closed on Notes' },
+                                        { value: 'all',       label: 'All Status' },
+                                        { value: 'open',      label: 'Open'       },
+                                        { value: 'confirmed', label: 'Confirmed'  },
+                                        { value: 'fixing',    label: 'Fixing'     },
+                                        { value: 'fixed',     label: 'Fixed'      },
+                                        { value: 'closed',    label: 'Closed'     },
                                     ]}
                                     isDark={isDark}
                                 />
@@ -263,7 +276,7 @@ function Findings () {
                                         {finding.severity}
                                     </span>
                                     <span className={`rounded-full px-2.5 md:px-3 py-0.5 md:py-1 text-xs md:text-sm font-semibold ${badgeClass(finding.status)}`}>
-                                        {finding.status.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                        {finding.status.replace(/_/g, ' ').split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                     </span>
                                 </div>
 
@@ -313,29 +326,43 @@ function Findings () {
                 isOpen={showAddFinding}
                 isDark={isDark}
                 onClose={() => setShowAddFinding(false)}
-                members={[]}
+                members={members}
                 onSubmit={async (data) => {
                     try {
-                        await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
+                        const createRes = await api.post(`/projects/${projectId}/worklists/${worklistId}/findings`, {
                             title: data.vulnName,
                             status: 'open',
-                            severity: data.cvssScore >= 9.0 ? 'Critical' : data.cvssScore >= 7.0 ? 'High' : data.cvssScore >= 4.0 ? 'Medium' : 'Low',
+                            severity: data.cvssScore >= 9.0 ? 'critical' : data.cvssScore >= 7.0 ? 'high' : data.cvssScore >= 4.0 ? 'medium' : 'low',
                             cvss_score: data.cvssScore,
                             cvss_vector: data.cvssVector,
+                            wstg_code: data.wstgCode,
+                            contributor: data.contributorName,
                             impact: data.impactedSystem,
-                            description: data.executiveSummary,
-                            reproduction_steps: data.str,
+                            description: data.executiveSummary || 'No description provided.',
+                            reproduction_steps: data.str + (data.pocText ? `\n\nProof of Concept:\n${data.pocText}` : ''),
                             remediation: data.remediation
                         })
+                        const newFindingId = createRes.data.data.id
+
+                        if (data.pocFiles && data.pocFiles.length > 0) {
+                            for (const file of data.pocFiles) {
+                                const formData = new FormData()
+                                formData.append('file', file)
+                                await api.post(`/projects/${projectId}/worklists/${worklistId}/findings/${newFindingId}/evidence`, formData, {
+                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                })
+                            }
+                        }
+
                         const res = await api.get(`/projects/${projectId}/worklists/${worklistId}/findings`)
                         const mapped = (res.data.data || []).map((f: any) => ({
                             id: f.id,
                             name: f.title || 'Untitled',
-                            code: '-',
+                            code: f.wstg_code || '-',
                             status: f.status || 'open',
-                            confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString() : '-',
+                            confirmDate: f.created_at ? new Date(f.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-',
                             severity: f.severity ? f.severity.charAt(0).toUpperCase() + f.severity.slice(1) : 'Low',
-                            member: '-'
+                            member: f.contributor || '-'
                         }))
                         setFindings(mapped)
                     } catch (err) { console.error('Failed to add finding', err) }

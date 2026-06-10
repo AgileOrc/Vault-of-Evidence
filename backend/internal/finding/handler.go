@@ -85,7 +85,7 @@ func projectIDParam(c *gin.Context) string {
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
-	f, err := h.service.GetByID(c.Param("finding_id"))
+	f, err := h.service.GetByID(projectIDParam(c), c.Param("finding_id"))
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "finding not found"})
@@ -113,7 +113,7 @@ func (h *Handler) Update(c *gin.Context) {
 	userRole := roleVal.(domain.ProjectRole)
 
 	// Lempar request DAN role ke service
-	f, err := h.service.Update(c.Param("finding_id"), &req, userRole)
+	f, err := h.service.Update(projectIDParam(c), c.Param("finding_id"), &req, userRole)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "finding not found"})
@@ -126,7 +126,7 @@ func (h *Handler) Update(c *gin.Context) {
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	if err := h.service.Delete(c.Param("finding_id")); err != nil {
+	if err := h.service.Delete(projectIDParam(c), c.Param("finding_id")); err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "finding not found"})
 			return

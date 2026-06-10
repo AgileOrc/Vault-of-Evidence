@@ -20,8 +20,13 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.DELETE("/:worklist_id", h.Delete)
 }
 
+func projectIDParam(c *gin.Context) string {
+	if pid := c.Param("project_id"); pid != "" { return pid }
+	return c.Param("id")
+}
+
 func (h *Handler) GetByProject(c *gin.Context) {
-	worklists, err := h.service.GetByProject(c.Param("project_id"))
+	worklists, err := h.service.GetByProject(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch worklists"})
 		return
@@ -35,7 +40,7 @@ func (h *Handler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	w, err := h.service.Create(c.Param("project_id"), &req)
+	w, err := h.service.Create(c.Param("id"), &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create worklist"})
 		return
@@ -44,7 +49,7 @@ func (h *Handler) Create(c *gin.Context) {
 }
 
 func (h *Handler) GetByID(c *gin.Context) {
-	w, err := h.service.GetByID(c.Param("worklist_id"))
+	w, err := h.service.GetByID(projectIDParam(c), c.Param("worklist_id"))
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "worklist not found"})
@@ -62,7 +67,7 @@ func (h *Handler) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	w, err := h.service.Update(c.Param("worklist_id"), &req)
+	w, err := h.service.Update(projectIDParam(c), c.Param("worklist_id"), &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update worklist"})
 		return
@@ -71,7 +76,7 @@ func (h *Handler) Update(c *gin.Context) {
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	if err := h.service.Delete(c.Param("worklist_id")); err != nil {
+	if err := h.service.Delete(projectIDParam(c), c.Param("worklist_id")); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete worklist"})
 		return
 	}

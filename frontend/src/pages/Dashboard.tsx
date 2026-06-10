@@ -13,6 +13,7 @@ import type { LayoutContext } from '../components/AppLayout'
 import { useUser } from '../context/UserContext'
 import { NewProjectModal } from '../components/PopUp'
 import api from '../api/axios'
+import { projectStatusBadge, projectStatusLabel } from '../utils/theme'
 
 type ProjectData = {
     id: string
@@ -106,20 +107,6 @@ function Dashboard () {
             statIcon: 'text-[#0E65AD]'
         }
 
-    const badgeClass = (status: string) => {
-        const cleanStatus = (status || 'planning').toLowerCase()
-        if (isDark) {
-            if (cleanStatus === 'active') return 'bg-[#17E58F] text-[#005B35]'
-            if (cleanStatus === 'paused') return 'bg-[#E6DF14] text-[#5B4100]'
-            if (cleanStatus === 'upcoming') return 'bg-[#C017DE] text-[#40005B]'
-            return 'bg-[#22BBDE] text-[#00375C]'
-        }
-        
-        if (cleanStatus === 'active') return 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (cleanStatus === 'paused') return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        if (cleanStatus === 'upcoming') return 'bg-[#40005B] text-[#D633FF] font-semibold'
-        return 'bg-[#00375C] text-[#22BBDE] font-semibold'
-    }
 
     const severityClass = (severity: string) => {
         const cleanSeverity = (severity || 'low').toLowerCase()
@@ -173,8 +160,8 @@ function Dashboard () {
                                         <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{project.name}</p>
                                         <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>{project.description || 'No description available'}</p>
                                     </div>
-                                    <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${badgeClass(project.status)}`}>
-                                        {project.status || 'Planning'}
+                                    <span className={`rounded-full px-3 md:px-5 xl:px-6 py-1 text-xs font-montserrat font-semibold ${projectStatusBadge(project.status, isDark)}`}>
+                                        {projectStatusLabel(project.status)}
                                     </span>
                                 </div>
                             ))

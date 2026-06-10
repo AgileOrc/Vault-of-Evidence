@@ -14,7 +14,7 @@ var ErrNotFound = errors.New("project not found")
 
 type Service interface {
 	Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) (*domain.Project, error)
-	GetAll(params pagination.Params) ([]domain.Project, int64, error)
+	GetAll(params pagination.Params, userID uuid.UUID) ([]domain.Project, int64, error)
 	GetByID(id string) (*domain.Project, error)
 	Update(id string, req *domain.UpdateProjectRequest) (*domain.Project, error)
 	Delete(id string) error
@@ -31,6 +31,7 @@ func NewService(repo Repository) Service { return &service{repo: repo} }
 func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) (*domain.Project, error) {
 	p := &domain.Project{
 		Name:        req.Name,
+		Type:        req.Type,
 		Description: req.Description,
 		Status:      domain.StatusPlanning,
 		StartDate:   req.StartDate,
@@ -40,11 +41,24 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 	if err := s.repo.Create(p); err != nil {
 		return nil, fmt.Errorf("project.service: create: %w", err)
 	}
+
+	// Automatically add the creator as a Project Manager
+	member := &domain.ProjectMember{
+		ProjectID:  p.ID,
+		UserID:     createdBy,
+		Role:       domain.RolePM,
+		AssignedBy: createdBy,
+	}
+	if err := s.repo.AddMember(member); err != nil {
+		// Log error or handle it (ideally handled via transaction in repo, but this works)
+		return nil, fmt.Errorf("project.service: add pm member: %w", err)
+	}
+
 	return p, nil
 }
 
-func (s *service) GetAll(params pagination.Params) ([]domain.Project, int64, error) {
-	return s.repo.FindAll(params)
+func (s *service) GetAll(params pagination.Params, userID uuid.UUID) ([]domain.Project, int64, error) {
+	return s.repo.FindAll(params, userID)
 }
 
 func (s *service) GetByID(id string) (*domain.Project, error) {
@@ -66,6 +80,9 @@ func (s *service) Update(id string, req *domain.UpdateProjectRequest) (*domain.P
 
 	if req.Name != "" {
 		p.Name = req.Name
+	}
+	if req.Type != "" {
+		p.Type = req.Type
 	}
 	if req.Description != "" {
 		p.Description = req.Description

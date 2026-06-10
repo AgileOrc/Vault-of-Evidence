@@ -4,7 +4,7 @@ import { Link, useOutletContext, useParams } from 'react-router-dom'
 import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
-import { getPageTheme } from '../utils/theme'
+import { getPageTheme, projectStatusBadge, projectStatusLabel } from '../utils/theme'
 import { 
     EditProjectModal, 
     ManageMembersModal,
@@ -100,18 +100,6 @@ function Worklist () {
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
-    const projectStatusClass = (status: string) => {
-        if (isDark) {
-            if (status === 'active')   return 'bg-[#17E58F] text-[#005B35]'
-            if (status === 'paused')   return 'bg-[#E6DF14] text-[#5B4100]'
-            if (status === 'planning') return 'bg-[#C017DE] text-[#40005B]'
-            return 'bg-[#22BBDE] text-[#00375C]'
-        }
-        if (status === 'active')   return 'bg-[#005B35] text-[#17E58F] font-semibold'
-        if (status === 'paused')   return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
-        if (status === 'planning') return 'bg-[#40005B] text-[#D633FF] font-semibold'
-        return 'bg-[#00375C] text-[#22BBDE] font-semibold'
-    }
 
     if (loading) {
         return <div className='text-center p-10 font-montserrat'>Loading Worklists...</div>
@@ -131,8 +119,8 @@ function Worklist () {
                     <div className='space-y-2 md:flex-4 lg:flex-3 min-w-0'>
                         <div className='flex items-center gap-4 min-w-0'>
                             <h1 className={`min-w-0 truncate text-2xl md:text-3xl xl:text-4xl font-semibold font-montserrat ${theme.text}`}>{project?.name}</h1>
-                            <span className={`shrink-0 px-4 py-1 rounded-full text-sm font-semibold font-montserrat ${projectStatusClass(project?.status || '')}`}>
-                                {(project?.status ?? '').charAt(0).toUpperCase() + (project?.status ?? '').slice(1)}
+                            <span className={`shrink-0 px-4 py-1 rounded-full text-sm font-semibold font-montserrat ${projectStatusBadge(project?.status || '', isDark)}`}>
+                                {projectStatusLabel(project?.status || '')}
                             </span>
                         </div>
 
@@ -269,20 +257,23 @@ function Worklist () {
                 project={project}
                 onSubmit={async (data) => {
                     try {
-                        const statusMap: Record<string, string> = {
-                            'Active': 'active',
-                            'Paused': 'planning', // Backend doesn't have paused
-                            'Upcoming': 'planning',
-                            'Completed': 'completed'
-                        }
                         const payload = {
                             name: data.name,
+                            type: data.type,
                             description: data.description,
-                            status: statusMap[data.status ?? 'Active'] || 'active'
+                            status: data.status ?? 'planning'
                         }
                         await api.put(`/projects/${projectId}`, payload)
                         const res = await api.get(`/projects/${projectId}`)
-                        setProject({ ...project, ...res.data.data })
+                        const p = res.data.data
+                        setProject(prev => prev ? {
+                            ...prev,
+                            name: p.name ?? prev.name,
+                            type: p.type ?? prev.type,
+                            description: p.description ?? prev.description,
+                            status: p.status ?? prev.status,
+                            members: p.members ? p.members.length : prev.members,
+                        } : prev)
                     } catch (err) { console.error('Failed to edit project', err) }
                 }}
             />
