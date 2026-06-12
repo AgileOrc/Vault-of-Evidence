@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { 
+import {
     Globe,
     Users,
     FileText,
     Bug,
-    Plus, 
-    Search 
+    Plus,
+    Search
 } from 'lucide-react'
 import { Link, useOutletContext } from 'react-router-dom'
 import CustomSelect from '../components/CustomSelect'
@@ -61,7 +61,6 @@ function Projects () {
 
 
     const theme = getPageTheme(isDark)
-
 
     if (loading) {
         return <div className="text-center p-10 font-montserrat">Loading penetration testing engagements...</div>
