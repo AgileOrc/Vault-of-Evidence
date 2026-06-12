@@ -14,7 +14,7 @@ var ErrNotFound = errors.New("project not found")
 
 type Service interface {
 	Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) (*domain.Project, error)
-	GetAll(params pagination.Params) ([]domain.Project, int64, error)
+	GetAll(params pagination.Params, userID uuid.UUID) ([]domain.Project, int64, error)
 	GetByID(id string) (*domain.Project, error)
 	Update(id string, req *domain.UpdateProjectRequest) (*domain.Project, error)
 	Delete(id string) error
@@ -42,7 +42,7 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 		return nil, fmt.Errorf("project.service: create: %w", err)
 	}
 
-	// Tambahkan creator sebagai PM otomatis
+	// Automatically add the creator as a Project Manager
 	member := &domain.ProjectMember{
 		ProjectID:  p.ID,
 		UserID:     createdBy,
@@ -50,14 +50,15 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 		AssignedBy: createdBy,
 	}
 	if err := s.repo.AddMember(member); err != nil {
-		fmt.Printf("warning: failed to add creator as PM for project %s: %v\n", p.ID, err)
+		// Log error or handle it (ideally handled via transaction in repo, but this works)
+		return nil, fmt.Errorf("project.service: add pm member: %w", err)
 	}
 
 	return p, nil
 }
 
-func (s *service) GetAll(params pagination.Params) ([]domain.Project, int64, error) {
-	return s.repo.FindAll(params)
+func (s *service) GetAll(params pagination.Params, userID uuid.UUID) ([]domain.Project, int64, error) {
+	return s.repo.FindAll(params, userID)
 }
 
 func (s *service) GetByID(id string) (*domain.Project, error) {

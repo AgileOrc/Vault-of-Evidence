@@ -26,11 +26,11 @@ type Project struct {
 	EndDate     *time.Time    `gorm:"type:date"                                      json:"end_date,omitempty"`
 	CreatedByID uuid.UUID     `gorm:"type:uuid;not null"                             json:"created_by_id"`
 	CreatedBy   User          `gorm:"foreignKey:CreatedByID"                         json:"created_by,omitempty"`
-	Findings    []Finding     `gorm:"foreignKey:ProjectID"                           json:"findings,omitempty"`
-	Worklists   []Worklist    `gorm:"foreignKey:ProjectID"                           json:"worklists,omitempty"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-	Members     []ProjectMember `gorm:"foreignKey:ProjectID"                         json:"members,omitempty"`
+	Findings    []Finding       `gorm:"foreignKey:ProjectID;constraint:OnDelete:CASCADE;" json:"findings,omitempty"`
+	Worklists   []Worklist      `gorm:"foreignKey:ProjectID;constraint:OnDelete:CASCADE;" json:"worklists,omitempty"`
+	CreatedAt   time.Time       `json:"created_at"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+	Members     []ProjectMember `gorm:"foreignKey:ProjectID;constraint:OnDelete:CASCADE;" json:"members,omitempty"`
 }
 
 type CreateProjectRequest struct {

@@ -141,7 +141,7 @@ function FindingDetail () {
                 name: raw.title,
                 code: raw.wstg_code || '—',
                 status: raw.status,
-                severity: raw.severity,
+                severity: raw.severity ? raw.severity.charAt(0).toUpperCase() + raw.severity.slice(1) : 'Low',
                 confirmDate: new Date(raw.created_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
                 member: raw.contributor || '—',
                 cvssScore: raw.cvss_score,
@@ -394,7 +394,7 @@ function FindingDetail () {
             await api.put(`/projects/${projectId}/findings/${findingId}`, {
                 title: editData.name,
                 status: editData.status,
-                severity: editData.severity,
+                severity: editData.severity.toLowerCase(),
                 cvss_score: editData.cvssScore,
                 cvss_vector: editData.cvssVector,
                 wstg_code: editData.wstgCode,

@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './Sidebar'
 import SettingsModal from './SettingsModal'
 import NotificationsModal from './NotificationsModal'
@@ -11,8 +11,20 @@ export type LayoutContext = {
 }
 
 function AppLayout () {
-  const [isDark, setIsDark] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('isDark') === 'true'
+  })
+  
+  useEffect(() => {
+    localStorage.setItem('isDark', String(isDark))
+  }, [isDark])
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('isCollapsed') === 'true'
+  })
+  
+  useEffect(() => {
+    localStorage.setItem('isCollapsed', String(isCollapsed))
+  }, [isCollapsed])
   const [showSettings, setShowSettings] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
 
