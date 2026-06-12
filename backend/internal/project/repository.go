@@ -64,7 +64,12 @@ func (r *repository) Update(project *domain.Project) error {
 }
 
 func (r *repository) Delete(id string) error {
-	return r.db.Where("id = ?", id).Delete(&domain.Project{}).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("project_id = ?", id).Delete(&domain.ProjectMember{}).Error; err != nil {
+			return err
+		}
+		return tx.Where("id = ?", id).Delete(&domain.Project{}).Error
+	})
 }
 
 func (r *repository) AddMember(member *domain.ProjectMember) error {
