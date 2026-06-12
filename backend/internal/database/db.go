@@ -48,8 +48,9 @@ func AutoMigrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
 		&domain.User{},
 		&domain.Project{},
-		&domain.ProjectMember{},     // NEW
+		&domain.ProjectMember{},      // NEW
 		&domain.PasswordResetToken{}, // NEW
+		&domain.Notification{},
 		&domain.Worklist{},
 		&domain.Finding{},
 		&domain.Evidence{},

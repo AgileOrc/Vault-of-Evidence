@@ -25,6 +25,8 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("/:id", h.GetByID)
 	rg.PUT("/:id", h.Update)
 	rg.DELETE("/:id", h.Delete)
+	rg.POST("/:id/members", h.InviteMember)
+	rg.DELETE("/:id/members/:user_id", h.RemoveMember)
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
@@ -101,7 +103,7 @@ func (h *Handler) Delete(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "project not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete project"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete project: " + err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "project deleted"})
@@ -129,7 +131,7 @@ func (h *Handler) InviteMember(c *gin.Context) {
 	pmID := pmIDVal.(uuid.UUID)
 
 	if err := h.service.InviteMember(projectID, pmID, req); err != nil {
-		if err.Error() == "user with this username not found" {
+		if err.Error() == "user with this username or email not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
@@ -146,6 +148,31 @@ func (h *Handler) InviteMember(c *gin.Context) {
 		"username": req.Username,
 		"role":     req.Role,
 	})
+}
+
+func (h *Handler) RemoveMember(c *gin.Context) {
+	projectID, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid project ID format"})
+		return
+	}
+
+	userID, err := uuid.Parse(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID format"})
+		return
+	}
+
+	if err := h.service.RemoveMember(projectID, userID); err != nil {
+		if errors.Is(err, ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "member not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to remove member"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "member removed"})
 }
 
 func (h *Handler) GetDashboardSummary(c *gin.Context) {

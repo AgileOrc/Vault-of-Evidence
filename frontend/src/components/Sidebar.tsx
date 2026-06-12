@@ -1,6 +1,6 @@
-import { Bell, Calculator, FolderKanban, LayoutDashboard, Settings, User, Sun, Moon } from 'lucide-react'
+import { Bell, Calculator, FolderKanban, LayoutDashboard, LogOut, Settings, User, Sun, Moon } from 'lucide-react'
 import { useUser } from '../context/UserContext'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import logo from '../assets/logo-01.svg'
 
 type SidebarProps = {
@@ -18,7 +18,8 @@ function Sidebar ({
   onOpenSettings,
   onOpenNotifications
 }: SidebarProps) {
-  const { user } = useUser()
+  const { user, logout } = useUser()
+  const navigate = useNavigate()
   const navItemBase = `flex items-center gap-2 xl:gap-3 rounded-md xl:rounded-lg px-1 py-2 xl:px-3 xl:py-3 text-[0.8rem] xl:text-[1.1rem] font-semibold transition ${
     isCollapsed ? 'justify-center' : ''
   }`
@@ -86,6 +87,20 @@ function Sidebar ({
         >
           <Bell className='h-4 xl:h-6' />
           {!isCollapsed && <span>Notifications</span>}
+        </button>
+
+        <button
+          type='button'
+          onClick={async () => {
+            await logout()
+            navigate('/', { replace: true })
+          }}
+          className={`flex items-center gap-1 xl:gap-2 text-[0.8rem] xl:text-[1.1rem] rounded-lg px-1 xl:px-3 py-2 xl:py-3 font-semibold transition ${
+            isCollapsed ? 'justify-center' : ''
+          } text-white hover:bg-[#EC2828]`}
+        >
+          <LogOut className='h-4 xl:h-6' />
+          {!isCollapsed && <span>Logout</span>}
         </button>
 
         <button

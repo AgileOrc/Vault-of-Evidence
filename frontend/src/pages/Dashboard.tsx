@@ -68,15 +68,19 @@ function Dashboard () {
 
     const [showNewProject, setShowNewProject] = useState(false)
 
+    const loadSummary = async () => {
+        try {
+            const res = await api.get('/projects/dashboard/summary')
+            setData(res.data)
+        } catch {
+            setData(null)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     useEffect(() => {
-        api.get('/projects/dashboard/summary')
-            .then((res) => {
-                setData(res.data)
-                setLoading(false)
-            })
-            .catch(() => {
-                setLoading(false)
-            })
+        loadSummary()
     }, [])
 
     const theme = isDark
@@ -223,7 +227,10 @@ function Dashboard () {
                 isOpen={showNewProject}
                 isDark={isDark}
                 onClose={() => setShowNewProject(false)}
-                onSubmit={(data) => console.log('new project', data)}
+                onSubmit={async (projectData) => {
+                    await api.post('/projects', projectData)
+                    await loadSummary()
+                }}
             />
 
         </div>

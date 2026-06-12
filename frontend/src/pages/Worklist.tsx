@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Users, FileText, Bug, Search, Trash2, FilePlusCorner, Pencil } from 'lucide-react'
-import { Link, useOutletContext, useParams } from 'react-router-dom'
+import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import CustomSelect from '../components/CustomSelect'
 import type { LayoutContext } from '../components/AppLayout'
 import api from '../api/axios'
@@ -18,10 +18,18 @@ type ProjectData = {
     name: string
     type: string
     members: number
+    memberList: MemberData[]
     worklists: number
     findings: number
     status: string
     description: string
+}
+
+type MemberData = {
+    id: string
+    name: string
+    email: string
+    role: string
 }
 
 type WorklistData = {
@@ -37,6 +45,7 @@ const iconSize = 'w-3 h-3 md:w-4 md:h-4'
 
 function Worklist () {
     const { isDark, isCollapsed } = useOutletContext<LayoutContext>()
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
@@ -50,29 +59,46 @@ function Worklist () {
 
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklists, setWorklists] = useState<WorklistData[]>([])
+    const [memberError, setMemberError] = useState('')
     const { projectId } = useParams()
 
-    useEffect(() => {
-        Promise.all([
+    const mapMembers = (members: any[] = []): MemberData[] => {
+        return members.map((member) => ({
+            id: member.user?.id ?? member.user_id,
+            name: member.user?.username ?? member.user?.email ?? 'Unknown user',
+            email: member.user?.email ?? '',
+            role: member.role ?? 'pentester',
+        })).filter((member) => member.id)
+    }
+
+    const loadProject = async () => {
+        const [projectRes, worklistsRes] = await Promise.all([
             api.get(`/projects/${projectId}`),
             api.get(`/projects/${projectId}/worklists`)
         ])
-        .then(([projectRes, worklistsRes]) => {
-            const wList = worklistsRes.data.data || [];
-            const mappedWorklists = wList.map((w: any) => ({
-                ...w,
-                findings: w.findings ? w.findings.length : 0
-            }))
-            
-            const p = projectRes.data.data;
-            setProject({
-                ...p,
-                members: p.members ? p.members.length : 0,
-                worklists: wList.length,
-                findings: mappedWorklists.reduce((acc: number, curr: any) => acc + curr.findings, 0)
-            })
-            
-            setWorklists(mappedWorklists)
+
+        const wList = worklistsRes.data.data || []
+        const mappedWorklists = wList.map((w: any) => ({
+            ...w,
+            findings: w.findings ? w.findings.length : 0
+        }))
+
+        const p = projectRes.data.data
+        const memberList = mapMembers(p.members)
+        setProject({
+            ...p,
+            members: memberList.length,
+            memberList,
+            worklists: wList.length,
+            findings: mappedWorklists.reduce((acc: number, curr: any) => acc + curr.findings, 0)
+        })
+
+        setWorklists(mappedWorklists)
+    }
+
+    useEffect(() => {
+        loadProject()
+        .then(() => {
             setLoading(false)
         })
         .catch((err) => {
@@ -272,6 +298,7 @@ function Worklist () {
                             type: p.type ?? prev.type,
                             description: p.description ?? prev.description,
                             status: p.status ?? prev.status,
+                            memberList: mapMembers(p.members),
                             members: p.members ? p.members.length : prev.members,
                         } : prev)
                     } catch (err) { console.error('Failed to edit project', err) }
@@ -282,9 +309,26 @@ function Worklist () {
                 isOpen={showManageMembers}
                 isDark={isDark}
                 onClose={() => setShowManageMembers(false)}
-                members={[]}
-                onAddMember={(email, role) => console.log(email, role)}
-                onRemoveMember={(id) => console.log(id)}
+                members={project?.memberList ?? []}
+                error={memberError}
+                onAddMember={async (identifier, role) => {
+                    try {
+                        setMemberError('')
+                        await api.post(`/projects/${projectId}/members`, { username: identifier, role })
+                        await loadProject()
+                    } catch (err: any) {
+                        setMemberError(err.response?.data?.error || 'Failed to invite member')
+                    }
+                }}
+                onRemoveMember={async (id) => {
+                    try {
+                        setMemberError('')
+                        await api.delete(`/projects/${projectId}/members/${id}`)
+                        await loadProject()
+                    } catch (err: any) {
+                        setMemberError(err.response?.data?.error || 'Failed to remove member')
+                    }
+                }}
             />
 
             <DeleteProjectModal
@@ -293,10 +337,8 @@ function Worklist () {
                 onClose={() => setShowDeleteProject(false)}
                 projectName={project?.name ?? ''}
                 onConfirm={async () => {
-                    try {
-                        await api.delete(`/projects/${projectId}`)
-                        window.location.href = '/projects'
-                    } catch (err) { console.error('Failed to delete project', err) }
+                    await api.delete(`/projects/${projectId}`)
+                    navigate('/projects', { replace: true })
                 }}
             />
 

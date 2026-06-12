@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	
+
 	"vault-of-evidence/backend/internal/domain"
 )
 
@@ -60,8 +60,22 @@ func RequireProjectRole(db *gorm.DB, paramName string, allowed ...domain.Project
 			}
 		}
 
-		// 4. Cek apakah jabatannya sesuai dengan yang diizinkan untuk fitur ini
-		if _, permitted := allowSet[member.Role]; !permitted {
+		// 4. Cek apakah jabatannya sesuai dengan yang diizinkan untuk fitur ini.
+		_, permitted := allowSet[member.Role]
+		if !permitted {
+			if _, pmAllowed := allowSet[domain.RolePM]; pmAllowed {
+				var project domain.Project
+				if dbErr := db.Select("id, created_by_id").Where("id = ?", projectID).First(&project).Error; dbErr == nil && project.CreatedByID == userID {
+					member.Role = domain.RolePM
+					db.Model(&domain.ProjectMember{}).
+						Where("project_id = ? AND user_id = ?", projectID, userID).
+						Update("role", domain.RolePM)
+					permitted = true
+				}
+			}
+		}
+
+		if !permitted {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "your role in this project does not permit this action"})
 			return
 		}

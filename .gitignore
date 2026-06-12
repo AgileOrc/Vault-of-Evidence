@@ -11,6 +11,7 @@ backend/.env
 backend/tmp/
 backend/bin/
 backend/*.exe
+.gocache/
 
 # Environment
 .env

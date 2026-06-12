@@ -1,12 +1,11 @@
 // ── Project status helpers ───────────────────────────────────────────────────
-// Backend values: planning | active | paused | completed | archived
-// Display labels: Upcoming  | Active | Paused | Completed  | Archived
+// Backend values: planning | active | completed | archived
+// Display labels: Planning  | Active | Completed  | Archived
 
 export const projectStatusLabel = (status: string): string => {
     const s = (status || '').toLowerCase()
-    if (s === 'planning')  return 'Upcoming'
+    if (s === 'planning')  return 'Planning'
     if (s === 'active')    return 'Active'
-    if (s === 'paused')    return 'Paused'
     if (s === 'completed') return 'Completed'
     if (s === 'archived')  return 'Archived'
     return status.charAt(0).toUpperCase() + status.slice(1)
@@ -16,14 +15,12 @@ export const projectStatusBadge = (status: string, isDark: boolean): string => {
     const s = (status || '').toLowerCase()
     if (isDark) {
         if (s === 'active')    return 'bg-[#17E58F] text-[#005B35]'
-        if (s === 'paused')    return 'bg-[#E6DF14] text-[#5B4100]'
         if (s === 'planning')  return 'bg-[#C017DE] text-[#40005B]'
         if (s === 'completed') return 'bg-[#22BBDE] text-[#00375C]'
         if (s === 'archived')  return 'bg-[#6B7280] text-[#F5F5F5]'
         return 'bg-[#22BBDE] text-[#00375C]'
     }
     if (s === 'active')    return 'bg-[#005B35] text-[#17E58F] font-semibold'
-    if (s === 'paused')    return 'bg-[#5B4100] text-[#E6DF14] font-semibold'
     if (s === 'planning')  return 'bg-[#40005B] text-[#D633FF] font-semibold'
     if (s === 'completed') return 'bg-[#00375C] text-[#22BBDE] font-semibold'
     if (s === 'archived')  return 'bg-[#374151] text-[#D1D5DB] font-semibold'
