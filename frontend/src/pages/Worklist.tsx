@@ -13,6 +13,13 @@ import {
     DeleteWorklistModal
 } from '../components/PopUp'
 
+type MemberData = {
+    id: string
+    name: string
+    username: string
+    role: string
+}
+
 type ProjectData = {
     id: string
     name: string
@@ -50,6 +57,9 @@ function Worklist () {
 
     const [project, setProject] = useState<ProjectData | null>(null)
     const [worklists, setWorklists] = useState<WorklistData[]>([])
+    const [projectMembers, setProjectMembers] = useState<MemberData[]>([])
+    const [inviteError, setInviteError] = useState('')
+    const [isInviting, setIsInviting] = useState(false)
     const { projectId } = useParams()
 
     useEffect(() => {
@@ -71,6 +81,14 @@ function Worklist () {
                 worklists: wList.length,
                 findings: mappedWorklists.reduce((acc: number, curr: any) => acc + curr.findings, 0)
             })
+            if (p.members) {
+                setProjectMembers(p.members.map((m: any) => ({
+                    id: m.user_id,
+                    name: m.user?.username ?? m.user_id,
+                    username: m.user?.username ?? '',
+                    role: m.role,
+                })))
+            }
             
             setWorklists(mappedWorklists)
             setLoading(false)
@@ -281,10 +299,22 @@ function Worklist () {
             <ManageMembersModal
                 isOpen={showManageMembers}
                 isDark={isDark}
-                onClose={() => setShowManageMembers(false)}
-                members={[]}
-                onAddMember={(email, role) => console.log(email, role)}
-                onRemoveMember={(id) => console.log(id)}
+                onClose={() => { setShowManageMembers(false); setInviteError('') }}
+                members={projectMembers}
+                isSubmitting={isInviting}
+                addError={inviteError}
+                onAddMember={async (username, role) => {
+                    setInviteError('')
+                    setIsInviting(true)
+                    try {
+                        await api.post(`/projects/${projectId}/members`, { username, role })
+                    } catch (err: any) {
+                        setInviteError(err?.response?.data?.error ?? 'Failed to send invitation')
+                    } finally {
+                        setIsInviting(false)
+                    }
+                }}
+                onRemoveMember={(id) => console.log('remove', id)}
             />
 
             <DeleteProjectModal

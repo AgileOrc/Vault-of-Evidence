@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Sidebar from './Sidebar'
 import SettingsModal from './SettingsModal'
 import NotificationsModal from './NotificationsModal'
+import api from '../api/axios'
 
 export type LayoutContext = {
   isDark: boolean
@@ -14,19 +15,26 @@ function AppLayout () {
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('isDark') === 'true'
   })
-  
+
   useEffect(() => {
     localStorage.setItem('isDark', String(isDark))
   }, [isDark])
   const [isCollapsed, setIsCollapsed] = useState(() => {
     return localStorage.getItem('isCollapsed') === 'true'
   })
-  
+
   useEffect(() => {
     localStorage.setItem('isCollapsed', String(isCollapsed))
   }, [isCollapsed])
   const [showSettings, setShowSettings] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    api.get('/notifications/unread-count')
+      .then(res => setUnreadCount(res.data.count ?? 0))
+      .catch(() => {})
+  }, [])
 
   const pageBase = isDark
     ? 'bg-[#002C49] text-[#F5F5F5]'
@@ -41,6 +49,7 @@ function AppLayout () {
         onToggleTheme={() => setIsDark((prev) => !prev)}
         onOpenSettings={() => setShowSettings(true)}
         onOpenNotifications={() => setShowNotifications(true)}
+        unreadCount={unreadCount}
       />
 
       <div className='relative flex-1 overflow-x-hidden'>
@@ -61,7 +70,12 @@ function AppLayout () {
       </div>
 
       <SettingsModal isOpen={showSettings} isDark={isDark} onClose={() => setShowSettings(false)} />
-      <NotificationsModal isOpen={showNotifications} isDark={isDark} onClose={() => setShowNotifications(false)} />
+      <NotificationsModal
+        isOpen={showNotifications}
+        isDark={isDark}
+        onClose={() => setShowNotifications(false)}
+        onUnreadChange={setUnreadCount}
+      />
     </div>
   )
 }

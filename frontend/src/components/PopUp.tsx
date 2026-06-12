@@ -297,22 +297,24 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
 
 
 {/* MANAGE MEMBERS MODAL */}
-type Member = { id: string; name: string; email: string; role: string }
+type Member = { id: string; name: string; username: string; role: string }
 
 type ManageMembersModalProps = BaseModalProps & {
     members: Member[]
-    onAddMember: (email: string, role: string) => void
+    onAddMember: (username: string, role: string) => void
     onRemoveMember: (id: string) => void
+    isSubmitting?: boolean
+    addError?: string
 }
 
-export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMember, onRemoveMember }: ManageMembersModalProps) {
-    const [email, setEmail] = useState('')
-    const [role, setRole] = useState('Pentester Member')
+export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMember, onRemoveMember, isSubmitting, addError }: ManageMembersModalProps) {
+    const [username, setUsername] = useState('')
+    const [role, setRole] = useState('pentester')
 
     const handleAdd = () => {
-        if (!email.trim()) return
-        onAddMember(email, role)
-        setEmail('')
+        if (!username.trim()) return
+        onAddMember(username, role)
+        setUsername('')
     }
 
     const optClass = isDark ? 'bg-[#0B2E46] text-white' : 'bg-white text-[#002C49]'
@@ -322,22 +324,23 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMemb
         <PopUpBase isOpen={isOpen} isDark={isDark} onClose={onClose} title="Manage Members" maxWidth="max-w-xl">
             {/* Add member */}
             <div>
-                <Label isDark={isDark}>Add Member</Label>
+                <Label isDark={isDark}>Invite Member</Label>
                 <div className="flex flex-col md:flex-row gap-2">
                     <div className="flex-1 min-w-0">
-                        <Input isDark={isDark} placeholder="Input email here..." value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <Input isDark={isDark} placeholder="Username..." value={username} onChange={(e) => setUsername(e.target.value)} />
                     </div>
                     <div className='flex gap-2'>
-                        <div className="w-48 shrink-0">
+                        <div className="w-40 shrink-0">
                         <Select isDark={isDark} value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option className={optClass} value="Project Manager">Project Manager</option>
-                            <option className={optClass} value="Pentester Member">Pentester Member</option>
-                            <option className={optClass} value="Developer">Developer</option>
+                            <option className={optClass} value="pm">Project Manager</option>
+                            <option className={optClass} value="pentester">Pentester</option>
+                            <option className={optClass} value="dev">Developer</option>
                         </Select>
                         </div>
                         <button
                             onClick={handleAdd}
-                            className={`shrink-0 flex items-center px-3 py-2 rounded-xl text-sm font-semibold font-montserrat transition ${
+                            disabled={isSubmitting}
+                            className={`shrink-0 flex items-center px-3 py-2 rounded-xl text-sm font-semibold font-montserrat transition disabled:opacity-50 ${
                                 isDark ? 'bg-[#41B0EC] text-white hover:bg-[#27D6FF]' : 'bg-[#1767AA] text-white hover:bg-[#41B0EC]'
                             }`}
                         >
@@ -345,6 +348,7 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMemb
                         </button>
                     </div>
                 </div>
+                {addError && <p className="text-xs text-red-400 font-montserrat mt-1">{addError}</p>}
             </div>
 
             {/* Member list */}
@@ -357,7 +361,7 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMemb
                     <div key={m.id} className={`flex items-center justify-between py-2.5 border-b ${rowClass}`}>
                         <div>
                             <p className="text-sm font-semibold font-montserrat">{m.name}</p>
-                            <p className={`text-xs font-montserrat opacity-60`}>{m.email}</p>
+                            <p className={`text-xs font-montserrat opacity-60`}>@{m.username}</p>
                         </div>
                         <div className="flex items-center gap-3">
                             <span className={`text-xs font-semibold font-montserrat px-2 py-0.5 rounded-full ${

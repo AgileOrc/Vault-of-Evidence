@@ -17,6 +17,7 @@ import (
 	"vault-of-evidence/backend/internal/evidence"
 	"vault-of-evidence/backend/internal/finding"
 	"vault-of-evidence/backend/internal/middleware"
+	"vault-of-evidence/backend/internal/notification"
 	jwtpkg "vault-of-evidence/backend/internal/pkg/jwt"
 	"vault-of-evidence/backend/internal/project"
 	"vault-of-evidence/backend/internal/worklist"
@@ -47,9 +48,13 @@ func main() {
 	authSvc := auth.NewService(authRepo)
 	authHandler := auth.NewHandler(authSvc, jwtManager)
 
+	notificationRepo := notification.NewRepository(db)
+	notificationSvc := notification.NewService(notificationRepo, db)
+	notificationHandler := notification.NewHandler(notificationSvc)
+
 	projectRepo := project.NewRepository(db)
 	projectSvc := project.NewService(projectRepo)
-	projectHandler := project.NewHandler(projectSvc)
+	projectHandler := project.NewHandler(projectSvc, notificationSvc)
 
 	worklistRepo := worklist.NewRepository(db)
 	worklistSvc := worklist.NewService(worklistRepo)
@@ -244,6 +249,17 @@ func main() {
 				}
 			}
 		}
+	}
+
+	notificationRoutes := api.Group("/notifications")
+	notificationRoutes.Use(authMw)
+	{
+		notificationRoutes.GET("", notificationHandler.GetAll)
+		notificationRoutes.GET("/unread-count", notificationHandler.UnreadCount)
+		notificationRoutes.PUT("/read-all", notificationHandler.MarkAllRead)
+		notificationRoutes.PUT("/:id/read", notificationHandler.MarkRead)
+		notificationRoutes.POST("/:id/accept", notificationHandler.Accept)
+		notificationRoutes.POST("/:id/deny", notificationHandler.Deny)
 	}
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)
