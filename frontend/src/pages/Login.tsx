@@ -17,50 +17,31 @@ function Login() {
     const [serverError, setServerError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // State untuk error validasi Zod dari frontend
-    const [errors, setErrors] = useState<{
-        email?: string[];
-        password?: string[];
-    }>({});
-
-    // Skema Validasi ZOD
     const loginSchema = z.object({
-        email: z.string().email('Invalid Email Format'),
-        password: z.string().min(12, 'Password must have at least 12 characters').regex(
-            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/, 'Password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &)'
-        ),
+        email: z.string().email(),
+        password: z.string().min(1),
     });
 
-    // Fungsi Utama Submit
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setServerError(''); // Reset error backend
-        setErrors({});      // Reset error zod
+        setServerError('');
 
-        // 1. LAPIS PERTAMA: Validasi Frontend dengan Zod
         const result = loginSchema.safeParse({ email, password });
         if (!result.success) {
-            // Jika format salah, tampilkan pesan error Zod di bawah input dan hentikan proses
-            setErrors(result.error.flatten().fieldErrors);
+            setServerError('Email or password is incorrect.');
             return;
         }
 
-        // 2. LAPIS KEDUA: Validasi Backend dengan Axios
         setIsLoading(true);
         try {
-            // Tembak API login
             const response = await api.post('/auth/login', { email, password });
 
             if (response.status === 200) {
-                if (response.data?.token) {
-                    localStorage.setItem('voe_token', response.data.token)
-                }
                 await refreshUser();
                 navigate('/Dashboard');
             }
-        } catch (err: any) {
-            // Tangkap penolakan dari server (misal password salah)
-            setServerError(err.response?.data?.error || 'Login failed. Cannot connect to server.');
+        } catch {
+            setServerError('Email or password is incorrect.');
         } finally {
             setIsLoading(false);
         }
@@ -104,6 +85,10 @@ function Login() {
                     </div>
                     
 
+                    {serverError && (
+                        <p className='text-sm text-red-300 font-montserrat'>{serverError}</p>
+                    )}
+
                     {/* Email Input */}
                     <div className='flex flex-col gap-y-1 text-xs md:text-sm xl:text-lg'>
                         <label className='font-montserrat font-medium text-white'>Email address</label>
@@ -114,10 +99,6 @@ function Login() {
                             onChange={(e) => setEmail(e.target.value)}
                             className='w-full rounded-md md:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-1.5 py-1 md:px-2 md:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
                             />
-                        {/* Teks Error Zod (Tepat di bawah input) */}
-                        {errors.email && (
-                            <p className='text-sm text-red-white'>{errors.email[0]}</p>
-                        )}
                     </div>
 
                     {/* Password Input */}
@@ -133,19 +114,8 @@ function Login() {
                             placeholder='******'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className='w-full rounded-md md:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-1.5 py-1 md:px-2 md:py-1.5 xl:px-4 xl:py-3 text-white outline-none' 
+                            className='w-full rounded-md md:rounded-lg xl:rounded-xl border border-[#27D6FF] bg-[#002C49]/50 px-1.5 py-1 md:px-2 md:py-1.5 xl:px-4 xl:py-3 text-white outline-none'
                             />
-                        {/* Teks Error Zod */}
-                        {errors.password && (
-                            <p className='text-sm text-red-300'>{errors.password[0]}</p>
-                        )}
-
-                        {/* Kotak Error Backend (Warna Merah) */}
-                        {serverError && (
-                            <div className="text-white px-1 py-2 lg:py-4 rounded-lg font-montserrat text-sm">
-                                 {serverError}
-                            </div>
-                        )}
                     </div>
 
                     <p className='text-center text-xs md:text-sm xl:text-lg font-montserrat font-medium text-white'>
