@@ -105,7 +105,7 @@ function Findings () {
             if (status === 'confirmed')       return 'bg-[#DCF3F8] text-[#1767AA]'
             if (status === 'fixing')          return 'bg-[#27D6FF] text-[#1767AA]'
             if (status === 'fixed')           return 'bg-[#DCF3F8] text-[#002C49]'
-            if (status === 'closed')          return 'bg-[#27D6FF] text-[#00375C]'
+            if (status === 'closed_on_notes') return 'bg-[#27D6FF] text-[#00375C]'
             return 'text-[#27D6FF] border border-[#27D6FF]'
         }
         if (status === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
@@ -223,12 +223,12 @@ function Findings () {
                                     value={statusFilter}
                                     onChange={setStatusFilter}
                                     options={[
-                                        { value: 'all',       label: 'All Status' },
-                                        { value: 'open',      label: 'Open'       },
-                                        { value: 'confirmed', label: 'Confirmed'  },
-                                        { value: 'fixing',    label: 'Fixing'     },
-                                        { value: 'fixed',     label: 'Fixed'      },
-                                        { value: 'closed',    label: 'Closed'     },
+                                        { value: 'all',             label: 'All Status'      },
+                                        { value: 'open',            label: 'Open'            },
+                                        { value: 'confirmed',       label: 'Confirmed'       },
+                                        { value: 'fixing',          label: 'Fixing'          },
+                                        { value: 'fixed',           label: 'Fixed'           },
+                                        { value: 'closed_on_notes', label: 'Closed on Notes' },
                                     ]}
                                     isDark={isDark}
                                 />
