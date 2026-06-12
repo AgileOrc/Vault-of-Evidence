@@ -1,6 +1,7 @@
 package project
 
 import (
+	"fmt"
 	"vault-of-evidence/backend/internal/domain"
 	"vault-of-evidence/backend/internal/pkg/pagination"
 
@@ -17,7 +18,10 @@ type Repository interface {
 
 	// Fitur Project Members
 	AddMember(member *domain.ProjectMember) error
-	FindUserByUsername(username string) (*domain.User, error)
+	AddMemberWithNotification(member *domain.ProjectMember, notification *domain.Notification) error
+	RemoveMember(projectID, userID uuid.UUID) error
+	FindUserByID(id uuid.UUID) (*domain.User, error)
+	FindUserByUsernameOrEmail(identifier string) (*domain.User, error)
 	CheckMemberExists(projectID, userID uuid.UUID) (bool, error)
 
 	// Fitur Dashboard
@@ -44,8 +48,8 @@ func (r *repository) FindAll(params pagination.Params, userID uuid.UUID) ([]doma
 		return nil, 0, err
 	}
 
-	err := r.db.Preload("Members").Preload("Worklists").Preload("Findings").
-		Order("created_at DESC").
+	err := query.Preload("Members").Preload("Worklists").Preload("Findings").
+		Order("projects.created_at DESC").
 		Limit(params.Limit).
 		Offset(params.Offset).
 		Find(&projects).Error
@@ -64,16 +68,75 @@ func (r *repository) Update(project *domain.Project) error {
 }
 
 func (r *repository) Delete(id string) error {
-	return r.db.Where("id = ?", id).Delete(&domain.Project{}).Error
+	projectID, err := uuid.Parse(id)
+	if err != nil {
+		return fmt.Errorf("invalid project id: %w", err)
+	}
+
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		findingIDs := tx.Model(&domain.Finding{}).
+			Select("id").
+			Where("project_id = ?", projectID)
+
+		if err := tx.Where("finding_id IN (?)", findingIDs).Delete(&domain.Evidence{}).Error; err != nil {
+			return fmt.Errorf("delete evidence: %w", err)
+		}
+
+		if err := tx.Where("project_id = ?", projectID).Delete(&domain.Finding{}).Error; err != nil {
+			return fmt.Errorf("delete findings: %w", err)
+		}
+
+		if err := tx.Where("project_id = ?", projectID).Delete(&domain.Worklist{}).Error; err != nil {
+			return fmt.Errorf("delete worklists: %w", err)
+		}
+
+		if err := tx.Where("project_id = ?", projectID).Delete(&domain.Notification{}).Error; err != nil {
+			return fmt.Errorf("delete notifications: %w", err)
+		}
+
+		if err := tx.Where("project_id = ?", projectID).Delete(&domain.ProjectMember{}).Error; err != nil {
+			return fmt.Errorf("delete project members: %w", err)
+		}
+
+		res := tx.Where("id = ?", projectID).Delete(&domain.Project{})
+		if res.Error != nil {
+			return fmt.Errorf("delete project: %w", res.Error)
+		}
+		if res.RowsAffected == 0 {
+			return ErrNotFound
+		}
+		return nil
+	})
 }
 
 func (r *repository) AddMember(member *domain.ProjectMember) error {
 	return r.db.Create(member).Error
 }
 
-func (r *repository) FindUserByUsername(username string) (*domain.User, error) {
+func (r *repository) AddMemberWithNotification(member *domain.ProjectMember, notification *domain.Notification) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(member).Error; err != nil {
+			return err
+		}
+		return tx.Create(notification).Error
+	})
+}
+
+func (r *repository) RemoveMember(projectID, userID uuid.UUID) error {
+	return r.db.Where("project_id = ? AND user_id = ?", projectID, userID).Delete(&domain.ProjectMember{}).Error
+}
+
+func (r *repository) FindUserByID(id uuid.UUID) (*domain.User, error) {
 	var user domain.User
-	if err := r.db.Where("username = ?", username).First(&user).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *repository) FindUserByUsernameOrEmail(identifier string) (*domain.User, error) {
+	var user domain.User
+	if err := r.db.Where("username = ? OR email = ?", identifier, identifier).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

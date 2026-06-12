@@ -1,4 +1,4 @@
-// ── Project status helpers ───────────────────────────────────────────────────
+﻿// ── Project status helpers ───────────────────────────────────────────────────
 // Backend values: upcoming | active | paused | completed
 // Display labels: Upcoming | Active | Paused | Completed
 

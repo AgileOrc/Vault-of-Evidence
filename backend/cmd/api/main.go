@@ -17,6 +17,7 @@ import (
 	"vault-of-evidence/backend/internal/evidence"
 	"vault-of-evidence/backend/internal/finding"
 	"vault-of-evidence/backend/internal/middleware"
+	"vault-of-evidence/backend/internal/notification"
 	jwtpkg "vault-of-evidence/backend/internal/pkg/jwt"
 	"vault-of-evidence/backend/internal/project"
 	"vault-of-evidence/backend/internal/worklist"
@@ -62,6 +63,10 @@ func main() {
 	evidenceRepo := evidence.NewRepository(db)
 	evidenceSvc := evidence.NewService(evidenceRepo)
 	evidenceHandler := evidence.NewHandler(evidenceSvc, cfg.EvidenceStoragePath, cfg.MaxUploadSizeMB)
+
+	notificationRepo := notification.NewRepository(db)
+	notificationSvc := notification.NewService(notificationRepo)
+	notificationHandler := notification.NewHandler(notificationSvc)
 
 	authLimiter := middleware.NewRateLimiter(rate.Every(20*time.Second), 3)
 
@@ -131,10 +136,14 @@ func main() {
 			singleProject.DELETE("",
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.Delete)
-				
+
 			singleProject.POST("/members",
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.InviteMember)
+
+			singleProject.DELETE("/members/:user_id",
+				middleware.RequireProjectRole(db, "id", domain.RolePM),
+				projectHandler.RemoveMember)
 
 			worklistRoutes := singleProject.Group("/worklists")
 			{
@@ -157,7 +166,7 @@ func main() {
 				worklistRoutes.DELETE("/:worklist_id",
 					middleware.RequireProjectRole(db, "id", domain.RolePM),
 					worklistHandler.Delete)
-					
+
 				// Nested routes untuk finding di dalam sebuah worklist: /projects/:id/worklists/:worklist_id/findings
 				worklistFindingsRoutes := worklistRoutes.Group("/:worklist_id/findings")
 				{
@@ -180,7 +189,7 @@ func main() {
 					worklistFindingsRoutes.DELETE("/:finding_id",
 						middleware.RequireProjectRole(db, "id", domain.RolePM),
 						findingHandler.Delete)
-					
+
 					worklistEvidenceRoutes := worklistFindingsRoutes.Group("/:finding_id/evidence")
 					{
 						worklistEvidenceRoutes.GET("",
@@ -244,6 +253,15 @@ func main() {
 				}
 			}
 		}
+	}
+
+	notificationRoutes := api.Group("/notifications")
+	notificationRoutes.Use(authMw)
+	{
+		notificationRoutes.GET("", notificationHandler.GetAll)
+		notificationRoutes.PUT("/read-all", notificationHandler.MarkAllRead)
+		notificationRoutes.PUT("/:id/read", notificationHandler.MarkRead)
+		notificationRoutes.DELETE("/:id", notificationHandler.Delete)
 	}
 
 	addr := fmt.Sprintf(":%s", cfg.ServerPort)

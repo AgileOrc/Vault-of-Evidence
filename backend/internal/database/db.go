@@ -48,8 +48,9 @@ func AutoMigrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
 		&domain.User{},
 		&domain.Project{},
-		&domain.ProjectMember{},     // NEW
+		&domain.ProjectMember{},      // NEW
 		&domain.PasswordResetToken{}, // NEW
+		&domain.Notification{},
 		&domain.Worklist{},
 		&domain.Finding{},
 		&domain.Evidence{},
@@ -57,6 +58,28 @@ func AutoMigrate(db *gorm.DB) error {
 		return fmt.Errorf("automigrate: %w", err)
 	}
 
+	if err := alignProjectStatuses(db); err != nil {
+		return err
+	}
+
 	log.Println("[DB] Migration complete")
+	return nil
+}
+
+func alignProjectStatuses(db *gorm.DB) error {
+	statements := []string{
+		"ALTER TABLE projects DROP CONSTRAINT IF EXISTS chk_status",
+		"UPDATE projects SET status = 'upcoming' WHERE status = 'planning'",
+		"UPDATE projects SET status = 'completed' WHERE status = 'archived'",
+		"ALTER TABLE projects ALTER COLUMN status SET DEFAULT 'upcoming'",
+		"ALTER TABLE projects ADD CONSTRAINT chk_status CHECK (status IN ('active','paused','upcoming','completed'))",
+	}
+
+	for _, statement := range statements {
+		if err := db.Exec(statement).Error; err != nil {
+			return fmt.Errorf("project statuses: %w", err)
+		}
+	}
+
 	return nil
 }

@@ -19,6 +19,7 @@ type Service interface {
 	Update(id string, req *domain.UpdateProjectRequest) (*domain.Project, error)
 	Delete(id string) error
 	InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error
+	RemoveMember(projectID, userID uuid.UUID) error
 
 	// Fitur Dashboard
 	GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error)
@@ -33,7 +34,7 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 		Name:        req.Name,
 		Type:        req.Type,
 		Description: req.Description,
-		Status:      domain.StatusPlanning,
+		Status:      domain.StatusUpcoming,
 		StartDate:   req.StartDate,
 		EndDate:     req.EndDate,
 		CreatedByID: createdBy,
@@ -112,9 +113,9 @@ func (s *service) Delete(id string) error {
 }
 
 func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error {
-	user, err := s.repo.FindUserByUsername(req.Username)
+	user, err := s.repo.FindUserByUsernameOrEmail(req.Username)
 	if err != nil {
-		return errors.New("user with this username not found")
+		return errors.New("user with this username or email not found")
 	}
 
 	exists, err := s.repo.CheckMemberExists(projectID, user.ID)
@@ -125,13 +126,47 @@ func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMembe
 		return errors.New("user is already a member of this project")
 	}
 
+	project, err := s.repo.FindByID(projectID.String())
+	if err != nil || project == nil {
+		return ErrNotFound
+	}
+
+	inviter, err := s.repo.FindUserByID(pmID)
+	if err != nil {
+		return err
+	}
+
 	member := &domain.ProjectMember{
 		ProjectID:  projectID,
 		UserID:     user.ID,
 		Role:       req.Role,
 		AssignedBy: pmID,
 	}
-	return s.repo.AddMember(member)
+
+	notification := &domain.Notification{
+		UserID:      user.ID,
+		Type:        domain.NotificationInvitation,
+		Title:       fmt.Sprintf("You were added to %s", project.Name),
+		Message:     fmt.Sprintf("%s added you to %s as %s.", inviter.Username, project.Name, req.Role),
+		ProjectID:   &projectID,
+		ProjectName: project.Name,
+		Role:        req.Role,
+		InvitedByID: &pmID,
+		InvitedBy:   inviter.Username,
+	}
+
+	return s.repo.AddMemberWithNotification(member, notification)
+}
+
+func (s *service) RemoveMember(projectID, userID uuid.UUID) error {
+	exists, err := s.repo.CheckMemberExists(projectID, userID)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return ErrNotFound
+	}
+	return s.repo.RemoveMember(projectID, userID)
 }
 
 func (s *service) GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error) {
