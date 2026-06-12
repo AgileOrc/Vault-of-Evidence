@@ -79,7 +79,7 @@ func (h *Handler) Login(c *gin.Context) {
 
 	h.jwtManager.SetAuthCookie(c.Writer, token)
 
-	c.JSON(http.StatusOK, gin.H{"message": "login successful", "user": user.ToResponse()})
+	c.JSON(http.StatusOK, gin.H{"message": "login successful", "token": token, "user": user.ToResponse()})
 }
 
 func (h *Handler) Logout(c *gin.Context) {

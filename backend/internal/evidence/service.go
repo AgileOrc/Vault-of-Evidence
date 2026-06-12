@@ -47,8 +47,8 @@ type UploadInput struct {
 type Service interface {
 	Upload(input UploadInput) (*domain.Evidence, error)
 	GetByFinding(findingID string) ([]domain.Evidence, error)
-	GetByID(id string) (*domain.Evidence, error)
-	Delete(id string) error
+	GetByID(findingID, id string) (*domain.Evidence, error)
+	Delete(findingID, id string) error
 }
 
 type service struct{ repo Repository }
@@ -145,20 +145,20 @@ func (s *service) GetByFinding(findingID string) ([]domain.Evidence, error) {
 	return s.repo.FindByFindingID(findingID)
 }
 
-func (s *service) GetByID(id string) (*domain.Evidence, error) {
+func (s *service) GetByID(findingID, id string) (*domain.Evidence, error) {
 	ev, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
-	if ev == nil {
+	if ev == nil || ev.FindingID.String() != findingID {
 		return nil, ErrNotFound
 	}
 	return ev, nil
 }
 
-func (s *service) Delete(id string) error {
+func (s *service) Delete(findingID, id string) error {
 	ev, err := s.repo.FindByID(id)
-	if err != nil || ev == nil {
+	if err != nil || ev == nil || ev.FindingID.String() != findingID {
 		return ErrNotFound
 	}
 	// Hapus file dari disk dulu, baru hapus record DB

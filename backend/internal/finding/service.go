@@ -15,12 +15,9 @@ type Service interface {
 	Create(projectID string, req *domain.CreateFindingRequest) (*domain.Finding, error)
 	GetByProject(projectID string, params pagination.Params) ([]domain.Finding, int64, error)
 	GetByWorklist(worklistID string, params pagination.Params) ([]domain.Finding, int64, error)
-	GetByID(id string) (*domain.Finding, error)
-	
-	
-	Update(id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error)
-	
-	Delete(id string) error
+	GetByID(projectID, id string) (*domain.Finding, error)
+	Update(projectID, id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error)
+	Delete(projectID, id string) error
 }
 
 type service struct{ repo Repository }
@@ -61,20 +58,20 @@ func (s *service) GetByWorklist(worklistID string, params pagination.Params) ([]
 	return s.repo.FindByWorklistID(worklistID, params)
 }
 
-func (s *service) GetByID(id string) (*domain.Finding, error) {
+func (s *service) GetByID(projectID, id string) (*domain.Finding, error) {
 	f, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
 	}
-	if f == nil {
+	if f == nil || f.ProjectID.String() != projectID {
 		return nil, ErrNotFound
 	}
 	return f, nil
 }
 
-func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error) {
+func (s *service) Update(projectID, id string, req *domain.UpdateFindingRequest, role domain.ProjectRole) (*domain.Finding, error) {
 	f, err := s.repo.FindByID(id)
-	if err != nil || f == nil {
+	if err != nil || f == nil || f.ProjectID.String() != projectID {
 		return nil, ErrNotFound
 	}
 
@@ -131,9 +128,9 @@ func (s *service) Update(id string, req *domain.UpdateFindingRequest, role domai
 	return f, nil
 }
 
-func (s *service) Delete(id string) error {
+func (s *service) Delete(projectID, id string) error {
 	f, err := s.repo.FindByID(id)
-	if err != nil || f == nil {
+	if err != nil || f == nil || f.ProjectID.String() != projectID {
 		return ErrNotFound
 	}
 	return s.repo.Delete(id)
