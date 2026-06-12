@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import {
     AlertTriangle,
     ArrowUpRight,
@@ -11,7 +11,6 @@ import {
 import { Link, useOutletContext } from 'react-router-dom'
 import type { LayoutContext } from '../components/AppLayout'
 import { useUser } from '../context/UserContext'
-import { NewProjectModal } from '../components/PopUp'
 import api from '../api/axios'
 import { projectStatusBadge, projectStatusLabel } from '../utils/theme'
 
@@ -26,8 +25,8 @@ type FindingData = {
     id: string
     title: string
     severity: string
-    project?: string
-    worklist?: string
+    project_name?: string
+    worklist_name?: string
     status?: string
 }
 
@@ -66,21 +65,15 @@ function Dashboard () {
     const [loading, setLoading] = useState(true)
     const [data, setData] = useState<DashboardSummary | null>(null)
 
-    const [showNewProject, setShowNewProject] = useState(false)
-
-    const loadSummary = async () => {
-        try {
-            const res = await api.get('/projects/dashboard/summary')
-            setData(res.data)
-        } catch {
-            setData(null)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     useEffect(() => {
-        loadSummary()
+        api.get('/projects/dashboard/summary')
+            .then((res) => {
+                setData(res.data)
+                setLoading(false)
+            })
+            .catch(() => {
+                setLoading(false)
+            })
     }, [])
 
     const theme = isDark
@@ -128,14 +121,14 @@ function Dashboard () {
         <div className='space-y-8 md:space-y-12 xl:space-y-6'>
             <header className='flex flex-wrap gap-6 items-start justify-between'>
                 <div className='flex flex-col xl:gap-1'>
-                    <h1 className={`text-2xl xl:text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, {user.name}</h1>
+                    <h1 className={`text-2xl xl:text-3xl font-semibold font-montserrat ${theme.greetings}`}>Hello there, {user.username}</h1>
                     <p className={`text-sm md:text-md xl:text-lg opacity-80 font-montserrat ${theme.greetings}`}>Here is what is happening across your projects today.</p>
                 </div> 
-                <button
-                    onClick={() => setShowNewProject(true)}
+                <Link
+                    to='/projects'
                     className={`flex items-center gap-1 xl:gap-2 rounded-md md:rounded-lg px-3 xl:px-4 py-1.5 xl:py-2 text-sm md:text-md xl:text-lg font-semibold font-montserrat ${theme.buttonNewProject}`}>
                     <Plus className='h-4 w-4' /> New Project
-                </button>
+                </Link>
             </header>
             
             {/* Statistik Atas: Data Asli dari Backend */}
@@ -209,7 +202,7 @@ function Dashboard () {
                                 <div className='flex flex-col gap-1 md:gap-0 py-1 md:py-0'>
                                     <p className={`text-md md:text-ls font-montserrat font-semibold ${theme.titles}`}>{finding.title}</p>
                                     <p className={`text-xs md:text-sm opacity-80 font-medium font-montserrat ${theme.description}`}>
-                                        {finding.project || 'General'} - {finding.worklist || finding.status || 'Open'}
+                                        {finding.project_name || 'Unknown Project'}{finding.worklist_name ? ` - ${finding.worklist_name}` : ''}
                                     </p>
                                 </div>
                                 <span className={`rounded-full px-2 py-0.5 md:px-4 md:py-1 text-xs font-montserrat font-semibold capitalize ${severityClass(finding.severity)}`}>
@@ -223,16 +216,6 @@ function Dashboard () {
                 </div>
             </div>
             
-            <NewProjectModal
-                isOpen={showNewProject}
-                isDark={isDark}
-                onClose={() => setShowNewProject(false)}
-                onSubmit={async (projectData) => {
-                    await api.post('/projects', projectData)
-                    await loadSummary()
-                }}
-            />
-
         </div>
     )
 }

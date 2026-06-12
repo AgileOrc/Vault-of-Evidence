@@ -32,6 +32,7 @@ func (h *Handler) RegisterRoutes(rg *gin.RouterGroup, authMw gin.HandlerFunc) {
 	// Butuh login
 	rg.POST("/change-password", authMw, h.ChangePassword)
 	rg.GET("/me", authMw, h.GetMe)
+	rg.PUT("/me", authMw, h.UpdateMe)
 }
 
 func (h *Handler) Signup(c *gin.Context) {
@@ -111,6 +112,35 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 
 	h.jwtManager.ClearAuthCookie(c.Writer)
 	c.JSON(http.StatusOK, gin.H{"message": "password changed, please log in again"})
+}
+
+func (h *Handler) UpdateMe(c *gin.Context) {
+	userID, ok := middleware.GetUserID(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "authentication required"})
+		return
+	}
+
+	var req domain.UpdateProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := h.service.UpdateProfile(userID.String(), &req)
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrUsernameExists):
+			c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
+		case errors.Is(err, ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update profile"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, user.ToResponse())
 }
 
 func (h *Handler) GetMe(c *gin.Context) {

@@ -57,7 +57,7 @@ function CreateNewPassword(){
         try {
             const response = await api.post('/auth/createNewPassword', {
                 token: token,
-                password: password,
+                new_password: password,
             });
 
             if (response.status === 201 || response.status === 200) {

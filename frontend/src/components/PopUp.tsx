@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import {
     X,
@@ -134,7 +134,7 @@ function ModalFooter({
 }: {
     isDark: boolean
     onClose: () => void
-    onConfirm: () => void | Promise<void>
+    onConfirm: () => void
     confirmLabel: string
     confirmClass?: string
 }) {
@@ -172,25 +172,19 @@ type NewProjectModalProps = BaseModalProps & {
         type: string
         status: string
         description: string
-    }) => void | Promise<void>
+    }) => void
 }
 
 export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjectModalProps) {
     const [form, setForm] = useState({ name: '', type: '', status: 'upcoming', description: '' })
-    const [loading, setLoading] = useState(false)
 
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (!form.name.trim()) return
-        setLoading(true)
-        try {
-            await onSubmit(form)
-            setForm({ name: '', type: '', status: 'upcoming', description: '' })
-            onClose()
-        } finally {
-            setLoading(false)
-        }
+        onSubmit(form)
+        setForm({ name: '', type: '', status: 'upcoming', description: '' })
+        onClose()
     }
 
     return (
@@ -216,7 +210,7 @@ export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjec
                 />
             </div>
 
-            <ModalFooter isDark={isDark} onClose={onClose} onConfirm={handleSubmit} confirmLabel={loading ? 'Creating...' : 'Create Project'} />
+            <ModalFooter isDark={isDark} onClose={onClose} onConfirm={handleSubmit} confirmLabel="Create Project" />
         </PopUpBase>
     )
 }
@@ -283,9 +277,9 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
                 <div>
                     <Label isDark={isDark}>Status</Label>
                     <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
+                        <option className={optClass} value="upcoming">Upcoming</option>
                         <option className={optClass} value="active">Active</option>
                         <option className={optClass} value="paused">Paused</option>
-                        <option className={optClass} value="upcoming">Upcoming</option>
                         <option className={optClass} value="completed">Completed</option>
                     </Select>
                 </div>
@@ -307,34 +301,22 @@ type Member = { id: string; name: string; email: string; role: string }
 
 type ManageMembersModalProps = BaseModalProps & {
     members: Member[]
-    error?: string
-    onAddMember: (identifier: string, role: string) => void | Promise<void>
-    onRemoveMember: (id: string) => void | Promise<void>
+    onAddMember: (email: string, role: string) => void
+    onRemoveMember: (id: string) => void
 }
 
-export function ManageMembersModal({ isOpen, isDark, onClose, members, error, onAddMember, onRemoveMember }: ManageMembersModalProps) {
-    const [identifier, setIdentifier] = useState('')
-    const [role, setRole] = useState('pentester')
-    const [loading, setLoading] = useState(false)
+export function ManageMembersModal({ isOpen, isDark, onClose, members, onAddMember, onRemoveMember }: ManageMembersModalProps) {
+    const [email, setEmail] = useState('')
+    const [role, setRole] = useState('Pentester Member')
 
-    const handleAdd = async () => {
-        if (!identifier.trim()) return
-        setLoading(true)
-        try {
-            await onAddMember(identifier, role)
-            setIdentifier('')
-        } finally {
-            setLoading(false)
-        }
+    const handleAdd = () => {
+        if (!email.trim()) return
+        onAddMember(email, role)
+        setEmail('')
     }
 
     const optClass = isDark ? 'bg-[#0B2E46] text-white' : 'bg-white text-[#002C49]'
     const rowClass = isDark ? 'border-[#2BA7D6]/20' : 'border-[#27D6FF]/30'
-    const roleLabel = (value: string) => {
-        if (value === 'pm') return 'Project Manager'
-        if (value === 'dev') return 'Developer'
-        return 'Pentester'
-    }
 
     return (
         <PopUpBase isOpen={isOpen} isDark={isDark} onClose={onClose} title="Manage Members" maxWidth="max-w-xl">
@@ -343,28 +325,26 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, error, on
                 <Label isDark={isDark}>Add Member</Label>
                 <div className="flex flex-col md:flex-row gap-2">
                     <div className="flex-1 min-w-0">
-                        <Input isDark={isDark} placeholder="Username or email..." value={identifier} onChange={(e) => setIdentifier(e.target.value)} />
+                        <Input isDark={isDark} placeholder="Input email here..." value={email} onChange={(e) => setEmail(e.target.value)} />
                     </div>
                     <div className='flex gap-2'>
                         <div className="w-48 shrink-0">
                         <Select isDark={isDark} value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option className={optClass} value="pm">Project Manager</option>
-                            <option className={optClass} value="pentester">Pentester</option>
-                            <option className={optClass} value="dev">Developer</option>
+                            <option className={optClass} value="Project Manager">Project Manager</option>
+                            <option className={optClass} value="Pentester Member">Pentester Member</option>
+                            <option className={optClass} value="Developer">Developer</option>
                         </Select>
                         </div>
                         <button
                             onClick={handleAdd}
-                            disabled={loading}
                             className={`shrink-0 flex items-center px-3 py-2 rounded-xl text-sm font-semibold font-montserrat transition ${
                                 isDark ? 'bg-[#41B0EC] text-white hover:bg-[#27D6FF]' : 'bg-[#1767AA] text-white hover:bg-[#41B0EC]'
-                            } ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                            }`}
                         >
                             <Plus size={16} />
                         </button>
                     </div>
                 </div>
-                {error && <p className="mt-2 text-sm font-montserrat text-red-400">{error}</p>}
             </div>
 
             {/* Member list */}
@@ -382,7 +362,7 @@ export function ManageMembersModal({ isOpen, isDark, onClose, members, error, on
                         <div className="flex items-center gap-3">
                             <span className={`text-xs font-semibold font-montserrat px-2 py-0.5 rounded-full ${
                                 isDark ? 'bg-[#2BA7D6]/20 text-[#41B0EC]' : 'bg-[#27D6FF]/20 text-[#1767AA]'
-                            }`}>{roleLabel(m.role)}</span>
+                            }`}>{m.role}</span>
                             <button
                                 onClick={() => onRemoveMember(m.id)}
                                 className="text-red-400 hover:text-red-500 transition"
@@ -417,18 +397,9 @@ type DeleteProjectModalProps = BaseModalProps & {
 
 export function DeleteProjectModal({ isOpen, isDark, onClose, projectName, onConfirm }: DeleteProjectModalProps) {
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
-
     const handleConfirm = async () => {
         setLoading(true)
-        setError('')
-        try {
-            await onConfirm()
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Failed to delete project')
-        } finally {
-            setLoading(false)
-        }
+        try { await onConfirm() } finally { setLoading(false) }
     }
 
     return (
@@ -444,11 +415,6 @@ export function DeleteProjectModal({ isOpen, isDark, onClose, projectName, onCon
                 <p className="text-sm opacity-60 font-montserrat">
                     This will permanently remove the project, all worklists, and all findings. This action cannot be undone.
                 </p>
-                {error && (
-                    <p className="text-sm font-semibold font-montserrat text-red-400">
-                        {error}
-                    </p>
-                )}
             </div>
 
             <ModalFooter

@@ -145,7 +145,7 @@ function Sidebar ({
               </div>
               {!isCollapsed && (
                 <div className='overflow-hidden truncate'>
-                  <p className='text-xs xl:text-[1.1rem] font-semibold truncate'>{user.name}</p>
+                  <p className='text-xs xl:text-[1.1rem] font-semibold truncate'>{user.username}</p>
                   <p className={`text-[0.5rem] xl:text-xs truncate ${isActive ? 'text-[#1767AA]/80' : 'opacity-80'}`}>
                     {user.email}
                   </p>
