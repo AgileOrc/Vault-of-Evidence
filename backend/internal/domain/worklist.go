@@ -24,7 +24,7 @@ type Worklist struct {
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 
-	Findings []Finding `gorm:"foreignKey:WorklistID"                          json:"findings,omitempty"`
+	Findings []Finding `gorm:"foreignKey:WorklistID;constraint:OnDelete:CASCADE;" json:"findings,omitempty"`
 }
 
 type CreateWorklistRequest struct {

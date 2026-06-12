@@ -130,6 +130,10 @@ func main() {
 			singleProject.DELETE("",
 				middleware.RequireProjectRole(db, "id", domain.RolePM),
 				projectHandler.Delete)
+				
+			singleProject.POST("/members",
+				middleware.RequireProjectRole(db, "id", domain.RolePM),
+				projectHandler.InviteMember)
 
 			worklistRoutes := singleProject.Group("/worklists")
 			{
@@ -156,9 +160,25 @@ func main() {
 				// Nested routes untuk finding di dalam sebuah worklist: /projects/:id/worklists/:worklist_id/findings
 				worklistFindingsRoutes := worklistRoutes.Group("/:worklist_id/findings")
 				{
-					// Di sini, auth & role middleware diwariskan dari group worklistRoutes/singleProject
-					worklistFindingsRoutes.Use(middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester))
-					findingHandler.RegisterWorklistRoutes(worklistFindingsRoutes)
+					worklistFindingsRoutes.GET("",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+						findingHandler.GetByWorklist)
+
+					worklistFindingsRoutes.POST("",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
+						findingHandler.Create)
+
+					worklistFindingsRoutes.GET("/:finding_id",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+						findingHandler.GetByID)
+
+					worklistFindingsRoutes.PUT("/:finding_id",
+						middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RoleDev, domain.RolePentester),
+						findingHandler.Update)
+
+					worklistFindingsRoutes.DELETE("/:finding_id",
+						middleware.RequireProjectRole(db, "id", domain.RolePM),
+						findingHandler.Delete)
 					
 					worklistEvidenceRoutes := worklistFindingsRoutes.Group("/:finding_id/evidence")
 					{
@@ -192,7 +212,7 @@ func main() {
 					findingHandler.GetByID)
 
 				findingRoutes.POST("",
-					middleware.RequireProjectRole(db, "id", domain.RolePM),
+					middleware.RequireProjectRole(db, "id", domain.RolePM, domain.RolePentester),
 					findingHandler.Create)
 
 				findingRoutes.PUT("/:finding_id",

@@ -10,7 +10,7 @@ import (
 
 type Repository interface {
 	Create(project *domain.Project) error
-	FindAll(params pagination.Params) ([]domain.Project, int64, error)
+	FindAll(params pagination.Params, userID uuid.UUID) ([]domain.Project, int64, error)
 	FindByID(id string) (*domain.Project, error)
 	Update(project *domain.Project) error
 	Delete(id string) error
@@ -32,11 +32,15 @@ func (r *repository) Create(project *domain.Project) error {
 	return r.db.Create(project).Error
 }
 
-func (r *repository) FindAll(params pagination.Params) ([]domain.Project, int64, error) {
+func (r *repository) FindAll(params pagination.Params, userID uuid.UUID) ([]domain.Project, int64, error) {
 	var projects []domain.Project
 	var total int64
 
-	if err := r.db.Model(&domain.Project{}).Count(&total).Error; err != nil {
+	query := r.db.Model(&domain.Project{}).
+		Joins("JOIN project_members ON project_members.project_id = projects.id").
+		Where("project_members.user_id = ?", userID)
+
+	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 

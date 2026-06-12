@@ -114,6 +114,11 @@ func (m *Manager) ValidateToken(token string) (*Claims, error) {
 }
 
 func (m *Manager) SetAuthCookie(w http.ResponseWriter, token string) {
+	sameSite := http.SameSiteLaxMode
+	if m.secureCookie {
+		sameSite = http.SameSiteNoneMode
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     CookieName,
 		Value:    token,
@@ -121,11 +126,16 @@ func (m *Manager) SetAuthCookie(w http.ResponseWriter, token string) {
 		MaxAge:   int(m.expiry.Seconds()),
 		HttpOnly: true,
 		Secure:   m.secureCookie,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: sameSite,
 	})
 }
 
 func (m *Manager) ClearAuthCookie(w http.ResponseWriter) {
+	sameSite := http.SameSiteLaxMode
+	if m.secureCookie {
+		sameSite = http.SameSiteNoneMode
+	}
+
 	http.SetCookie(w, &http.Cookie{
 		Name:     CookieName,
 		Value:    "",
@@ -133,7 +143,7 @@ func (m *Manager) ClearAuthCookie(w http.ResponseWriter) {
 		MaxAge:   -1,
 		HttpOnly: true,
 		Secure:   m.secureCookie,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: sameSite,
 	})
 }
 

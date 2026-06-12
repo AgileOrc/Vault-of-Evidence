@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import {
     X,
     // Trash2,
@@ -586,8 +587,14 @@ function calcCVSS(m: CvssMetrics): number {
     const get = (key: keyof CvssMetrics) =>
         CVSS_OPTIONS[key].options.find((o) => o.val === m[key])?.score ?? 0
 
-    const AV = get('AV'), AC = get('AC'), PR = get('PR'), UI = get('UI')
+    const AV = get('AV'), AC = get('AC'), UI = get('UI')
     const S = m.S === 'C', C = get('C'), I = get('I'), A = get('A')
+    
+    let PR = get('PR')
+    if (S) {
+        if (m.PR === 'L') PR = 0.68
+        if (m.PR === 'H') PR = 0.50
+    }
 
     const ISCBase = 1 - (1 - C) * (1 - I) * (1 - A)
     const ISS = S ? 7.52 * (ISCBase - 0.029) - 3.25 * Math.pow(ISCBase - 0.02, 15) : 6.42 * ISCBase
@@ -624,18 +631,45 @@ export function CvssCalculatorModal({ isOpen, isDark, onClose, onApply }: CvssCa
                 : isDark ? 'border-[#2BA7D6]/40 text-[#41B0EC] hover:bg-[#2BA7D6]/20' : 'border-[#1767AA]/30 text-[#1767AA] hover:bg-[#27D6FF]/20'
         }`
 
+    const getVal = (v: string, map: Record<string, number>) => map[v] ?? 0
+    const chartData = [
+        { metric: 'AV', full: 'Attack Vector', value: getVal(m.AV, { P: 0, L: 33, A: 66, N: 100 }) },
+        { metric: 'AC', full: 'Attack Complexity', value: getVal(m.AC, { L: 0, H: 100 }) },
+        { metric: 'PR', full: 'Privileges Required', value: getVal(m.PR, { N: 0, L: 50, H: 100 }) },
+        { metric: 'UI', full: 'User Interaction', value: getVal(m.UI, { N: 0, R: 100 }) },
+        { metric: 'S', full: 'Scope', value: getVal(m.S, { U: 0, C: 100 }) },
+        { metric: 'C', full: 'Confidentiality', value: getVal(m.C, { N: 0, L: 50, H: 100 }) },
+        { metric: 'I', full: 'Integrity', value: getVal(m.I, { N: 0, L: 50, H: 100 }) },
+        { metric: 'A', full: 'Availability', value: getVal(m.A, { N: 0, L: 50, H: 100 }) },
+    ]
+
     return (
         <PopUpBase isOpen={isOpen} isDark={isDark} onClose={onClose} title="CVSS v3.1 Calculator" maxWidth="max-w-2xl">
             {/* Score display */}
-            <div className={`flex items-center justify-between rounded-xl px-5 py-4 ${isDark ? 'bg-[#0B2E46]' : 'bg-[#F0FAFF]'}`}>
-                <div>
+            <div className={`flex flex-col sm:flex-row items-center gap-6 rounded-xl px-5 py-4 ${isDark ? 'bg-[#0B2E46]' : 'bg-[#F0FAFF]'}`}>
+                <div className="flex-1 w-full text-center sm:text-left">
                     <p className="text-xs font-semibold font-montserrat opacity-60 uppercase tracking-wider">Base Score</p>
-                    <p className={`text-4xl font-bold font-montserrat ${color}`}>{score.toFixed(1)}</p>
+                    <p className={`text-5xl font-bold font-montserrat ${color}`}>{score.toFixed(1)}</p>
                     <p className={`text-sm font-semibold font-montserrat ${color}`}>{label}</p>
+                    <div className="mt-4">
+                        <p className="text-xs opacity-60 font-montserrat mb-1">Vector String</p>
+                        <p className={`text-xs font-mono break-all max-w-xs mx-auto sm:mx-0 ${isDark ? 'text-[#41B0EC]' : 'text-[#1767AA]'}`}>{vector}</p>
+                    </div>
                 </div>
-                <div className="text-right">
-                    <p className="text-xs opacity-60 font-montserrat mb-1">Vector String</p>
-                    <p className={`text-xs font-mono break-all max-w-xs ${isDark ? 'text-[#41B0EC]' : 'text-[#1767AA]'}`}>{vector}</p>
+                <div className="w-full sm:w-64 h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                            <PolarGrid stroke={isDark ? '#2BA7D640' : '#1767AA40'} />
+                            <PolarAngleAxis dataKey="metric" tick={{ fill: isDark ? '#41B0EC' : '#1767AA', fontSize: 10, fontWeight: 600, fontFamily: 'Montserrat' }} />
+                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                            <Tooltip 
+                                contentStyle={{ backgroundColor: isDark ? '#002C49' : '#FFFFFF', borderColor: isDark ? '#41B0EC' : '#1767AA', borderRadius: '8px' }}
+                                itemStyle={{ color: isDark ? '#F5F5F5' : '#002C49', fontWeight: 600, fontFamily: 'Montserrat', fontSize: 12 }}
+                                formatter={(val, _name, props) => [`Score: ${val}%`, props.payload.full]}
+                            />
+                            <Radar name="CVSS Metric" dataKey="value" stroke={isDark ? '#41B0EC' : '#1767AA'} fill={isDark ? '#41B0EC' : '#1767AA'} fillOpacity={0.4} />
+                        </RadarChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
 

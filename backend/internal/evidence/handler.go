@@ -69,7 +69,7 @@ func (h *Handler) GetByFinding(c *gin.Context) {
 func (h *Handler) Download(c *gin.Context) {
 	// Path file di-resolve dari DB — BUKAN dari user input.
 	// Path traversal tidak mungkin karena tidak ada string user yang masuk ke filepath.
-	ev, err := h.service.GetByID(c.Param("evidence_id"))
+	ev, err := h.service.GetByID(c.Param("finding_id"), c.Param("evidence_id"))
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "evidence not found"})
@@ -87,7 +87,7 @@ func (h *Handler) Download(c *gin.Context) {
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	if err := h.service.Delete(c.Param("evidence_id")); err != nil {
+	if err := h.service.Delete(c.Param("finding_id"), c.Param("evidence_id")); err != nil {
 		if errors.Is(err, ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "evidence not found"})
 			return
