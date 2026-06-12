@@ -89,7 +89,6 @@ func (r *repository) GetDashboardSummary(userID uuid.UUID) (map[string]interface
 	var activeProjects int64
 	var criticalHighCount int64
 	var recentProjects []domain.Project
-	var recentFindings []domain.Finding
 
 	r.db.Table("projects").
 		Joins("JOIN project_members ON project_members.project_id = projects.id").
@@ -104,20 +103,30 @@ func (r *repository) GetDashboardSummary(userID uuid.UUID) (map[string]interface
 		Where("project_members.user_id = ?", userID).
 		Order("projects.created_at DESC").Limit(5).Find(&recentProjects)
 
-	r.db.Table("findings").Select("findings.*").
+	type DashboardFinding struct {
+		domain.Finding
+		ProjectName  string `json:"project_name"`
+		WorklistName string `json:"worklist_name"`
+	}
+	var dashboardFindings []DashboardFinding
+
+	r.db.Table("findings").
+		Select("findings.*, projects.name as project_name, COALESCE(worklists.name, '') as worklist_name").
 		Joins("JOIN project_members ON project_members.project_id = findings.project_id").
+		Joins("JOIN projects ON projects.id = findings.project_id").
+		Joins("LEFT JOIN worklists ON worklists.id = findings.worklist_id").
 		Where("project_members.user_id = ?", userID).
-		Order("findings.created_at DESC").Limit(5).Find(&recentFindings)
+		Order("findings.created_at DESC").Limit(5).Find(&dashboardFindings)
 
 	r.db.Table("findings").
 		Joins("JOIN project_members ON project_members.project_id = findings.project_id").
-		Where("project_members.user_id = ? AND findings.status = ? AND findings.severity IN (?, ?)", userID, "open", "Critical", "High").Count(&criticalHighCount)
+		Where("project_members.user_id = ? AND findings.status = ? AND findings.severity IN (?, ?)", userID, "open", "critical", "high").Count(&criticalHighCount)
 
 	return map[string]interface{}{
 		"totalProjects":     totalProjects,
 		"activeProjects":    activeProjects,
 		"criticalHighCount": criticalHighCount,
 		"recentProjects":    recentProjects,
-		"recentFindings":    recentFindings,
+		"recentFindings":    dashboardFindings,
 	}, nil
 }

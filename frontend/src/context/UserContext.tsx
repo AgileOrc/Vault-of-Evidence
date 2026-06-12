@@ -2,8 +2,11 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import api from '../api/axios'
 
 type User = {
-  name: string
+  username: string
   email: string
+  nickname: string
+  address: string
+  contactNumber: string
 }
 
 type UserContextType = {
@@ -13,33 +16,47 @@ type UserContextType = {
   setUser: (user: User) => void
   setIsLoggedIn: (val: boolean) => void
   refreshUser: () => Promise<void>
+  logout: () => Promise<void>
 }
 
 const UserContext = createContext<UserContextType>({
-  user: { name: 'User', email: '' },
+  user: { username: 'User', email: '', nickname: '', address: '', contactNumber: '' },
   isLoggedIn: false,
   isLoading: true,
   setUser: () => {},
   setIsLoggedIn: () => {},
   refreshUser: async () => {},
+  logout: async () => {},
 })
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>({ name: 'User', email: 'mail@mail.com' })
+  const [user, setUser] = useState<User>({ username: 'User', email: '', nickname: '', address: '', contactNumber: '' })
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   const refreshUser = async () => {
     try {
       const res = await api.get('/auth/me')
-      setUser({ name: res.data.name, email: res.data.email })
+      setUser({
+        username: res.data.username,
+        email: res.data.email,
+        nickname: res.data.nickname || '',
+        address: res.data.address || '',
+        contactNumber: res.data.contact_number || '',
+      })
       setIsLoggedIn(true)
     } catch {
-      // SET FALSE KALAU UDAH DEPLOYING
       setIsLoggedIn(false)
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const logout = async () => {
+    try { await api.post('/auth/logout') } catch { /* ignore */ }
+    localStorage.removeItem('voe_token')
+    setIsLoggedIn(false)
+    setUser({ username: 'User', email: '', nickname: '', address: '', contactNumber: '' })
   }
 
   useEffect(() => {
@@ -47,7 +64,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, isLoggedIn, isLoading, setUser, setIsLoggedIn, refreshUser }}>
+    <UserContext.Provider value={{ user, isLoggedIn, isLoading, setUser, setIsLoggedIn, refreshUser, logout }}>
       {children}
     </UserContext.Provider>
   )

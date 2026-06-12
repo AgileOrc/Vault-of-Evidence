@@ -111,7 +111,7 @@ function Findings () {
         if (status === 'confirmed')       return 'bg-[#1767AA] text-[#F5F5F5]'
         if (status === 'fixing')          return 'bg-[#1767AA] text-[#27D6FF]'
         if (status === 'fixed')           return 'bg-[#002C49] text-[#DCF3F8]'
-        if (status === 'closed on notes') return 'bg-[#00375C] text-[#22BBDE]'
+        if (status === 'closed_on_notes') return 'bg-[#00375C] text-[#22BBDE]'
         return 'text-[#1767AA] border border-[#1767AA]'
     }
 
