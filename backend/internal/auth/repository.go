@@ -13,6 +13,7 @@ type Repository interface {
 	FindByEmail(email string) (*domain.User, error)
 	FindByID(id string) (*domain.User, error)
 	UpdatePasswordHash(userID, hash string) error
+	UpdateUser(user *domain.User) error
 	EmailExists(email string) bool
 	UsernameExists(username string) bool
 
@@ -59,6 +60,10 @@ func (r *repository) FindByID(id string) (*domain.User, error) {
 
 func (r *repository) UpdatePasswordHash(userID, hash string) error {
 	return r.db.Model(&domain.User{}).Where("id = ?", userID).Update("password_hash", hash).Error
+}
+
+func (r *repository) UpdateUser(user *domain.User) error {
+	return r.db.Save(user).Error
 }
 
 func (r *repository) EmailExists(email string) bool {

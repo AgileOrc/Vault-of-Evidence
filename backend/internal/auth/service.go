@@ -26,7 +26,8 @@ type Service interface {
 	Login(req *domain.LoginRequest) (*domain.User, error)
 	ChangePassword(userID, currentPw, newPw string) error
 	GetUserByID(id string) (*domain.User, error)
-	
+	UpdateProfile(userID string, req *domain.UpdateProfileRequest) (*domain.User, error)
+
 	// Tambahan Fitur Logika Bisnis Reset Password
 	ForgotPassword(req *domain.ForgotPasswordRequest) (string, error)
 	ResetPassword(req *domain.ResetPasswordRequest) error
@@ -95,6 +96,34 @@ func (s *service) ChangePassword(userID, currentPw, newPw string) error {
 
 func (s *service) GetUserByID(id string) (*domain.User, error) {
 	return s.repo.FindByID(id)
+}
+
+func (s *service) UpdateProfile(userID string, req *domain.UpdateProfileRequest) (*domain.User, error) {
+	user, err := s.repo.FindByID(userID)
+	if err != nil || user == nil {
+		return nil, ErrUserNotFound
+	}
+
+	if req.Username != "" && req.Username != user.Username {
+		if s.repo.UsernameExists(req.Username) {
+			return nil, ErrUsernameExists
+		}
+		user.Username = req.Username
+	}
+	if req.Nickname != "" {
+		user.Nickname = req.Nickname
+	}
+	if req.Address != "" {
+		user.Address = req.Address
+	}
+	if req.ContactNumber != "" {
+		user.ContactNumber = req.ContactNumber
+	}
+
+	if err := s.repo.UpdateUser(user); err != nil {
+		return nil, fmt.Errorf("auth.service: update profile: %w", err)
+	}
+	return user, nil
 }
 
 // Tahap 1: Generate Token Aman dan Catat ke Console Terminal

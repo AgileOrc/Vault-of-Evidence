@@ -7,12 +7,15 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
-	Username     string    `gorm:"type:varchar(50);uniqueIndex;not null"          json:"username"`
-	Email        string    `gorm:"type:varchar(255);uniqueIndex;not null"         json:"email"`
-	PasswordHash string    `gorm:"type:text;not null"                             json:"-"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID            uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	Username      string    `gorm:"type:varchar(50);uniqueIndex;not null"          json:"username"`
+	Email         string    `gorm:"type:varchar(255);uniqueIndex;not null"         json:"email"`
+	PasswordHash  string    `gorm:"type:text;not null"                             json:"-"`
+	Nickname      string    `gorm:"type:varchar(100)"                              json:"nickname"`
+	Address       string    `gorm:"type:varchar(255)"                              json:"address"`
+	ContactNumber string    `gorm:"type:varchar(50)"                               json:"contact_number"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 // ── Request DTOs ──────────────────────────────────────────────────────────────
@@ -36,17 +39,30 @@ type ChangePasswordRequest struct {
 // ── Response DTO ──────────────────────────────────────────────────────────────
 
 type UserResponse struct {
-	ID        uuid.UUID `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
+	ID            uuid.UUID `json:"id"`
+	Username      string    `json:"username"`
+	Email         string    `json:"email"`
+	Nickname      string    `json:"nickname"`
+	Address       string    `json:"address"`
+	ContactNumber string    `json:"contact_number"`
+	CreatedAt     time.Time `json:"created_at"`
 }
 
 func (u *User) ToResponse() UserResponse {
 	return UserResponse{
-		ID:        u.ID,
-		Username:  u.Username,
-		Email:     u.Email,
-		CreatedAt: u.CreatedAt,
+		ID:            u.ID,
+		Username:      u.Username,
+		Email:         u.Email,
+		Nickname:      u.Nickname,
+		Address:       u.Address,
+		ContactNumber: u.ContactNumber,
+		CreatedAt:     u.CreatedAt,
 	}
+}
+
+type UpdateProfileRequest struct {
+	Username      string `json:"username"       binding:"omitempty,min=3,max=50,alphanum"`
+	Nickname      string `json:"nickname"       binding:"omitempty,max=100"`
+	Address       string `json:"address"        binding:"omitempty,max=255"`
+	ContactNumber string `json:"contact_number" binding:"omitempty,max=50"`
 }

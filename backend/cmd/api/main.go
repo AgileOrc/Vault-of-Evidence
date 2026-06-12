@@ -107,6 +107,7 @@ func main() {
 		authRoutes.POST("/logout", authHandler.Logout)
 		authRoutes.POST("/change-password", authMw, authHandler.ChangePassword)
 		authRoutes.GET("/me", authMw, authHandler.GetMe)
+		authRoutes.PUT("/me", authMw, authHandler.UpdateMe)
 	}
 
 	projectRoutes := api.Group("/projects")

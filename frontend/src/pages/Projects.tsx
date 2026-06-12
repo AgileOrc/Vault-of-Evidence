@@ -107,7 +107,7 @@ function Projects () {
                         { value: 'all',       label: 'All Status' },
                         { value: 'active',    label: 'Active'     },
                         { value: 'paused',    label: 'Paused'     },
-                        { value: 'planning',  label: 'Upcoming'   },
+                        { value: 'upcoming',  label: 'Upcoming'   },
                         { value: 'completed', label: 'Completed'  },
                     ]}
                     isDark={isDark}

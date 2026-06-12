@@ -261,7 +261,7 @@ function Worklist () {
                             name: data.name,
                             type: data.type,
                             description: data.description,
-                            status: data.status ?? 'planning'
+                            status: data.status ?? 'upcoming'
                         }
                         await api.put(`/projects/${projectId}`, payload)
                         const res = await api.get(`/projects/${projectId}`)
