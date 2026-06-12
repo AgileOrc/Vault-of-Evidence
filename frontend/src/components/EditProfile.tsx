@@ -69,6 +69,11 @@ function EditProfile({ isOpen, isDark, onClose, currentData, onSaveSuccess }: Ed
           setIsLoading(false)
           return
         }
+        if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/.test(newPassword)) {
+          setPasswordError('New password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &).')
+          setIsLoading(false)
+          return
+        }
         await api.post('/auth/change-password', {
           current_password: currentPassword,
           new_password: newPassword,
