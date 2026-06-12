@@ -176,7 +176,7 @@ type NewProjectModalProps = BaseModalProps & {
 }
 
 export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjectModalProps) {
-    const [form, setForm] = useState({ name: '', type: '', status: 'planning', description: '' })
+    const [form, setForm] = useState({ name: '', type: '', status: 'upcoming', description: '' })
     const [loading, setLoading] = useState(false)
 
     const set = (key: string, val: string) => setForm((p) => ({ ...p, [key]: val }))
@@ -186,7 +186,7 @@ export function NewProjectModal({ isOpen, isDark, onClose, onSubmit }: NewProjec
         setLoading(true)
         try {
             await onSubmit(form)
-            setForm({ name: '', type: '', status: 'planning', description: '' })
+            setForm({ name: '', type: '', status: 'upcoming', description: '' })
             onClose()
         } finally {
             setLoading(false)
@@ -243,7 +243,7 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
     const [form, setForm] = useState({
         name: project?.name ?? '',
         type: project?.type ?? '',
-        status: project?.status ?? 'planning',
+        status: project?.status ?? 'upcoming',
         description: project?.description ?? '',
     })
 
@@ -252,7 +252,7 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
         if (project) setForm({
             name: project.name ?? '',
             type: project.type ?? '',
-            status: project.status ?? 'planning',
+            status: project.status ?? 'upcoming',
             description: project.description ?? '',
         })
     }, [project])
@@ -284,9 +284,9 @@ export function EditProjectModal({ isOpen, isDark, onClose, project, onSubmit }:
                     <Label isDark={isDark}>Status</Label>
                     <Select isDark={isDark} value={form.status} onChange={(e) => set('status', e.target.value)}>
                         <option className={optClass} value="active">Active</option>
-                        <option className={optClass} value="planning">Planning</option>
+                        <option className={optClass} value="paused">Paused</option>
+                        <option className={optClass} value="upcoming">Upcoming</option>
                         <option className={optClass} value="completed">Completed</option>
-                        <option className={optClass} value="archived">Archived</option>
                     </Select>
                 </div>
             </div>

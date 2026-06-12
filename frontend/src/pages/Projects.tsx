@@ -106,9 +106,9 @@ function Projects () {
                     options={[
                         { value: 'all',       label: 'All Status' },
                         { value: 'active',    label: 'Active'     },
-                        { value: 'planning',  label: 'Planning'   },
+                        { value: 'paused',    label: 'Paused'     },
+                        { value: 'upcoming',  label: 'Upcoming'   },
                         { value: 'completed', label: 'Completed'  },
-                        { value: 'archived',  label: 'Archived'   },
                     ]}
                     isDark={isDark}
                     className='xl:w-42'
