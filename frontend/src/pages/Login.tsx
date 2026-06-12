@@ -52,7 +52,9 @@ function Login() {
             const response = await api.post('/auth/login', { email, password });
 
             if (response.status === 200) {
-                // Refresh user context lalu arahkan ke Dashboard
+                if (response.data?.token) {
+                    localStorage.setItem('voe_token', response.data.token)
+                }
                 await refreshUser();
                 navigate('/Dashboard');
             }

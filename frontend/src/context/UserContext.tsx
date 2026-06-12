@@ -13,6 +13,7 @@ type UserContextType = {
   setUser: (user: User) => void
   setIsLoggedIn: (val: boolean) => void
   refreshUser: () => Promise<void>
+  logout: () => Promise<void>
 }
 
 const UserContext = createContext<UserContextType>({
@@ -22,6 +23,7 @@ const UserContext = createContext<UserContextType>({
   setUser: () => {},
   setIsLoggedIn: () => {},
   refreshUser: async () => {},
+  logout: async () => {},
 })
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
@@ -42,12 +44,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const logout = async () => {
+    try { await api.post('/auth/logout') } catch { /* ignore */ }
+    localStorage.removeItem('voe_token')
+    setIsLoggedIn(false)
+    setUser({ name: 'User', email: '' })
+  }
+
   useEffect(() => {
     refreshUser()
   }, [])
 
   return (
-    <UserContext.Provider value={{ user, isLoggedIn, isLoading, setUser, setIsLoggedIn, refreshUser }}>
+    <UserContext.Provider value={{ user, isLoggedIn, isLoading, setUser, setIsLoggedIn, refreshUser, logout }}>
       {children}
     </UserContext.Provider>
   )

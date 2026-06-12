@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,6 +18,13 @@ const (
 func AuthRequired(jwtManager *jwtpkg.Manager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr, err := jwtpkg.ExtractFromCookie(c.Request)
+		if err != nil {
+			// fallback: Authorization: Bearer <token>
+			if h := c.GetHeader("Authorization"); strings.HasPrefix(h, "Bearer ") {
+				tokenStr = strings.TrimPrefix(h, "Bearer ")
+				err = nil
+			}
+		}
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "authentication required"})
 			return
