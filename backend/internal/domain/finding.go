@@ -18,11 +18,11 @@ const (
 )
 
 const (
-	FindingStatusOpen      FindingStatus = "open"
-	FindingStatusConfirmed FindingStatus = "confirmed"
-	FindingStatusFixing    FindingStatus = "fixing"
-	FindingStatusFixed     FindingStatus = "fixed"
-	FindingStatusClosed    FindingStatus = "closed"
+	FindingStatusOpen           FindingStatus = "open"
+	FindingStatusConfirmed      FindingStatus = "confirmed"
+	FindingStatusFixing         FindingStatus = "fixing"
+	FindingStatusFixed          FindingStatus = "fixed"
+	FindingStatusClosedOnNotes  FindingStatus = "closed_on_notes"
 )
 
 type Finding struct {
@@ -35,7 +35,7 @@ type Finding struct {
 	Status            FindingStatus `gorm:"type:varchar(20);not null;default:'open'"       json:"status"`
 	Notes             string        `gorm:"type:text"                                      json:"notes"`
 	CVSSScore         float64       `gorm:"type:decimal(4,1);default:0.0"                  json:"cvss_score"`
-	CVSSVector        string        `gorm:"type:varchar(100)"                              json:"cvss_vector"`
+	CVSSVector        string        `gorm:"type:varchar(255)"                              json:"cvss_vector"`
 	WSTGCode          string        `gorm:"type:varchar(100)"                              json:"wstg_code"`
 	Contributor       string        `gorm:"type:varchar(255)"                              json:"contributor"`
 	AffectedEndpoints string        `gorm:"type:text"                                      json:"affected_endpoints"`
@@ -65,10 +65,10 @@ type UpdateFindingRequest struct {
 	Title             string        `json:"title"              binding:"omitempty,min=3,max=255"`
 	Description       string        `json:"description"        binding:"omitempty"`
 	Severity          Severity      `json:"severity"           binding:"omitempty,oneof=critical high medium low informational"`
-	Status            FindingStatus `json:"status"             binding:"omitempty,oneof=open confirmed fixing fixed closed"`
+	Status            FindingStatus `json:"status"             binding:"omitempty,oneof=open confirmed fixing fixed closed_on_notes"`
 	Notes             string        `json:"notes"              binding:"omitempty"`
 	CVSSScore         float64       `json:"cvss_score"         binding:"omitempty,min=0,max=10"`
-	CVSSVector        string        `json:"cvss_vector"        binding:"omitempty,max=100"`
+	CVSSVector        string        `json:"cvss_vector"`
 	WSTGCode          string        `json:"wstg_code"`
 	AffectedEndpoints string        `json:"affected_endpoints"`
 	ReproductionSteps string        `json:"reproduction_steps"`
