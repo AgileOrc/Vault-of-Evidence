@@ -41,34 +41,39 @@ function EditProfile({ isOpen, isDark, onClose, currentData, onSaveSuccess }: Ed
     e.preventDefault()
     setPasswordError('')
     setProfileError('')
-    setIsLoading(true)
 
+    if (!currentPassword) {
+      setProfileError('Current password is required to save changes.')
+      return
+    }
+
+    // Validate new password fields if user wants to change password
+    if (newPassword || confirmPassword) {
+      if (newPassword !== confirmPassword) {
+        setPasswordError('New passwords do not match.')
+        return
+      }
+      if (newPassword.length < 12) {
+        setPasswordError('New password must be at least 12 characters.')
+        return
+      }
+      if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/.test(newPassword)) {
+        setPasswordError('New password must contain letters, numbers, and symbols (@, $, !, %, *, ?, &).')
+        return
+      }
+    }
+
+    setIsLoading(true)
     try {
-      // Update profile data ke backend
       await api.put('/auth/me', {
+        current_password: currentPassword,
         username: profile.fullName,
         nickname: profile.nickname,
         address: profile.address,
         contact_number: profile.contactNumber,
       })
 
-      // Kalau ada input password, kirim ke backend
-      if (newPassword || currentPassword) {
-        if (!currentPassword) {
-          setPasswordError('Current password is required to change password.')
-          setIsLoading(false)
-          return
-        }
-        if (newPassword !== confirmPassword) {
-          setPasswordError('New passwords do not match.')
-          setIsLoading(false)
-          return
-        }
-        if (newPassword.length < 12) {
-          setPasswordError('New password must be at least 12 characters.')
-          setIsLoading(false)
-          return
-        }
+      if (newPassword) {
         await api.post('/auth/change-password', {
           current_password: currentPassword,
           new_password: newPassword,
@@ -136,6 +141,7 @@ function EditProfile({ isOpen, isDark, onClose, currentData, onSaveSuccess }: Ed
               <p className='text-xs sm:text-sm opacity-80 mt-0.5'>Update your profile account details.</p>
             </div>
 
+            {/* Profile fields */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5'>
               <div className='space-y-1.5'>
                 <label className={`text-xs sm:text-sm block ${theme.inputLabel}`}>Full Name</label>
@@ -145,37 +151,40 @@ function EditProfile({ isOpen, isDark, onClose, currentData, onSaveSuccess }: Ed
                 <label className={`text-xs sm:text-sm block ${theme.inputLabel}`}>Nickname</label>
                 <input type='text' name='nickname' value={profile.nickname} onChange={handleChange} className={`w-full rounded-xl px-4 py-2 sm:py-2.5 text-sm outline-none transition-all ${theme.inputBox}`} />
               </div>
-
               <div className='space-y-1.5 md:col-span-2'>
                 <label className={`text-xs sm:text-sm block ${theme.inputLabel}`}>Address</label>
                 <input type='text' name='address' value={profile.address} onChange={handleChange} className={`w-full rounded-xl px-4 py-2 sm:py-2.5 text-sm outline-none transition-all ${theme.inputBox}`} />
               </div>
-
               <div className='space-y-1.5 md:col-span-2'>
                 <label className={`text-xs sm:text-sm block ${theme.inputLabel}`}>Contact Number</label>
                 <input type='text' name='contactNumber' value={profile.contactNumber} onChange={handleChange} className={`w-full rounded-xl px-4 py-2 sm:py-2.5 text-sm outline-none transition-all ${theme.inputBox}`} />
               </div>
             </div>
 
-            {profileError && (
-              <p className='text-xs text-red-400 font-montserrat'>{profileError}</p>
-            )}
+            {/* Confirm identity — always required */}
+            <div className='border-t border-[#27D6FF]/20 pt-5 space-y-2'>
+              <p className={`text-xs sm:text-sm font-semibold ${theme.titles}`}>
+                Confirm Identity <span className='text-red-400'>*</span>
+              </p>
+              <p className='text-xs opacity-60'>Enter your current password to save any changes.</p>
+              <input
+                type='password'
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder='Current password'
+                className={`w-full rounded-xl px-4 py-2 sm:py-2.5 text-sm outline-none transition-all ${theme.inputBox}`}
+              />
+              {profileError && (
+                <p className='text-xs text-red-400 font-montserrat'>{profileError}</p>
+              )}
+            </div>
 
-            {/* Password section */}
+            {/* Change password — optional */}
             <div className='border-t border-[#27D6FF]/20 pt-5 space-y-4'>
-              <p className={`text-xs sm:text-sm font-semibold ${theme.titles}`}>Change Password <span className='opacity-50 font-normal'>(leave blank to keep current)</span></p>
-
+              <p className={`text-xs sm:text-sm font-semibold ${theme.titles}`}>
+                Change Password <span className='opacity-50 font-normal'>(optional — leave blank to keep current)</span>
+              </p>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5'>
-                <div className='space-y-1.5 md:col-span-2'>
-                  <label className={`text-xs sm:text-sm block ${theme.inputLabel}`}>Current Password</label>
-                  <input
-                    type='password'
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder='Enter current password'
-                    className={`w-full rounded-xl px-4 py-2 sm:py-2.5 text-sm outline-none transition-all ${theme.inputBox}`}
-                  />
-                </div>
                 <div className='space-y-1.5'>
                   <label className={`text-xs sm:text-sm block ${theme.inputLabel}`}>New Password</label>
                   <input
@@ -197,7 +206,6 @@ function EditProfile({ isOpen, isDark, onClose, currentData, onSaveSuccess }: Ed
                   />
                 </div>
               </div>
-
               {passwordError && (
                 <p className='text-xs text-red-400 font-montserrat'>{passwordError}</p>
               )}

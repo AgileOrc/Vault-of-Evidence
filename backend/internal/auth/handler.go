@@ -130,6 +130,8 @@ func (h *Handler) UpdateMe(c *gin.Context) {
 	user, err := h.service.UpdateProfile(userID.String(), &req)
 	if err != nil {
 		switch {
+		case errors.Is(err, ErrInvalidCreds):
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "current password is incorrect"})
 		case errors.Is(err, ErrUsernameExists):
 			c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
 		case errors.Is(err, ErrUserNotFound):

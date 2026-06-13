@@ -104,6 +104,10 @@ func (s *service) UpdateProfile(userID string, req *domain.UpdateProfileRequest)
 		return nil, ErrUserNotFound
 	}
 
+	if err := password.Verify(req.CurrentPassword, user.PasswordHash); err != nil {
+		return nil, ErrInvalidCreds
+	}
+
 	if req.Username != "" && req.Username != user.Username {
 		if s.repo.UsernameExists(req.Username) {
 			return nil, ErrUsernameExists

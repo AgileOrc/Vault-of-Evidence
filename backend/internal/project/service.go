@@ -33,7 +33,7 @@ func (s *service) Create(req *domain.CreateProjectRequest, createdBy uuid.UUID) 
 		Name:        req.Name,
 		Type:        req.Type,
 		Description: req.Description,
-		Status:      domain.StatusPlanning,
+		Status:      domain.StatusUpcoming,
 		StartDate:   req.StartDate,
 		EndDate:     req.EndDate,
 		CreatedByID: createdBy,

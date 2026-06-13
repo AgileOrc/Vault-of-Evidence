@@ -61,8 +61,9 @@ func (u *User) ToResponse() UserResponse {
 }
 
 type UpdateProfileRequest struct {
-	Username      string `json:"username"       binding:"omitempty,min=3,max=50,alphanum"`
-	Nickname      string `json:"nickname"       binding:"omitempty,max=100"`
-	Address       string `json:"address"        binding:"omitempty,max=255"`
-	ContactNumber string `json:"contact_number" binding:"omitempty,max=50"`
+	CurrentPassword string `json:"current_password" binding:"required"`
+	Username        string `json:"username"         binding:"omitempty,min=3,max=50,alphanum"`
+	Nickname        string `json:"nickname"         binding:"omitempty,max=100"`
+	Address         string `json:"address"          binding:"omitempty,max=255"`
+	ContactNumber   string `json:"contact_number"   binding:"omitempty,max=50"`
 }
