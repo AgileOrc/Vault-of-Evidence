@@ -48,11 +48,12 @@ func AutoMigrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
 		&domain.User{},
 		&domain.Project{},
-		&domain.ProjectMember{},     // NEW
-		&domain.PasswordResetToken{}, // NEW
+		&domain.ProjectMember{},
+		&domain.PasswordResetToken{},
 		&domain.Worklist{},
 		&domain.Finding{},
 		&domain.Evidence{},
+		&domain.Notification{},
 	); err != nil {
 		return fmt.Errorf("automigrate: %w", err)
 	}

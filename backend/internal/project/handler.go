@@ -11,9 +11,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type Handler struct{ service Service }
+type NotificationService interface {
+	CreateInvite(targetUserID, projectID, inviterID uuid.UUID, projectName, inviterName, role string) error
+	HasPendingInvite(projectID, userID uuid.UUID) (bool, error)
+}
 
-func NewHandler(service Service) *Handler { return &Handler{service: service} }
+type Handler struct {
+	service  Service
+	notifSvc NotificationService
+}
+
+func NewHandler(service Service, notifSvc NotificationService) *Handler {
+	return &Handler{service: service, notifSvc: notifSvc}
+}
 
 func (h *Handler) RegisterRoutes(rg *gin.RouterGroup) {
 	rg.GET("", h.GetAll)
@@ -128,7 +138,8 @@ func (h *Handler) InviteMember(c *gin.Context) {
 	}
 	pmID := pmIDVal.(uuid.UUID)
 
-	if err := h.service.InviteMember(projectID, pmID, req); err != nil {
+	targetUser, err := h.service.InviteMember(projectID, pmID, req)
+	if err != nil {
 		if err.Error() == "user with this username not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
@@ -141,8 +152,28 @@ func (h *Handler) InviteMember(c *gin.Context) {
 		return
 	}
 
+	hasPending, err := h.notifSvc.HasPendingInvite(projectID, targetUser.ID)
+	if err == nil && hasPending {
+		c.JSON(http.StatusConflict, gin.H{"error": "user already has a pending invitation to this project"})
+		return
+	}
+
+	p, err := h.service.GetByID(projectIDStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch project info"})
+		return
+	}
+
+	inviterName, _ := c.Get(middleware.CtxUsername)
+	inviterNameStr, _ := inviterName.(string)
+
+	if err := h.notifSvc.CreateInvite(targetUser.ID, projectID, pmID, p.Name, inviterNameStr, string(req.Role)); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to send invitation"})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message":  "Member successfully invited to the project",
+		"message":  "Invitation sent",
 		"username": req.Username,
 		"role":     req.Role,
 	})

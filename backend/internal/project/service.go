@@ -18,7 +18,7 @@ type Service interface {
 	GetByID(id string) (*domain.Project, error)
 	Update(id string, req *domain.UpdateProjectRequest) (*domain.Project, error)
 	Delete(id string) error
-	InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error
+	InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) (*domain.User, error)
 
 	// Fitur Dashboard
 	GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error)
@@ -111,27 +111,21 @@ func (s *service) Delete(id string) error {
 	return s.repo.Delete(id)
 }
 
-func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) error {
+func (s *service) InviteMember(projectID, pmID uuid.UUID, req domain.InviteMemberRequest) (*domain.User, error) {
 	user, err := s.repo.FindUserByUsername(req.Username)
 	if err != nil {
-		return errors.New("user with this username not found")
+		return nil, errors.New("user with this username not found")
 	}
 
 	exists, err := s.repo.CheckMemberExists(projectID, user.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if exists {
-		return errors.New("user is already a member of this project")
+		return nil, errors.New("user is already a member of this project")
 	}
 
-	member := &domain.ProjectMember{
-		ProjectID:  projectID,
-		UserID:     user.ID,
-		Role:       req.Role,
-		AssignedBy: pmID,
-	}
-	return s.repo.AddMember(member)
+	return user, nil
 }
 
 func (s *service) GetDashboardSummary(userID uuid.UUID) (map[string]interface{}, error) {

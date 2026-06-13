@@ -9,6 +9,7 @@ type SidebarProps = {
   onToggleTheme: () => void
   onOpenSettings: () => void
   onOpenNotifications: () => void
+  unreadCount?: number
 }
 
 function Sidebar ({
@@ -16,7 +17,8 @@ function Sidebar ({
   isCollapsed,
   onToggleTheme,
   onOpenSettings,
-  onOpenNotifications
+  onOpenNotifications,
+  unreadCount = 0,
 }: SidebarProps) {
   const { user } = useUser()
   const navItemBase = `flex items-center gap-2 xl:gap-3 rounded-md xl:rounded-lg px-1 py-2 xl:px-3 xl:py-3 text-[0.8rem] xl:text-[1.1rem] font-semibold transition ${
@@ -80,11 +82,18 @@ function Sidebar ({
         <button
           type='button'
           onClick={onOpenNotifications}
-          className={`flex gap-1 xl:gap-2 text-[0.8rem] xl:text-[1.1rem] rounded-lg px-1 xl:px-3 py-3 font-semibold transition ${
+          className={`relative flex gap-1 xl:gap-2 text-[0.8rem] xl:text-[1.1rem] rounded-lg px-1 xl:px-3 py-3 font-semibold transition ${
             isCollapsed ? 'justify-center' : ''
           } text-white hover:bg-[#F5F5F5]/30`}
         >
-          <Bell className='h-4 xl:h-6' />
+          <span className='relative'>
+            <Bell className='h-4 xl:h-6' />
+            {unreadCount > 0 && (
+              <span className='absolute -top-1 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[0.5rem] font-bold text-white'>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </span>
           {!isCollapsed && <span>Notifications</span>}
         </button>
 
